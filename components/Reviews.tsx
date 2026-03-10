@@ -45,7 +45,7 @@ export const Reviews: React.FC = () => {
         </div>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 items-stretch">
           {reviews.map((review, i) => (
             <motion.div 
               key={i} 
@@ -54,7 +54,7 @@ export const Reviews: React.FC = () => {
               viewport={{ once: true, margin: "-10%" }}
               transition={{ delay: i * 0.1, duration: 0.8 }}
               // GLASS CARD STYLE
-              className="flex flex-col group p-6 rounded-3xl backdrop-blur-md bg-white/40 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] transition-all duration-500 hover:-translate-y-2"
+              className="flex h-full flex-col group p-6 rounded-3xl backdrop-blur-md bg-white/40 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] transition-all duration-500 hover:-translate-y-2"
             >
               {/* Video Container */}
               <div className="w-full aspect-[4/3] relative overflow-hidden mb-6 rounded-2xl bg-white/50">
@@ -71,7 +71,7 @@ export const Reviews: React.FC = () => {
               </div>
 
               {/* Content */}
-              <div className="text-center md:text-left">
+              <div className="flex flex-1 flex-col text-center md:text-left">
                 <div className="flex flex-col md:flex-row md:items-baseline md:justify-between mb-4 border-b border-brand-black/10 pb-4">
                     <h3 className="font-serif font-bold text-xl uppercase text-brand-black">{review.name}</h3>
                     <span className="font-sans text-[9px] uppercase tracking-widest text-gray-500 mt-1 md:mt-0">{review.role}</span>

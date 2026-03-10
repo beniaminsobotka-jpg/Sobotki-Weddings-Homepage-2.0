@@ -2,6 +2,19 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Play, Camera } from 'lucide-react';
 
+const cardContentVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: 0.32 + index * 0.08,
+      duration: 0.55,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  })
+};
+
 export const VideoSection: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -60,16 +73,23 @@ export const VideoSection: React.FC = () => {
 
             {/* 3. LIQUID GLASS TEXT CARD (Overlapping) */}
             <motion.div 
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 72, scale: 0.94, filter: "blur(18px)" }}
+                whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
                 viewport={{ once: true, margin: "-10%" }}
-                transition={{ duration: 0.8, delay: 0.2 }}
+                transition={{ duration: 1.05, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
                 className="lg:absolute lg:bottom-12 lg:right-12 w-[90%] lg:w-[450px] -mt-12 lg:mt-0 z-20"
             >
                 <div className="liquid-glass liquid-glass-interactive rounded-3xl p-8 md:p-12 backdrop-blur-xl border border-white/60">
                     
                     {/* Badge */}
-                    <div className="flex justify-between items-start mb-8">
+                    <motion.div
+                        custom={0}
+                        variants={cardContentVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-10%" }}
+                        className="flex justify-between items-start mb-8"
+                    >
                         <div className="flex items-center gap-4">
                              {/* Pstryk */}
                              <div className="flex items-center gap-2">
@@ -89,19 +109,40 @@ export const VideoSection: React.FC = () => {
                                 <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-brand-black/60">Rec</span>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
 
-                    <h3 className="font-serif font-black text-4xl md:text-5xl uppercase leading-[0.9] text-brand-black mb-6">
+                    <motion.h3
+                        custom={1}
+                        variants={cardContentVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-10%" }}
+                        className="font-serif font-black text-4xl md:text-5xl uppercase leading-[0.9] text-brand-black mb-6"
+                    >
                         Foto +<br/>Video
-                    </h3>
+                    </motion.h3>
                     
-                    <p className="font-sans text-brand-black/70 text-sm leading-relaxed mb-6">
+                    <motion.p
+                        custom={2}
+                        variants={cardContentVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-10%" }}
+                        className="font-sans text-brand-black/70 text-sm leading-relaxed mb-6"
+                    >
                         Nie interesują nas sztywne pozy. Szukamy ruchu, wiatru we włosach i nieoczywistych kadrów. Tworzymy przestrzeń, w której możecie być sobą, łącząc reporterską uważność z filmową estetyką.
-                    </p>
+                    </motion.p>
 
-                    <p className="font-sans text-brand-black/70 text-sm leading-relaxed mb-0">
+                    <motion.p
+                        custom={3}
+                        variants={cardContentVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-10%" }}
+                        className="font-sans text-brand-black/70 text-sm leading-relaxed mb-0"
+                    >
                         Jesteśmy duetem foto+video. Dzięki temu zyskujecie spójną estetykę pomiędzy zdjęciami i filmem, doskonałą komunikację w dniu ślubu i pełniejsze uchwycenie emocji bez chaosu organizacyjnego. Zyskujecie komfort, że wszystko jest dopracowane przez zespół, który działa jak jeden organizm.
-                    </p>
+                    </motion.p>
 
                 </div>
             </motion.div>

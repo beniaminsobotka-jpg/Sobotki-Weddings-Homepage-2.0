@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Grid } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const films = [
   {
@@ -34,6 +35,7 @@ const films = [
 ];
 
 export const Portfolio: React.FC = () => {
+  const navigate = useNavigate();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
@@ -85,10 +87,10 @@ export const Portfolio: React.FC = () => {
                         <AnimatePresence>
                             {hoveredIndex === index && (
                                 <motion.div 
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.5 }}
+                                    initial={{ opacity: 0, y: 18, scale: 1.03 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 1.01 }}
+                                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                                     className="absolute inset-0 z-10 pointer-events-none overflow-hidden"
                                 >
                                     <iframe 
@@ -98,11 +100,18 @@ export const Portfolio: React.FC = () => {
                                             marginLeft: `-${(film.videoScale - 1) * 50}%`, 
                                             marginTop: `-${(film.videoScale - 1) * 50}%` 
                                         }}
-                                        className="object-cover pointer-events-none opacity-100 max-w-none"
+                                        className="object-cover pointer-events-none max-w-none"
                                         src={`https://www.youtube.com/embed/${film.id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${film.id}${film.startAt ? `&start=${film.startAt}` : ''}`} 
                                         title={film.title}
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                                     ></iframe>
+                                    <motion.div
+                                        initial={{ opacity: 0.24 }}
+                                        animate={{ opacity: 0 }}
+                                        exit={{ opacity: 0.18 }}
+                                        transition={{ duration: 0.45, ease: "easeOut" }}
+                                        className="absolute inset-0 bg-black/20"
+                                    />
                                 </motion.div>
                             )}
                         </AnimatePresence>
