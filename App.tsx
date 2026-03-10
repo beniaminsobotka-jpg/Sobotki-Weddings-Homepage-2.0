@@ -12,6 +12,8 @@ import { LiquidBackground } from './components/LiquidBackground';
 import { Home } from './pages/Home';
 import { PortfolioPage } from './pages/PortfolioPage';
 import { PortraitsPage } from './pages/PortraitsPage';
+import { PortraitsEventPage } from './pages/PortraitsEventPage';
+import { PortraitsWeddingPage } from './pages/PortraitsWeddingPage';
 
 // ScrollToTop component to reset scroll on route change
 const ScrollToTop = () => {
@@ -76,6 +78,8 @@ const App: React.FC = () => {
                     <Route path="/home" element={<Home />} />
                     <Route path="/portfolio" element={<PortfolioPage />} />
                     <Route path="/portraits" element={<PortraitsPage />} />
+                    <Route path="/portraits/event" element={<PortraitsEventPage />} />
+                    <Route path="/portraits/wedding" element={<PortraitsWeddingPage />} />
                  </Routes>
               </main>
               <Footer />

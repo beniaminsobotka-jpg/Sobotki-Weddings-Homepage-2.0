@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowUpRight, MapPin, Calendar, Briefcase } from 'lucide-react';
-import { LiquidBackground } from '../components/LiquidBackground';
+import { useNavigate } from 'react-router-dom';
 
 // --- DATA ---
 const portraitsData = Array.from({ length: 9 }, (_, i) => ({
@@ -13,6 +13,7 @@ const portraitsData = Array.from({ length: 9 }, (_, i) => ({
 
 export const PortraitsPage: React.FC = () => {
   const [selectedindex, setSelectedIndex] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   // --- LIGHTBOX LOGIC ---
   const openLightbox = (index: number) => setSelectedIndex(index);
@@ -350,14 +351,14 @@ export const PortraitsPage: React.FC = () => {
                              </div>
                              
                              {/* Click Area Link */}
-                             <a 
-                                href="#kontakt" 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    document.getElementById('kontakt')?.scrollIntoView({ behavior: 'smooth' });
+                             <button
+                                onClick={() => {
+                                    navigate('/portraits/wedding');
+                                    window.scrollTo(0, 0);
                                 }}
                                 className="absolute inset-0 z-20"
-                             ></a>
+                                aria-label="Przejdz do Fotostacji Slubnej"
+                             ></button>
                         </div>
 
                         {/* CARD 2: EVENT */}
@@ -393,14 +394,14 @@ export const PortraitsPage: React.FC = () => {
                              </div>
 
                              {/* Click Area Link */}
-                             <a 
-                                href="#kontakt" 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    document.getElementById('kontakt')?.scrollIntoView({ behavior: 'smooth' });
+                             <button
+                                onClick={() => {
+                                    navigate('/portraits/event');
+                                    window.scrollTo(0, 0);
                                 }}
                                 className="absolute inset-0 z-20"
-                             ></a>
+                                aria-label="Przejdz do Fotostacji Eventowej"
+                             ></button>
                         </div>
 
                         {/* CARD 3: STUDIO */}

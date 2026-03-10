@@ -17,6 +17,7 @@ export const Navbar: React.FC = () => {
   const { scrollY } = useScroll();
   const location = useLocation();
   const navigate = useNavigate();
+  const isPortraitsRoute = location.pathname.startsWith('/portraits');
 
   // Handle Navigation with Paths and Hashes
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -84,7 +85,7 @@ export const Navbar: React.FC = () => {
     }
 
     // PORTRAITS PAGE LOGIC (Now at /portraits) - Always Dark
-    if (location.pathname === '/portraits') {
+    if (isPortraitsRoute) {
         setIsDark(true);
         return;
     }
@@ -95,14 +96,14 @@ export const Navbar: React.FC = () => {
 
   // Reset dark mode immediately on route change
   useEffect(() => {
-    if (location.pathname === '/portraits') {
+    if (isPortraitsRoute) {
         setIsDark(true);
     } else if (location.pathname === '/home' || location.pathname === '/') {
         setIsDark(true); // Start dark on Home (Hero)
     } else {
         setIsDark(false); // Portfolio etc.
     }
-  }, [location]);
+  }, [isPortraitsRoute, location]);
 
   return (
     <>
