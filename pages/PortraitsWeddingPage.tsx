@@ -121,17 +121,27 @@ export const PortraitsWeddingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-brand-paper pt-32 text-brand-black selection:bg-brand-black selection:text-white">
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.07] bg-[radial-gradient(circle_at_top_left,rgba(212,188,125,0.22),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(196,36,36,0.08),transparent_20%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.04] mix-blend-soft-light bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+    <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
       <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-24 px-4 pb-24 md:px-8 md:pb-32">
-        <section className="overflow-hidden rounded-[40px] bg-[#090909] text-[#F3F2ED] shadow-[0_32px_90px_rgba(0,0,0,0.24)]">
-          <div className="grid gap-10 px-6 py-8 md:px-10 md:py-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:px-14 lg:py-14">
-            <div className="max-w-3xl">
-              <div className="mb-8 inline-flex items-center gap-3 rounded-full bg-white/6 px-4 py-2 backdrop-blur-md">
-                <Star size={12} className="fill-[#d42929] text-[#d42929]" />
-                <span className="font-sans text-[10px] uppercase tracking-[0.26em] text-white/68">
+        
+        {/* HERO SECTION */}
+        <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
+          <img
+            src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/NataliaxMateusz_Fotostacja_-123.avif"
+            alt="Fotostacja ślubna hero"
+            className="absolute inset-0 h-full w-full object-cover filter grayscale contrast-110 opacity-70"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent" />
+          <div className="relative grid min-h-[84vh] gap-12 px-6 py-10 md:px-10 md:py-14 lg:grid-cols-[1fr_1fr] lg:items-end lg:px-14 lg:py-16">
+            
+            {/* Left side - Title and Text */}
+            <div className="max-w-3xl flex flex-col justify-end pt-20 lg:pt-32">
+              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-md self-start">
+                <Star size={12} className="fill-white text-white" />
+                <span className="font-sans text-[10px] uppercase tracking-[0.26em] text-white/80">
                   Sobotki Portraits / Fotostacja Ślubna
                 </span>
               </div>
@@ -140,76 +150,59 @@ export const PortraitsWeddingPage: React.FC = () => {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="font-serif text-5xl font-[1000] uppercase leading-[0.88] tracking-tight text-white md:text-7xl lg:text-[6rem]"
+                className="font-serif text-6xl font-black uppercase leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem] flex flex-col items-start"
               >
-                Czarno-białe
-                <span className="ml-3 font-playfair-italic font-normal normal-case text-[#d4bc7d]">
-                  portrety
+                <span>Portrety</span>
+                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-3 md:-mt-6 lg:-mt-8">
+                  na weselu
                 </span>
-                <br />
-                na weselu
               </motion.h1>
 
-              <p className="mt-8 max-w-2xl font-sans text-sm leading-8 text-white/68 md:text-base">
+              <p className="mt-6 max-w-xl font-sans text-sm leading-8 text-gray-400 md:text-base">
                 To prawdziwa studyjna sesja portretowa z profesjonalnym fotografem na Waszym przyjęciu.
                 Rozmawiamy z gośćmi, prowadzimy ich przez kadry i oddajemy pamiątkę, która wygląda jak
                 fragment eleganckiego editorialu, a nie losowa atrakcja weselna.
               </p>
+            </div>
 
-              <div className="mt-10 flex flex-wrap gap-4">
+            {/* Right side - Buttons */}
+            <div className="flex flex-col lg:items-end justify-end pb-2 lg:pb-0 gap-4">
+              <div className="flex flex-wrap lg:flex-nowrap gap-4 justify-end">
                 <button
                   onClick={() => document.getElementById('wedding-offer-form')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group inline-flex items-center gap-3 rounded-full bg-[#d42929] px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#bb2020]"
+                  className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-200 whitespace-nowrap"
                 >
                   Otrzymaj ofertę
                   <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </button>
 
                 <button
-                  onClick={() => navigate('/portraits')}
-                  className="rounded-full bg-white/8 px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white/72 transition-all duration-300 hover:bg-white/12 hover:text-white"
+                  onClick={() => {
+                      navigate('/portraits');
+                      window.scrollTo(0,0);
+                  }}
+                  className="rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5 whitespace-nowrap"
                 >
-                  Wróć do wyboru doświadczeń
+                  Wszystkie usługi
                 </button>
               </div>
             </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.15 }}
-              className="relative overflow-hidden rounded-[34px] bg-[#111] shadow-[0_28px_70px_rgba(0,0,0,0.38)]"
-            >
-              <img
-                src="https://sobotkiweddings.pl/wp-content/uploads/2024/11/Kamila-x-Konrad_-6-1024x683.webp"
-                alt="Fotostacja ślubna"
-                className="aspect-[4/3] w-full object-cover grayscale"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                <div className="rounded-[28px] bg-black/45 p-5 backdrop-blur-xl">
-                  <p className="font-playfair-italic text-xl text-white/92 md:text-2xl">
-                    Fotostacja to pamiątkowe zdjęcia z klasą, edytowane na żywo i wywoływane na miejscu
-                    w formacie 10×15.
-                  </p>
-                </div>
-              </div>
-            </motion.div>
           </div>
         </section>
 
-        <section className="grid gap-8 rounded-[40px] bg-[#0d0d0d] px-6 py-12 text-white shadow-[0_24px_60px_rgba(0,0,0,0.16)] lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
-          <div className="rounded-[34px] bg-white/[0.04] p-8 md:p-10">
-            <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-white/38">
+        {/* CZYM JEST FOTOSTACJA */}
+        <section className="grid gap-8 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
+          <div className="rounded-[24px] border border-white/10 bg-black/40 p-8 md:p-10">
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
               Czym jest fotostacja portretowa?
             </span>
-            <h2 className="mt-5 font-serif text-3xl uppercase leading-none text-white md:text-5xl">
+            <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Prawdziwe mini studio
-              <span className="ml-2 font-playfair-italic font-normal normal-case text-[#d42929]">
+              <span className="ml-2 font-playfair-italic lowercase text-[#d42929]">
                 wśród gości
               </span>
             </h2>
-            <div className="mt-8 space-y-5 font-sans text-sm leading-8 text-white/68 md:text-base">
+            <div className="mt-8 space-y-5 font-sans text-sm md:text-base leading-relaxed text-gray-400">
               <p>
                 To prawdziwa studyjna sesja portretowa z profesjonalnym fotografem na Waszym przyjęciu.
                 Angażujemy się w rozmowy z gośćmi, uczymy ich pozowania i sprawiamy, że wracają do domu
@@ -256,63 +249,67 @@ export const PortraitsWeddingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-10%' }}
                 transition={{ duration: 0.6, delay: index * 0.08 }}
-                className="rounded-[28px] bg-[#151515] p-6 text-white shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+                className="rounded-[24px] border border-white/5 bg-[#0a0a0a] p-6 text-white"
               >
-                <item.icon size={20} className="text-[#d42929]" />
-                <h3 className="mt-6 font-serif text-2xl">{item.title}</h3>
-                <p className="mt-3 font-sans text-sm leading-7 text-white/60">{item.text}</p>
+                <div className="p-3 bg-white/5 inline-block rounded-full mb-4">
+                   <item.icon size={20} className="text-white" />
+                </div>
+                <h3 className="font-serif text-2xl mb-2">{item.title}</h3>
+                <p className="font-sans text-sm leading-relaxed text-gray-400">{item.text}</p>
               </motion.div>
             ))}
           </div>
         </section>
 
-        <section className="grid gap-10 rounded-[40px] bg-[#0d0d0d] px-6 py-12 text-white shadow-[0_24px_60px_rgba(0,0,0,0.16)] lg:grid-cols-[0.9fr_1.1fr] lg:items-center md:px-10 md:py-14">
+        {/* FOTOBUDKA VS FOTOSTACJA */}
+        <section className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] lg:items-center md:px-10 md:py-14">
           <div>
-            <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-[#d42929]">
+            <span className="font-sans text-[10px] uppercase font-bold tracking-[0.4em] text-gray-500">
               Fotobudka vs Fotostacja
             </span>
-            <h2 className="mt-5 font-serif text-3xl uppercase leading-[0.95] text-white md:text-5xl">
+            <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Podobna obietnica,
-              <span className="ml-2 font-playfair-italic font-normal normal-case text-white/55">
+              <br/>
+              <span className="font-playfair-italic lowercase text-[#d42929]">
                 zupełnie inny efekt
               </span>
             </h2>
-            <p className="mt-6 max-w-xl font-sans text-sm leading-8 text-white/65 md:text-base">
+            <p className="mt-6 max-w-xl font-sans text-sm md:text-base leading-relaxed text-gray-400">
               Na pierwszy rzut oka obie usługi mają natychmiastowy wydruk. W praktyce to dwa różne
               światy: jeden robi szybki gadżet, drugi buduje wspomnienie z klasą.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-[30px] bg-white/[0.05] p-7 shadow-[0_18px_40px_rgba(0,0,0,0.12)]">
+            <div className="rounded-[24px] border border-white/5 bg-[#0a0a0a] p-7">
               <div className="mb-6 inline-flex items-center gap-3">
-                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#341616]">
+                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5">
                   <X size={14} className="text-[#d42929]" />
                 </div>
-                <h3 className="font-serif text-3xl uppercase text-white/42">Fotobudka</h3>
+                <h3 className="font-serif text-2xl text-gray-500">Fotobudka</h3>
               </div>
               <div className="space-y-4">
                 {comparisonPhotobooth.map((item) => (
-                  <div key={item} className="flex items-start gap-3 text-white/56">
-                    <X size={14} className="mt-1 shrink-0 text-[#d42929]" />
-                    <p className="font-sans text-sm leading-7">{item}</p>
+                  <div key={item} className="flex items-start gap-3 text-gray-400">
+                    <X size={14} className="mt-1 shrink-0 text-gray-600" />
+                    <p className="font-sans text-sm leading-relaxed">{item}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-[30px] bg-[#121212] p-7 text-white shadow-[0_24px_60px_rgba(0,0,0,0.2)]">
+            <div className="rounded-[24px] border border-white/10 bg-black/40 p-7 shadow-2xl">
               <div className="mb-6 inline-flex items-center gap-3">
                 <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#d42929]">
                   <Check size={14} className="text-white" />
                 </div>
-                <h3 className="font-serif text-3xl text-white">Fotostacja</h3>
+                <h3 className="font-serif text-2xl text-white">Fotostacja</h3>
               </div>
               <div className="space-y-4">
                 {comparisonPortraits.map((item) => (
-                  <div key={item} className="flex items-start gap-3 text-white/82">
-                    <Check size={14} className="mt-1 shrink-0 text-[#d4bc7d]" />
-                    <p className="font-sans text-sm leading-7">{item}</p>
+                  <div key={item} className="flex items-start gap-3 text-gray-300">
+                    <Check size={14} className="mt-1 shrink-0 text-[#d42929]" />
+                    <p className="font-sans text-sm leading-relaxed">{item}</p>
                   </div>
                 ))}
               </div>
@@ -320,12 +317,14 @@ export const PortraitsWeddingPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-[40px] bg-[#0c0c0c] px-6 py-12 text-white shadow-[0_28px_70px_rgba(0,0,0,0.18)] md:px-10 md:py-14">
+        {/* GALERIA */}
+        <section className="overflow-hidden rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl md:px-10 md:py-14">
           <div className="mb-12 max-w-2xl">
-            <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-white/38">Galeria</span>
-            <h2 className="mt-5 font-serif text-3xl uppercase leading-none text-white md:text-5xl">
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">Galeria</span>
+            <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Kadry, które mają
-              <span className="ml-2 font-playfair-italic font-normal normal-case text-[#d4bc7d]">
+              <br/>
+              <span className="font-playfair-italic lowercase text-[#d42929]">
                 zostać z Wami
               </span>
             </h2>
@@ -341,7 +340,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-10%' }}
                     transition={{ duration: 0.6, delay: imageIndex * 0.06 }}
-                    className="overflow-hidden rounded-[24px] bg-[#151515]"
+                    className="overflow-hidden rounded-[24px] bg-[#050505] border border-white/5"
                   >
                     <img
                       src={src}
@@ -355,69 +354,110 @@ export const PortraitsWeddingPage: React.FC = () => {
           </div>
         </section>
 
+        {/* PAKIETY I WYCENA - FULL WIDTH IMAGE WITH LIQUID GLASS PANEL AND ANIMATION */}
+        <section className="relative rounded-[30px] border border-white/5 shadow-2xl overflow-hidden min-h-[500px] flex items-center p-6 md:p-14">
+            {/* Background Image full width */}
+            <div className="absolute inset-0 z-0 bg-black">
+                <img
+                    src="https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp"
+                    alt="Fotostacja Ślubna Oferta"
+                    className="h-full w-full object-cover filter grayscale contrast-110"
+                />
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: false, amount: 0.4 }}
+                    transition={{ duration: 1 }}
+                    className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none" 
+                />
+            </div>
+
+            {/* Text Panel overlapping image */}
+            <motion.div 
+                initial={{ opacity: 0, x: -60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.4 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+                className="relative z-10 rounded-[24px] bg-black/50 border border-white/5 backdrop-blur-xl p-8 md:p-12 w-full lg:max-w-[55%]"
+            >
+                <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">
+                  Oferta
+                </span>
+                <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-6">
+                  Pakiety i
+                  <br/>
+                  <span className="font-playfair-italic lowercase text-[#d42929]">
+                    wycena
+                  </span>
+                </h2>
+                <div className="space-y-5 font-sans text-sm md:text-base leading-relaxed text-gray-300">
+                  <p>
+                    Fotostacja na weselu wymaga przestrzeni rodem ze studia oraz odpowiednio jednolitego tła, dlatego dostosowujemy ofertę do warunków sali.
+                  </p>
+                  <p>
+                    Standardowy czas działania fotostacji to 3 godziny. Opcje podstawowe obejmują limit zdjęć (np. 300) oraz album online, jednak proponujemy również nielimitowany wydruk odbitek na duże wydarzenia.
+                  </p>
+                  <div className="mt-8 inline-block rounded-2xl border border-[#d42929] px-5 py-3">
+                    <p className="font-sans text-xs text-gray-300 m-0">
+                      Cena fotostacji ślubnej zaczyna się od 3500 zł.
+                    </p>
+                  </div>
+                </div>
+            </motion.div>
+        </section>
+
+        {/* FORMULARZ KONTAKTOWY */}
         <section
           id="wedding-offer-form"
-          className="grid gap-10 rounded-[40px] bg-[#0d0d0d] px-6 py-12 text-white shadow-[0_24px_60px_rgba(0,0,0,0.16)] lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14"
+          className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14"
         >
-          <div>
-            <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-white/38">
+          <div className="p-4">
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
               Otrzymaj ofertę
             </span>
-            <h2 className="mt-5 font-serif text-3xl uppercase leading-none text-white md:text-5xl">
+            <h2 className="mt-5 font-serif text-4xl md:text-6xl uppercase leading-none text-white mb-6">
               Opowiedzcie nam
-              <span className="ml-2 font-playfair-italic font-normal normal-case text-[#d42929]">
+              <br/>
+              <span className="font-playfair-italic lowercase text-[#d42929]">
                 o swoim dniu
               </span>
             </h2>
-            <p className="mt-6 max-w-md font-sans text-sm leading-8 text-white/66 md:text-base">
+            <p className="max-w-md font-sans text-sm md:text-base leading-relaxed text-gray-400">
               Wyślijcie podstawowe informacje, a przygotujemy ofertę dopasowaną do Waszego przyjęcia.
             </p>
           </div>
 
-          <div className="rounded-[34px] bg-[linear-gradient(180deg,#171717_0%,#101010_100%)] p-8 text-white shadow-[0_24px_60px_rgba(0,0,0,0.16)] md:p-10">
+          <div className="rounded-[24px] border border-white/10 bg-black/40 p-8 shadow-2xl md:p-10">
             {status === 'success' ? (
               <div className="py-10 text-center">
-                <Sparkles size={28} className="mx-auto text-[#d42929]" />
-                <h3 className="mt-5 font-serif text-3xl text-white">Wiadomość wysłana</h3>
-                <p className="mt-3 font-sans text-sm leading-7 text-white/58">
+                <Sparkles size={28} className="mx-auto text-[#d42929] mb-6" strokeWidth={1} />
+                <h3 className="font-serif text-3xl text-white mb-4 uppercase">Wiadomość wysłana</h3>
+                <p className="font-sans text-sm md:text-base text-gray-400 mb-8 max-w-sm mx-auto leading-relaxed">
                   Dziękujemy. Wrócimy do Was z ofertą najszybciej jak to możliwe.
                 </p>
                 <button
                   onClick={() => setStatus('idle')}
-                  className="mt-8 rounded-full bg-white/8 px-6 py-3 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white/72 transition-colors duration-300 hover:text-white"
+                  className="rounded-full bg-white px-8 py-3 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-gray-200"
                 >
-                  Wyślij kolejną wiadomość
+                  Wyślij ponownie
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="grid gap-6">
-                <div className="flex items-center justify-between rounded-2xl bg-white/[0.04] px-4 py-3">
-                  <span className="font-sans text-[10px] uppercase tracking-[0.26em] text-white/42">
-                    Formularz kontaktowy
-                  </span>
-                  <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#d42929]">
-                    Fotostacja ślubna
-                  </span>
-                </div>
-
                 <div className="grid gap-6 md:grid-cols-2">
                   <label className="grid gap-2">
-                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-white/54">
-                      Imię i nazwisko
-                    </span>
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Imię i nazwisko</span>
                     <input
                       required
                       name="fullname"
                       value={formData.fullname}
                       onChange={handleChange}
                       placeholder="Wasze imiona i nazwisko"
-                      className="rounded-2xl border border-white/10 bg-[#f3f0ea] px-5 py-4 font-sans text-sm text-brand-black caret-[#d42929] placeholder:text-brand-black/38 focus:border-[#d42929]/70 focus:bg-white focus:outline-none"
+                      className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
                   </label>
                   <label className="grid gap-2">
-                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-white/54">
-                      Adres e-mail
-                    </span>
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Adres e-mail</span>
                     <input
                       required
                       name="email"
@@ -425,80 +465,73 @@ export const PortraitsWeddingPage: React.FC = () => {
                       onChange={handleChange}
                       placeholder="kontakt@waszadres.pl"
                       type="email"
-                      className="rounded-2xl border border-white/10 bg-[#f3f0ea] px-5 py-4 font-sans text-sm text-brand-black caret-[#d42929] placeholder:text-brand-black/38 focus:border-[#d42929]/70 focus:bg-white focus:outline-none"
+                      className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
                   </label>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2">
                   <label className="grid gap-2">
-                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-white/54">
-                      Data ślubu
-                    </span>
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Data ślubu</span>
                     <input
                       name="date"
                       value={formData.date}
                       onChange={handleChange}
                       type="date"
-                      className="rounded-2xl border border-white/10 bg-[#f3f0ea] px-5 py-4 font-sans text-sm text-brand-black caret-[#d42929] placeholder:text-brand-black/38 focus:border-[#d42929]/70 focus:bg-white focus:outline-none [color-scheme:light]"
+                      className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors [color-scheme:dark]"
                     />
                   </label>
                   <label className="grid gap-2">
-                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-white/54">
-                      Miejsce ślubu
-                    </span>
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Miejsce ślubu</span>
                     <input
                       name="location"
                       value={formData.location}
                       onChange={handleChange}
                       placeholder="Miasto, sala, plener..."
-                      className="rounded-2xl border border-white/10 bg-[#f3f0ea] px-5 py-4 font-sans text-sm text-brand-black caret-[#d42929] placeholder:text-brand-black/38 focus:border-[#d42929]/70 focus:bg-white focus:outline-none"
+                      className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
                   </label>
                 </div>
 
                 <label className="grid gap-2">
-                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-white/54">
-                    Liczba gości
-                  </span>
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Liczba gości</span>
                   <input
                     name="guests"
                     value={formData.guests}
                     onChange={handleChange}
                     placeholder="Ile gości planujecie na swoim przyjęciu?"
-                    className="rounded-2xl border border-white/10 bg-[#f3f0ea] px-5 py-4 font-sans text-sm text-brand-black caret-[#d42929] placeholder:text-brand-black/38 focus:border-[#d42929]/70 focus:bg-white focus:outline-none"
+                    className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                   />
                 </label>
 
                 <label className="grid gap-2">
-                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-white/54">
-                    Dodatkowe pytania i uwagi
-                  </span>
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Dodatkowe wiadomości i uwagi</span>
                   <textarea
                     name="notes"
                     value={formData.notes}
                     onChange={handleChange}
-                    rows={5}
+                    rows={4}
                     placeholder="Napiszcie, jaki klimat planujecie, czy zależy Wam na konkretnym tle albo jak wygląda Wasz dzień."
-                    className="resize-none rounded-2xl border border-white/10 bg-[#f3f0ea] px-5 py-4 font-sans text-sm text-brand-black caret-[#d42929] placeholder:text-brand-black/38 focus:border-[#d42929]/70 focus:bg-white focus:outline-none"
+                    className="resize-none rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                   />
                 </label>
 
                 {status === 'error' && (
-                  <p className="font-sans text-sm text-[#ff7a7a]">Coś poszło nie tak. Spróbuj ponownie.</p>
+                  <p className="font-sans text-sm text-[#d42929] text-center">Coś poszło nie tak. Spróbuj ponownie.</p>
                 )}
 
                 <button
                   disabled={status === 'loading'}
-                  className="inline-flex items-center justify-center rounded-full bg-[#d42929] px-8 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#bb2020] hover:shadow-[0_18px_40px_rgba(212,41,41,0.28)] disabled:opacity-60"
+                  className="mt-4 rounded-full bg-white px-8 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-gray-200 disabled:opacity-50"
                 >
-                  {status === 'loading' ? 'Wysyłanie...' : 'Wyślij formularz'}
+                  {status === 'loading' ? 'Wysyłanie...' : 'Wyślij zapytanie'}
                 </button>
               </form>
             )}
           </div>
         </section>
 
+        {/* BOTTOM LINKS */}
         <section className="grid gap-6 md:grid-cols-2">
           {[
             {
@@ -514,27 +547,17 @@ export const PortraitsWeddingPage: React.FC = () => {
               href: '/portraits',
             },
           ].map((item) => (
-            <div
-              key={item.title}
-              className="rounded-[30px] bg-[#111] p-8 text-white shadow-[0_18px_40px_rgba(0,0,0,0.14)]"
-            >
-              <span
-                className="font-sans text-[10px] uppercase tracking-[0.28em] text-[#d42929]"
-              >
-                {item.eyebrow}
-              </span>
+            <div key={item.title} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group" onClick={() => {
+                navigate(item.href);
+                window.scrollTo(0,0);
+            }}>
+              <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-gray-500">{item.eyebrow}</span>
               <h3 className="mt-5 font-serif text-3xl">{item.title}</h3>
-              <p className="mt-2 font-playfair-italic text-xl text-white/48">{item.subtitle}</p>
-              <button
-                onClick={() => {
-                  navigate(item.href);
-                  window.scrollTo(0, 0);
-                }}
-                className="mt-8 inline-flex items-center gap-3 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white/65 transition-colors duration-300 hover:text-white"
-              >
-                Zobacz więcej
+              <p className="mt-2 font-playfair-italic text-xl text-gray-400 mb-8">{item.subtitle}</p>
+              <div className="flex items-center gap-3 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-gray-500 transition-colors duration-300 group-hover:text-white">
+                Zobacz
                 <ArrowUpRight size={15} />
-              </button>
+              </div>
             </div>
           ))}
         </section>
