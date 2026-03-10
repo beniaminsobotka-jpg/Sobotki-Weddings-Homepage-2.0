@@ -340,7 +340,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-10%' }}
                     transition={{ duration: 0.6, delay: imageIndex * 0.06 }}
-                    className="overflow-hidden rounded-[24px] bg-[#050505] border border-white/5"
+                    className="overflow-hidden bg-[#050505] border border-white/5"
                   >
                     <img
                       src={src}
