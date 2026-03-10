@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Grid, ArrowUpRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Play, Grid } from 'lucide-react';
 
 const films = [
   {
@@ -35,7 +34,6 @@ const films = [
 ];
 
 export const Portfolio: React.FC = () => {
-  const navigate = useNavigate();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
@@ -57,18 +55,6 @@ export const Portfolio: React.FC = () => {
                     </span>
                 </h2>
                 
-                <button 
-                    onClick={() => {
-                        navigate('/portfolio');
-                        window.scrollTo(0,0);
-                    }}
-                    className="hidden md:flex items-center gap-2 group text-brand-black hover:opacity-70 transition-opacity mb-2"
-                >
-                    <span className="font-sans text-xs font-bold uppercase tracking-widest">Zobacz więcej</span>
-                    <div className="w-8 h-8 rounded-full border border-brand-black/20 flex items-center justify-center group-hover:bg-brand-black group-hover:text-white transition-all">
-                        <ArrowUpRight size={14} />
-                    </div>
-                </button>
             </div>
 
             {/* Content Grid */}
