@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo, useState, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Camera, Check, Download, Printer, Sparkles, Star, Users, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -45,6 +45,290 @@ const comparisonPortraits = [
   'Odpowiednie dla wszystkich pokoleń',
   'Pamiątka na całe życie',
 ];
+
+const BookSheet = ({ index, scrollYProgress, frontImage, backImage }: any) => {
+  const step = 1 / 6;
+  const rotation = useTransform(scrollYProgress, [index * step, (index + 1) * step], [0, -180]);
+  
+  // Custom transform to simulate physical bending of paper.
+  const bendScaleX = useTransform(
+      scrollYProgress, 
+      [index * step, (index + 0.5) * step, (index + 1) * step], 
+      [1, 0.75, 1] 
+  );
+
+  const bendScaleY = useTransform(
+      scrollYProgress, 
+      [index * step, (index + 0.5) * step, (index + 1) * step], 
+      [1, 0.96, 1] 
+  );
+
+  const liftZ = useTransform(
+      scrollYProgress, 
+      [index * step, (index + 0.5) * step, (index + 1) * step], 
+      [0, 80, 0] 
+  );
+
+  const twistX = useTransform(
+      scrollYProgress, 
+      [index * step, (index + 0.5) * step, (index + 1) * step], 
+      [0, -12, 0] 
+  );
+
+  // Dynamic Z index so that pages that have already flipped end up "on top" of the left pile
+  const dynamicZIndex = useTransform(
+      scrollYProgress,
+      [index * step, index * step + 0.001], 
+      [10 - index, 20 + index] 
+  );
+
+  const frontShadowOpacity = useTransform(scrollYProgress, [index * step, (index + 0.5) * step], [0, 0.8]);
+  const frontHighlightOpacity = useTransform(scrollYProgress, [index * step, (index + 0.5) * step], [0, 0.5]);
+  
+  // REDUCED BACK SHADOW FOR BRIGHTER LEFT SIDE
+  const backShadowOpacity = useTransform(scrollYProgress, [(index + 0.5) * step, (index + 1) * step], [0.6, 0]);
+  const backHighlightOpacity = useTransform(scrollYProgress, [(index + 0.5) * step, (index + 1) * step], [0.4, 0]);
+
+  return (
+    <motion.div 
+      className="absolute right-0 top-0 bottom-0 w-1/2 origin-left"
+      style={{ 
+        rotateY: rotation,
+        rotateX: twistX,
+        scaleX: bendScaleX,
+        scaleY: bendScaleY,
+        z: liftZ,
+        zIndex: dynamicZIndex,
+        transformStyle: 'preserve-3d'
+      }}
+    >
+      {/* Front Face (Right half of the current spread) */}
+      <div 
+        className="absolute inset-0 bg-[#f4f4f4] rounded-r-md overflow-hidden" 
+        style={{ 
+            backfaceVisibility: 'hidden',
+        }} 
+      >
+        <div 
+           className="absolute inset-0" 
+           style={{
+               backgroundImage: `url(${frontImage})`, 
+               backgroundSize: '200% 100%', 
+               backgroundPosition: 'right center',
+               boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)' 
+           }}
+        />
+        <div className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-black/60 to-transparent mix-blend-multiply" />
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-black/20 via-black/40 to-black/60 pointer-events-none mix-blend-multiply" 
+          style={{ opacity: frontShadowOpacity }}
+        />
+        <motion.div 
+          className="absolute inset-y-0 left-[35%] w-[40%] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none mix-blend-overlay blur-md" 
+          style={{ opacity: frontHighlightOpacity }}
+        />
+        <motion.div 
+          className="absolute inset-y-0 right-0 w-[15%] bg-gradient-to-l from-black/30 to-transparent pointer-events-none mix-blend-multiply" 
+          style={{ opacity: frontShadowOpacity }}
+        />
+      </div>
+      
+      {/* Back Face (Reverse of the turned page) */}
+      <div 
+        className="absolute inset-0 bg-[#f4f4f4] rounded-l-md overflow-hidden" 
+        style={{ 
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+        }} 
+      >
+        {/* Un-mirror the background since the whole face is rotated 180 */}
+        <div 
+           className="absolute inset-0" 
+           style={{
+               transform: 'scaleX(-1)', // Un-mirror the texture so text is readable
+               backgroundImage: `url(${backImage})`, 
+               backgroundSize: '200% 100%', 
+               backgroundPosition: 'left center', // Use LEFT center to show a different picture than the right side of the spread
+               boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)' 
+           }}
+        />
+
+        {/* LIGHTER SHADOWS ON THE LEFT SIDE */}
+        <div className="absolute inset-y-0 right-0 w-[12%] bg-gradient-to-l from-black/50 to-transparent mix-blend-multiply" />
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-l from-transparent via-black/10 to-black/30 pointer-events-none mix-blend-multiply" 
+          style={{ opacity: backShadowOpacity }}
+        />
+        <motion.div 
+          className="absolute inset-y-0 right-[35%] w-[40%] bg-gradient-to-l from-transparent via-white/80 to-transparent pointer-events-none mix-blend-overlay blur-md" 
+          style={{ opacity: backHighlightOpacity }}
+        />
+        <motion.div 
+          className="absolute inset-y-0 left-0 w-[15%] bg-gradient-to-r from-black/20 to-transparent pointer-events-none mix-blend-multiply" 
+          style={{ opacity: backShadowOpacity }}
+        />
+      </div>
+    </motion.div>
+  );
+};
+
+const GuestbookScrollAnimation: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const images = [
+    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-01-scaled.avif',
+    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-02-scaled.avif',
+    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-03-scaled.avif',
+    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-04-scaled.avif',
+    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-05-scaled.avif',
+    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-06-scaled.avif',
+    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-07-scaled.avif',
+  ];
+
+  const step = 1 / 6;
+
+  // Track which active page index we are currently looking at based on scroll
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Zoom effect: starts at 1.2 (120%), ends at 0.8 (80%) based on total scroll progress
+  const bookScale = useTransform(scrollYProgress, [0, 1], [1.2, 0.8]);
+
+  React.useEffect(() => {
+    const unsub = scrollYProgress.on("change", (latest) => {
+        let newIndex = 0;
+        for (let i = 0; i < 6; i++) {
+           if (latest > (i * step) + (step / 2)) {
+               newIndex = i + 1;
+           }
+        }
+        if (newIndex !== activeIndex) {
+            setActiveIndex(newIndex);
+        }
+    });
+    return () => unsub();
+  }, [scrollYProgress, activeIndex]);
+
+  return (
+    <div ref={containerRef} className="relative h-[400vh] my-4 w-full rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl">
+      <div className="sticky top-0 h-[100vh] w-full flex flex-col items-center justify-center overflow-hidden rounded-[30px]">
+        {/* Background ambient lighting */}
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)] pointer-events-none" />
+        
+        <div className="absolute top-[6%] md:top-[8%] z-30 text-center w-full px-4 font-sans text-white pointer-events-none">
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
+              Księga Gości
+            </span>
+            <h2 className="mt-3 md:mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-2 md:mb-6">
+              Prawdziwa pamiątka
+              <br/>
+              <span className="font-playfair-italic lowercase text-[#d42929]">
+                na lata
+              </span>
+            </h2>
+        </div>
+        
+        {/* Book Entire Scene Container */}
+        <motion.div 
+           className="relative w-[98%] sm:w-[90%] md:w-[85%] max-w-[1400px] aspect-[1.3/1] sm:aspect-[1.6/1] md:aspect-[2/1] z-10 mt-16 sm:mt-8 mb-4 perspective-[3500px]"
+           style={{ scale: bookScale }}
+        >
+            {/* The Book itself, tilted along X axis so it looks like it's laying flat in front of us */}
+            <motion.div 
+               className="relative w-full h-full transform-style-3d bg-transparent"
+               style={{ rotateX: '15deg', rotateY: '0deg', rotateZ: '0deg' }}
+            >
+                {/* Book Cover / Spine (Background Layer) */}
+                <div className="absolute -inset-2 md:-inset-4 bg-[#111] rounded-xl md:rounded-2xl shadow-[0_40px_100px_rgba(0,0,0,0.95)] border border-white/10 overflow-hidden flex transform-style-3d">
+                    <div className="w-1/2 h-full relative">
+                        {/* Left cover texture/lighting */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a] via-[#050505] to-[#040404] opacity-80" />
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
+                    </div>
+                    {/* Center Spine */}
+                    <div className="w-6 md:w-10 h-full bg-gradient-to-r from-[#030303] via-[#151515] to-[#030303] shadow-[inset_0_0_20px_rgba(0,0,0,1)] relative z-0">
+                        <div className="absolute inset-y-0 left-1/2 w-[2px] bg-white/5 -translate-x-1/2" />
+                        <div className="absolute inset-y-0 left-[20%] w-[1px] bg-black/60" />
+                        <div className="absolute inset-y-0 right-[20%] w-[1px] bg-black/60" />
+                    </div>
+                    <div className="w-1/2 h-full relative">
+                        {/* Right cover texture/lighting */}
+                        <div className="absolute inset-0 bg-gradient-to-l from-[#1a1a1a] via-[#050505] to-[#040404] opacity-80" />
+                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
+                    </div>
+                </div>
+
+                {/* 3D Pages Container */}
+                <div 
+                  className="absolute inset-[1%] md:inset-[1.5%] rounded-md transform-style-3d"
+                >
+                    {/* Stack of inactive pages below (Left) to give thickness */}
+                    <div className="absolute left-0 top-[2px] bottom-[-2px] w-1/2 bg-[#d0d0d0] rounded-l-md shadow-[-4px_4px_10px_rgba(0,0,0,0.5)] z-0" />
+                    
+                    {/* Stack of inactive pages below (Right) to give thickness */}
+                    <div className="absolute right-0 top-[2px] bottom-[-2px] w-1/2 bg-[#d0d0d0] rounded-r-md shadow-[4px_4px_10px_rgba(0,0,0,0.5)] z-0" />
+
+                    {/* Dynamic Base Left (Shows the left half of the NEXT spread before it turns) */}
+                    <div 
+                      className="absolute left-0 top-0 bottom-0 w-1/2 bg-[#f4f4f4] rounded-l-md overflow-hidden z-1"
+                      style={{ 
+                          // The left base shows the left side of CURRENT index spread 
+                          backgroundImage: `url(${images[activeIndex]})`, 
+                          backgroundSize: '200% 100%', 
+                          backgroundPosition: 'left center',
+                          boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)' 
+                      }} 
+                    >
+                       <div className="absolute inset-y-0 right-0 w-[8%] bg-gradient-to-l from-black/50 to-transparent pointer-events-none mix-blend-multiply" />
+                    </div>
+
+                    {/* Base Right (Always shows the Right half of the absolute LAST spread) */}
+                    <div 
+                      className="absolute right-0 top-0 bottom-0 w-1/2 bg-[#f4f4f4] rounded-r-md overflow-hidden z-1"
+                      style={{ 
+                          backgroundImage: `url(${images[6]})`, 
+                          backgroundSize: '200% 100%', 
+                          backgroundPosition: 'right center',
+                          boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)'
+                      }} 
+                    >
+                       <div className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none mix-blend-multiply" />
+                    </div>
+
+                    {/* Middle Seam Depth */}
+                    <div className="absolute top-0 bottom-0 left-1/2 w-[6px] -translate-x-1/2 bg-gradient-to-r from-black/80 via-[#111] to-black/80 shadow-[0_0_20px_rgba(0,0,0,0.8)] z-50 pointer-events-none" />
+
+                    {/* Turning Sheets */}
+                    {images.slice(0, 6).map((img, i) => (
+                        <BookSheet 
+                            key={i} 
+                            index={i} 
+                            scrollYProgress={scrollYProgress} 
+                            frontImage={img} 
+                            // The back face of turning sheet 'i' should display the LEFT half of spread 'i+1' 
+                            // so that it visually "lands" matching the base left underlying it
+                            backImage={images[i+1]} 
+                        />
+                    ))}
+                </div>
+            </motion.div>
+        </motion.div>
+
+        <div className="absolute bottom-[3%] z-30 font-sans text-[10px] text-gray-400 uppercase tracking-[0.2em] flex flex-col items-center gap-2">
+            <motion.div 
+               animate={{ y: [0, 8, 0] }} 
+               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+               className="h-6 w-[1px] bg-gray-400 rounded-full"
+            />
+            Przewiń, aby przeglądać
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const PortraitsWeddingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -260,6 +544,8 @@ export const PortraitsWeddingPage: React.FC = () => {
             ))}
           </div>
         </section>
+
+        <GuestbookScrollAnimation />
 
         {/* FOTOBUDKA VS FOTOSTACJA */}
         <section className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] lg:items-center md:px-10 md:py-14">
