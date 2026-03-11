@@ -14,6 +14,7 @@ import { PortfolioPage } from './pages/PortfolioPage';
 import { PortraitsPage } from './pages/PortraitsPage';
 import { PortraitsEventPage } from './pages/PortraitsEventPage';
 import { PortraitsWeddingPage } from './pages/PortraitsWeddingPage';
+import { PortraitsStationaryPage } from './pages/PortraitsStationaryPage';
 
 // ScrollToTop component to reset scroll on route change
 const ScrollToTop = () => {
@@ -80,6 +81,7 @@ const App: React.FC = () => {
                     <Route path="/portraits" element={<PortraitsPage />} />
                     <Route path="/portraits/event" element={<PortraitsEventPage />} />
                     <Route path="/portraits/wedding" element={<PortraitsWeddingPage />} />
+                    <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
                  </Routes>
               </main>
               <Footer />

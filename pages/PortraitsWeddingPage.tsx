@@ -166,11 +166,11 @@ export const PortraitsWeddingPage: React.FC = () => {
             </div>
 
             {/* Right side - Buttons */}
-            <div className="flex flex-col lg:items-end justify-end pb-2 lg:pb-0 gap-4">
-              <div className="flex flex-wrap lg:flex-nowrap gap-4 justify-end">
+            <div className="flex flex-col lg:items-end justify-end pb-2 lg:pb-0 mt-8 lg:mt-0 w-full">
+              <div className="flex flex-col sm:flex-row gap-4 justify-start lg:justify-end w-full sm:w-auto">
                 <button
                   onClick={() => document.getElementById('wedding-offer-form')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-200 whitespace-nowrap"
+                  className="group inline-flex justify-center items-center gap-3 rounded-full bg-white px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-200"
                 >
                   Otrzymaj ofertę
                   <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -181,7 +181,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                       navigate('/portraits');
                       window.scrollTo(0,0);
                   }}
-                  className="rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5 whitespace-nowrap"
+                  className="flex justify-center items-center rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
                   Wszystkie usługi
                 </button>
