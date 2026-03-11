@@ -46,131 +46,109 @@ const comparisonPortraits = [
   'Pamiątka na całe życie',
 ];
 
-const BookSheet = ({ index, scrollYProgress, frontImage, backImage }: any) => {
-  const step = 1 / 6;
+const BookSheet = ({ index, step = 1/5, scrollYProgress, frontImage, backImage }: any) => {
   const rotation = useTransform(scrollYProgress, [index * step, (index + 1) * step], [0, -180]);
-  
+
   // Custom transform to simulate physical bending of paper.
+  // Instead of twisting the spine (which looks detached), we just compress the X and Y
+  // scale at the peak of the turn to simulate a natural arched paper bow.
   const bendScaleX = useTransform(
-      scrollYProgress, 
-      [index * step, (index + 0.5) * step, (index + 1) * step], 
-      [1, 0.75, 1] 
+    scrollYProgress,
+    [index * step, (index + 0.5) * step, (index + 1) * step],
+    [1, 0.85, 1] // Arch inwards towards the spine peak
   );
-
   const bendScaleY = useTransform(
-      scrollYProgress, 
-      [index * step, (index + 0.5) * step, (index + 1) * step], 
-      [1, 0.96, 1] 
+    scrollYProgress,
+    [index * step, (index + 0.5) * step, (index + 1) * step],
+    [1, 0.98, 1] // Very subtle edge curl
   );
-
   const liftZ = useTransform(
-      scrollYProgress, 
-      [index * step, (index + 0.5) * step, (index + 1) * step], 
-      [0, 80, 0] 
+    scrollYProgress,
+    [index * step, (index + 0.5) * step, (index + 1) * step],
+    [0, 50, 0] // Just enough lift to arch over the right pile
   );
-
-  const twistX = useTransform(
-      scrollYProgress, 
-      [index * step, (index + 0.5) * step, (index + 1) * step], 
-      [0, -12, 0] 
-  );
-
-  // Dynamic Z index so that pages that have already flipped end up "on top" of the left pile
   const dynamicZIndex = useTransform(
-      scrollYProgress,
-      [index * step, index * step + 0.001], 
-      [10 - index, 20 + index] 
+    scrollYProgress,
+    [index * step, index * step + 0.001],
+    [10 - index, 20 + index]
   );
+
+  // Instead of CSS backface-visibility (unreliable with Framer Motion),
+  // we toggle opacity at the exact midpoint of the rotation (90 degrees = -90 on our -180 scale).
+  // Front face is visible (opacity 1) when rotation is between 0 and -90 (i.e. showing right).
+  // Back face is visible (opacity 1) when rotation is between -90 and -180 (i.e. showing left).
+  const frontOpacity = useTransform(rotation, [-180, -90, -89, 0], [0, 0, 1, 1]);
+  const backOpacity = useTransform(rotation, [-180, -91, -90, 0], [1, 1, 0, 0]);
 
   const frontShadowOpacity = useTransform(scrollYProgress, [index * step, (index + 0.5) * step], [0, 0.8]);
   const frontHighlightOpacity = useTransform(scrollYProgress, [index * step, (index + 0.5) * step], [0, 0.5]);
-  
-  // REDUCED BACK SHADOW FOR BRIGHTER LEFT SIDE
   const backShadowOpacity = useTransform(scrollYProgress, [(index + 0.5) * step, (index + 1) * step], [0.6, 0]);
-  const backHighlightOpacity = useTransform(scrollYProgress, [(index + 0.5) * step, (index + 1) * step], [0.4, 0]);
 
   return (
-    <motion.div 
+    <motion.div
       className="absolute right-0 top-0 bottom-0 w-1/2 origin-left"
-      style={{ 
+      style={{
         rotateY: rotation,
-        rotateX: twistX,
         scaleX: bendScaleX,
         scaleY: bendScaleY,
         z: liftZ,
         zIndex: dynamicZIndex,
-        transformStyle: 'preserve-3d'
       }}
     >
-      {/* Front Face (Right half of the current spread) */}
-      <div 
-        className="absolute inset-0 bg-[#f4f4f4] rounded-r-md overflow-hidden" 
-        style={{ 
-            backfaceVisibility: 'hidden',
-        }} 
+      {/* FRONT FACE - shown when the page has NOT yet been flipped (rotation 0 to -90) */}
+      <motion.div
+        className="absolute inset-0 bg-[#f4f4f4] rounded-r-md overflow-hidden"
+        style={{ opacity: frontOpacity }}
       >
-        <div 
-           className="absolute inset-0" 
-           style={{
-               backgroundImage: `url(${frontImage})`, 
-               backgroundSize: '200% 100%', 
-               backgroundPosition: 'right center',
-               boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)' 
-           }}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${frontImage})`,
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+          }}
         />
-        <div className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-black/60 to-transparent mix-blend-multiply" />
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-r from-black/20 via-black/40 to-black/60 pointer-events-none mix-blend-multiply" 
+        <div className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none mix-blend-multiply" />
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-black/20 via-black/40 to-black/60 pointer-events-none mix-blend-multiply"
           style={{ opacity: frontShadowOpacity }}
         />
-        <motion.div 
-          className="absolute inset-y-0 left-[35%] w-[40%] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none mix-blend-overlay blur-md" 
+        <motion.div
+          className="absolute inset-y-0 left-[35%] w-[40%] bg-gradient-to-r from-transparent via-white/80 to-transparent pointer-events-none mix-blend-overlay blur-md"
           style={{ opacity: frontHighlightOpacity }}
         />
-        <motion.div 
-          className="absolute inset-y-0 right-0 w-[15%] bg-gradient-to-l from-black/30 to-transparent pointer-events-none mix-blend-multiply" 
-          style={{ opacity: frontShadowOpacity }}
-        />
-      </div>
-      
-      {/* Back Face (Reverse of the turned page) */}
-      <div 
-        className="absolute inset-0 bg-[#f4f4f4] rounded-l-md overflow-hidden" 
-        style={{ 
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-        }} 
-      >
-        {/* Un-mirror the background since the whole face is rotated 180 */}
-        <div 
-           className="absolute inset-0" 
-           style={{
-               transform: 'scaleX(-1)', // Un-mirror the texture so text is readable
-               backgroundImage: `url(${backImage})`, 
-               backgroundSize: '200% 100%', 
-               backgroundPosition: 'left center', // Use LEFT center to show a different picture than the right side of the spread
-               boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)' 
-           }}
-        />
+      </motion.div>
 
-        {/* LIGHTER SHADOWS ON THE LEFT SIDE */}
-        <div className="absolute inset-y-0 right-0 w-[12%] bg-gradient-to-l from-black/50 to-transparent mix-blend-multiply" />
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-l from-transparent via-black/10 to-black/30 pointer-events-none mix-blend-multiply" 
+      {/* BACK FACE - shown when the page HAS been flipped past 90 degrees (rotation -90 to -180).
+          Because the parent is rotating on Y axis, the content itself appears mirrored.
+          We counter this by placing the image in a wrapper that flips it back with scaleX(-1).
+          The wrapper itself occupies the full space, and the image within is un-mirrored. */}
+      <motion.div
+        className="absolute inset-0 bg-[#f4f4f4] rounded-r-md overflow-hidden"
+        style={{ opacity: backOpacity }}
+      >
+        {/* This wrapper uses scaleX(-1) to un-mirror the image that appears flipped
+            because the parent motion.div is currently rotated past -90deg on Y axis */}
+        <div
+          className="absolute inset-0"
+          style={{
+            transform: 'scaleX(-1)',
+            backgroundImage: `url(${backImage})`,
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+          }}
+        />
+        {/* The shadow must remain on the local left edge (the spine), just like the front face */}
+        <div className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none mix-blend-multiply" />
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-l from-transparent via-black/10 to-black/30 pointer-events-none mix-blend-multiply"
           style={{ opacity: backShadowOpacity }}
         />
-        <motion.div 
-          className="absolute inset-y-0 right-[35%] w-[40%] bg-gradient-to-l from-transparent via-white/80 to-transparent pointer-events-none mix-blend-overlay blur-md" 
-          style={{ opacity: backHighlightOpacity }}
-        />
-        <motion.div 
-          className="absolute inset-y-0 left-0 w-[15%] bg-gradient-to-r from-black/20 to-transparent pointer-events-none mix-blend-multiply" 
-          style={{ opacity: backShadowOpacity }}
-        />
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
+
 
 const GuestbookScrollAnimation: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -179,38 +157,36 @@ const GuestbookScrollAnimation: React.FC = () => {
     offset: ["start start", "end end"]
   });
 
-  const images = [
-    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-01-scaled.avif',
-    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-02-scaled.avif',
-    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-03-scaled.avif',
-    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-04-scaled.avif',
-    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-05-scaled.avif',
-    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-06-scaled.avif',
-    'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka-07-scaled.avif',
-  ];
+  const images = Array.from({ length: 14 }, (_, i) => 
+    `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka_www_${i + 1}.jpg`
+  );
 
-  const step = 1 / 6;
+  const turningPagesCount = 13; // 14 images total minus the base left (1) = 13 turning pages
+  const step = 1 / turningPagesCount;
 
   // Track which active page index we are currently looking at based on scroll
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Zoom effect: starts at 1.2 (120%), ends at 0.8 (80%) based on total scroll progress
-  const bookScale = useTransform(scrollYProgress, [0, 1], [1.2, 0.8]);
-
   React.useEffect(() => {
     const unsub = scrollYProgress.on("change", (latest) => {
-        let newIndex = 0;
-        for (let i = 0; i < 6; i++) {
-           if (latest > (i * step) + (step / 2)) {
-               newIndex = i + 1;
+        let flippedPagesCount = 0;
+        for (let i = 0; i < turningPagesCount; i++) {
+           // Only consider the page "flipped" when its turn animation is 95% complete.
+           // This prevents the Base Left background from updating to the new image
+           // *while* the page is still visibly returning down to the left side!
+           if (latest > (i * step) + (step * 0.95)) {
+               flippedPagesCount = i + 1;
            }
         }
-        if (newIndex !== activeIndex) {
-            setActiveIndex(newIndex);
+        if (flippedPagesCount !== activeIndex) {
+            setActiveIndex(flippedPagesCount);
         }
     });
     return () => unsub();
-  }, [scrollYProgress, activeIndex]);
+  }, [scrollYProgress, activeIndex, step]);
+
+  // Zoom effect: starts at 1.2 (120%), ends at 0.8 (80%) based on total scroll progress
+  const bookScale = useTransform(scrollYProgress, [0, 1], [1.2, 0.8]);
 
   return (
     <div ref={containerRef} className="relative h-[400vh] my-4 w-full rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl">
@@ -218,18 +194,31 @@ const GuestbookScrollAnimation: React.FC = () => {
         {/* Background ambient lighting */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)] pointer-events-none" />
         
-        <div className="absolute top-[6%] md:top-[8%] z-30 text-center w-full px-4 font-sans text-white pointer-events-none">
-            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
-              Księga Gości
-            </span>
-            <h2 className="mt-3 md:mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-2 md:mb-6">
-              Prawdziwa pamiątka
-              <br/>
-              <span className="font-playfair-italic lowercase text-[#d42929]">
-                na lata
-              </span>
-            </h2>
-        </div>
+        {/* Parallax Main Title */}
+        <motion.div 
+          className="absolute w-full flex items-center justify-center z-0 pointer-events-none"
+          style={{ 
+              top: useTransform(scrollYProgress, [0, 1], ["30%", "8%"]),
+              opacity: useTransform(scrollYProgress, [0, 0.15, 1], [0.1, 1, 1])
+          }}
+        >
+          <h1 className="text-[12vw] sm:text-[10vw] font-serif font-black uppercase text-white tracking-widest text-center whitespace-nowrap drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-none">
+            Księga Gości
+          </h1>
+        </motion.div>
+
+        {/* Parallax Subtitle - Emerging from dynamically underneath the book */}
+        <motion.div 
+          className="absolute w-full flex flex-col items-center justify-center z-0 pointer-events-none"
+          style={{ 
+              top: useTransform(scrollYProgress, [0, 1], ["75%", "85%"]),
+              opacity: useTransform(scrollYProgress, [0, 0.1, 0.3, 1], [0, 0, 1, 1]), // Fades in quickly at the top 30% of scroll
+          }}
+        >
+          <h2 className="font-playfair-italic text-3xl md:text-[3.5rem] lowercase text-[#d42929] text-center drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-tight">
+            prawdziwa pamiątka na lata
+          </h2>
+        </motion.div>
         
         {/* Book Entire Scene Container */}
         <motion.div 
@@ -271,46 +260,50 @@ const GuestbookScrollAnimation: React.FC = () => {
                     {/* Stack of inactive pages below (Right) to give thickness */}
                     <div className="absolute right-0 top-[2px] bottom-[-2px] w-1/2 bg-[#d0d0d0] rounded-r-md shadow-[4px_4px_10px_rgba(0,0,0,0.5)] z-0" />
 
-                    {/* Dynamic Base Left (Shows the left half of the NEXT spread before it turns) */}
+                    {/* Dynamic Base Left (Shows the back of the most recently turned page!) */}
                     <div 
                       className="absolute left-0 top-0 bottom-0 w-1/2 bg-[#f4f4f4] rounded-l-md overflow-hidden z-1"
                       style={{ 
-                          // The left base shows the left side of CURRENT index spread 
-                          backgroundImage: `url(${images[activeIndex]})`, 
-                          backgroundSize: '200% 100%', 
-                          backgroundPosition: 'left center',
+                          // If activeIndex is 0, show image 0
+                          // If activeIndex is 1 (first page flipped), show image 2 (the back of that page)
+                          // If activeIndex is 2 (second page flipped), show image 4...
+                          backgroundImage: `url(${images[activeIndex === 0 ? 0 : activeIndex * 2]})`, 
+                          backgroundSize: '100% 100%', 
+                          backgroundPosition: 'center',
                           boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)' 
                       }} 
                     >
-                       <div className="absolute inset-y-0 right-0 w-[8%] bg-gradient-to-l from-black/50 to-transparent pointer-events-none mix-blend-multiply" />
+                       <div className="absolute inset-y-0 right-0 w-[10%] bg-gradient-to-l from-black/60 to-transparent pointer-events-none mix-blend-multiply" />
                     </div>
 
-                    {/* Base Right (Always shows the Right half of the absolute LAST spread) */}
+                    {/* Base Right (Final page at the bottom of the right stack) */}
                     <div 
                       className="absolute right-0 top-0 bottom-0 w-1/2 bg-[#f4f4f4] rounded-r-md overflow-hidden z-1"
                       style={{ 
-                          backgroundImage: `url(${images[6]})`, 
-                          backgroundSize: '200% 100%', 
-                          backgroundPosition: 'right center',
+                          backgroundImage: `url(${images[images.length - 1]})`,
+                          backgroundSize: '100% 100%',
+                          backgroundPosition: 'center',
                           boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)'
                       }} 
                     >
                        <div className="absolute inset-y-0 left-0 w-[10%] bg-gradient-to-r from-black/60 to-transparent pointer-events-none mix-blend-multiply" />
                     </div>
 
-                    {/* Middle Seam Depth */}
-                    <div className="absolute top-0 bottom-0 left-1/2 w-[6px] -translate-x-1/2 bg-gradient-to-r from-black/80 via-[#111] to-black/80 shadow-[0_0_20px_rgba(0,0,0,0.8)] z-50 pointer-events-none" />
+                    {/* Middle Seam - elegant thin crack in the binding */}
+                    <div className="absolute top-0 bottom-0 left-1/2 w-[2px] -translate-x-1/2 bg-black/40 pointer-events-none z-50" />
 
-                    {/* Turning Sheets */}
-                    {images.slice(0, 6).map((img, i) => (
+                    {/* Turning Sheets. We have 14 images total minus 1 base = 13 images.
+                        We can turn 6 full sheets (which show 12 images: 6 fronts + 6 backs).
+                        The 14th image (index 13) will end up being the final base left.
+                    */}
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
                         <BookSheet 
                             key={i} 
                             index={i} 
+                            step={step}
                             scrollYProgress={scrollYProgress} 
-                            frontImage={img} 
-                            // The back face of turning sheet 'i' should display the LEFT half of spread 'i+1' 
-                            // so that it visually "lands" matching the base left underlying it
-                            backImage={images[i+1]} 
+                            frontImage={images[i * 2 + 1]} 
+                            backImage={images[i * 2 + 2]} 
                         />
                     ))}
                 </div>
