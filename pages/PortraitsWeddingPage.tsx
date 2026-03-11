@@ -202,7 +202,7 @@ const GuestbookScrollAnimation: React.FC = () => {
               opacity: useTransform(scrollYProgress, [0, 0.15, 1], [0.1, 1, 1])
           }}
         >
-          <h1 className="text-[12vw] sm:text-[10vw] font-serif font-black uppercase text-white tracking-widest text-center whitespace-nowrap drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-none">
+          <h1 className="text-[9vw] sm:text-[8vw] md:text-[10vw] px-4 font-serif font-black uppercase text-white tracking-widest text-center whitespace-nowrap drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-none">
             Księga Gości
           </h1>
         </motion.div>
@@ -222,7 +222,7 @@ const GuestbookScrollAnimation: React.FC = () => {
         
         {/* Book Entire Scene Container */}
         <motion.div 
-           className="relative w-[98%] sm:w-[90%] md:w-[85%] max-w-[1400px] aspect-[1.3/1] sm:aspect-[1.6/1] md:aspect-[2/1] z-10 mt-16 sm:mt-8 mb-4 perspective-[3500px]"
+           className="relative w-[90%] sm:w-[85%] md:w-[80%] max-w-[1400px] aspect-[1.4/1] sm:aspect-[1.6/1] md:aspect-[2/1] z-10 mt-16 sm:mt-8 mb-4 perspective-[3500px]"
            style={{ scale: bookScale }}
         >
             {/* The Book itself, tilted along X axis so it looks like it's laying flat in front of us */}
@@ -411,8 +411,8 @@ export const PortraitsWeddingPage: React.FC = () => {
             alt="Fotostacja ślubna hero"
             className="absolute inset-0 h-full w-full object-cover filter grayscale contrast-110 opacity-70"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent" />
-          <div className="relative grid min-h-[84vh] gap-12 px-6 py-10 md:px-10 md:py-14 lg:grid-cols-[1fr_1fr] lg:items-end lg:px-14 lg:py-16">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent" />
+          <div className="relative grid min-h-[92vh] md:min-h-[84vh] gap-6 md:gap-12 px-6 pb-6 pt-10 md:px-10 md:py-14 lg:grid-cols-[1fr_1fr] lg:items-end lg:px-14 lg:py-16">
             
             {/* Left side - Title and Text */}
             <div className="max-w-3xl flex flex-col justify-end pt-20 lg:pt-32">
@@ -427,10 +427,10 @@ export const PortraitsWeddingPage: React.FC = () => {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="font-serif text-6xl font-black uppercase leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem] flex flex-col items-start"
+                className="font-serif text-[3.2rem] md:text-8xl lg:text-[7rem] font-black uppercase leading-[0.75] md:leading-[0.84] tracking-tight text-white flex flex-col items-start"
               >
                 <span>Portrety</span>
-                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-3 md:-mt-6 lg:-mt-8">
+                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-5 md:-mt-6 lg:-mt-8">
                   na weselu
                 </span>
               </motion.h1>
