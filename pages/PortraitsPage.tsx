@@ -48,7 +48,7 @@ export const PortraitsPage: React.FC = () => {
     <div className="min-h-screen bg-[#050505] text-[#F3F2ED] pt-32 pb-24 relative selection:bg-white selection:text-black">
        
        {/* Background Noise for Texture */}
-       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
        <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
             

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 // Wybieramy 9 zdjęć
 const selectedIds = [5, 12, 3, 9, 1, 8, 11, 2, 7];
@@ -10,6 +11,7 @@ const images = selectedIds.map((num, i) => ({
 }));
 
 export const HeroPortfolio: React.FC = () => {
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(4); // Start w środku (4 to środek dla 9 elementów)
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -184,17 +186,11 @@ export const HeroPortfolio: React.FC = () => {
         {/* BUTTON - LIQUID GLASS STYLE */}
         <div className="flex justify-center mt-12 md:mt-16 relative z-30 pointer-events-auto">
             <a 
-              href="#portfolio"
+              href="#/portfolio"
               onClick={(e) => {
                 e.preventDefault();
-                const target = document.getElementById('portfolio');
-                if (target) {
-                    if ((window as any).lenis) {
-                        (window as any).lenis.scrollTo('#portfolio', { duration: 1.5 });
-                    } else {
-                        target.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }
+                navigate('/portfolio');
+                window.scrollTo(0, 0);
               }}
               className="group flex items-center gap-3 px-8 py-4 rounded-full backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] hover:bg-white/50 hover:shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all duration-500 cursor-pointer hover:scale-105"
             >

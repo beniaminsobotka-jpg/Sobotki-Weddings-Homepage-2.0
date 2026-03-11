@@ -66,12 +66,18 @@ const App: React.FC = () => {
     <div className="min-h-screen text-brand-black selection:bg-brand-black selection:text-white no-scrollbar relative">
       <HashRouter>
           <ScrollToTop />
-          {/* Background is Global */}
-          <LiquidBackground />
           
           <AnimatePresence mode="wait">
             {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
           </AnimatePresence>
+
+          {/* Conditional Background render to save GPU on dark pages */}
+          <Routes>
+            <Route path="/" element={<LiquidBackground />} />
+            <Route path="/home" element={<LiquidBackground />} />
+            <Route path="/portfolio" element={<LiquidBackground />} />
+            <Route path="*" element={null} />
+          </Routes>
 
           {!isLoading && (
             <>

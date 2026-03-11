@@ -97,7 +97,7 @@ export const PortraitsEventPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
       <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-24 px-4 pb-24 md:px-8 md:pb-32">
         
