@@ -82,7 +82,7 @@ export const PortraitsPage: React.FC = () => {
             </div>
 
             {/* --- GRID LAYOUT (SHARP CORNERS - 3x3) --- */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-0.5 bg-[#111]">
+            <div className="grid grid-cols-3 grid-rows-3 gap-0.5 bg-[#111] w-full max-w-5xl mx-auto h-[60vh] md:h-[80vh] border border-white/5 p-0.5">
                 <AnimatePresence>
                     {portraitsData.map((item, index) => (
                         <motion.div
@@ -92,7 +92,7 @@ export const PortraitsPage: React.FC = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: index * 0.05 }}
                             onClick={() => openLightbox(index)}
-                            className="relative aspect-[3/4] group cursor-pointer overflow-hidden bg-[#0a0a0a]"
+                            className="relative w-full h-full group cursor-pointer overflow-hidden bg-[#0a0a0a]"
                         >
                             <img 
                                 src={item.src} 
@@ -437,14 +437,14 @@ export const PortraitsPage: React.FC = () => {
                              </div>
 
                              {/* Click Area Link */}
-                             <a 
-                                href="#kontakt" 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    document.getElementById('kontakt')?.scrollIntoView({ behavior: 'smooth' });
+                             <button
+                                onClick={() => {
+                                    navigate('/portraits/stationary');
+                                    window.scrollTo(0, 0);
                                 }}
                                 className="absolute inset-0 z-20"
-                             ></a>
+                                aria-label="Przejdz do Fotostacji Stacjonarnej"
+                             ></button>
                         </div>
 
                     </div>

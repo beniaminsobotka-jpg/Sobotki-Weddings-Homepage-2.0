@@ -22,6 +22,10 @@ const ScrollToTop = () => {
     useEffect(() => {
         if (!pathname.includes('#')) {
              window.scrollTo(0, 0);
+             const lenis = (window as any).lenis;
+             if (lenis) {
+                 lenis.scrollTo(0, { immediate: true });
+             }
         }
     }, [pathname]);
     return null;
