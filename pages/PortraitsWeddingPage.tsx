@@ -198,7 +198,7 @@ const GuestbookScrollAnimation: React.FC = () => {
         <motion.div 
           className="absolute w-full flex items-center justify-center z-0 pointer-events-none"
           style={{ 
-              top: useTransform(scrollYProgress, [0, 1], ["30%", "8%"]),
+              top: useTransform(scrollYProgress, [0, 1], ["15%", "8%"]),
               opacity: useTransform(scrollYProgress, [0, 0.15, 1], [0.1, 1, 1])
           }}
         >
@@ -211,8 +211,8 @@ const GuestbookScrollAnimation: React.FC = () => {
         <motion.div 
           className="absolute w-full flex flex-col items-center justify-center z-0 pointer-events-none"
           style={{ 
-              top: useTransform(scrollYProgress, [0, 1], ["75%", "85%"]),
-              opacity: useTransform(scrollYProgress, [0, 0.1, 0.3, 1], [0, 0, 1, 1]), // Fades in quickly at the top 30% of scroll
+              top: useTransform(scrollYProgress, [0, 1], ["78%", "83%"]),
+              opacity: useTransform(scrollYProgress, [0, 0.1, 0.3, 1], [0, 0, 1, 1]),
           }}
         >
           <h2 className="font-playfair-italic text-3xl md:text-[3.5rem] lowercase text-[#d42929] text-center drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-tight">
@@ -222,7 +222,7 @@ const GuestbookScrollAnimation: React.FC = () => {
         
         {/* Book Entire Scene Container */}
         <motion.div 
-           className="relative w-[90%] sm:w-[85%] md:w-[80%] max-w-[1400px] aspect-[1.4/1] sm:aspect-[1.6/1] md:aspect-[2/1] z-10 mt-16 sm:mt-8 mb-4 perspective-[3500px]"
+           className="relative w-[90%] sm:w-[85%] md:w-[80%] max-w-[1400px] aspect-[2/1] z-10 mt-4 sm:mt-8 mb-4 perspective-[3500px]"
            style={{ scale: bookScale }}
         >
             {/* The Book itself, tilted along X axis so it looks like it's laying flat in front of us */}
