@@ -9,7 +9,7 @@
     <!-- GOOGLE FONTS (Fallback) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=DM+Sans:wght@300;400;500;700&subset=latin,latin-ext&display=swap" rel="stylesheet">
     
     <!-- ADOBE FONTS -->
     <!-- WAŻNE: Skopiuj link ze swojego projektu Adobe Fonts i wklej go poniżej zamiast 'TWOJE_ID_PROJEKTU' -->
@@ -29,8 +29,8 @@
               }
             },
             fontFamily: {
-              // Podium jako domyślny serif
-              serif: ['"podium-sharp-variable"', '"podium-sharp"', '"Podium Sharp"', 'Playfair Display', 'serif'],
+              // Podium jako domyślny serif, Playfair jako wysokiej jakości fallback dla polskich znaków
+              serif: ['"podium-sharp-variable"', 'Playfair Display', '"podium-sharp"', '"Podium Sharp"', 'serif'],
               // Playfair jako osobna rodzina do wymuszania w italikach
               playfair: ['Playfair Display', 'serif'],
               sans: ['DM Sans', 'sans-serif'],
