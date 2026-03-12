@@ -420,7 +420,7 @@ export const PortraitsWeddingPage: React.FC = () => {
           <div className="relative grid min-h-[92vh] md:min-h-[84vh] gap-6 md:gap-12 px-6 pb-6 pt-10 md:px-10 md:py-14 lg:grid-cols-[1fr_1fr] lg:items-end lg:px-14 lg:py-16">
             
             {/* Left side - Title and Text */}
-            <div className="max-w-3xl flex flex-col justify-end pt-20 lg:pt-32">
+            <div className="max-w-3xl flex flex-col justify-end pt-40 lg:pt-32">
               <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-md self-start">
                 <Star size={12} className="fill-white text-white" />
                 <span className="font-sans text-[10px] uppercase tracking-[0.26em] text-white/80">
@@ -448,7 +448,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             </div>
 
             {/* Right side - Buttons */}
-            <div className="flex flex-col lg:items-end justify-end pb-2 lg:pb-0 mt-8 lg:mt-0 w-full">
+            <div className="flex flex-col lg:items-end justify-end pb-2 lg:pb-0 mt-4 lg:mt-0 w-full">
               <div className="flex flex-col sm:flex-row gap-4 justify-start lg:justify-end w-full sm:w-auto">
                 <button
                   onClick={() => document.getElementById('wedding-offer-form')?.scrollIntoView({ behavior: 'smooth' })}
