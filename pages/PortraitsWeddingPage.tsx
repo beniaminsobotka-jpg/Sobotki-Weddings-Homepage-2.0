@@ -19,15 +19,15 @@ const AC_CONFIG = {
 };
 
 const galleryImages = [
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Basia-x-Szymon_-2-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Kamila-x-Konrad_-76-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2025/07/IsmenaxTomasz_Fotostacja_-37-1024x683.avif',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2025/07/OlgaxFranek_Fotostacja_-136-1024x683.avif',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Kamila-x-Konrad_-54-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2025/07/IsmenaxTomasz_Fotostacja_-134-e1752095442720-1024x789.avif',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Basia-x-Szymon_-22-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-42-1024x683.webp',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_2.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_3.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_4.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_5.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_6.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_7.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_8.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_9.jpg',
 ];
 
 const comparisonPhotobooth = [
