@@ -55,8 +55,8 @@ export const Portfolio: React.FC = () => {
         <div className="max-w-[1600px] mx-auto">
             
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 md:mb-24 relative z-10">
-                <h2 className="flex flex-col leading-[0.85]">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-16 md:mb-24 relative z-10 gap-8 md:gap-16">
+                <h2 className="flex flex-col leading-[0.85] shrink-0">
                     <span className="font-serif font-black text-6xl md:text-8xl uppercase tracking-tighter text-brand-black">
                         Wasze Historie
                     </span>
@@ -65,6 +65,9 @@ export const Portfolio: React.FC = () => {
                     </span>
                 </h2>
                 
+                <p className="font-sans text-sm md:text-base leading-relaxed text-brand-black/60 max-w-xl md:pt-4 md:border-l md:border-brand-black/10 md:pl-10">
+                    Tworzymy dwa filmy ślubne: krótki film kreatywny (3–5 min) oraz dłuższy film rodzinny (15–20 min). Zależy nam, by opowiadały nie tylko o samym dniu ślubu, ale przede wszystkim o Was — o Waszej relacji, energii i sposobie, w jaki jesteście razem. Nie tworzymy ani typowych, niemych teledysków ślubnych, ani wielogodzinnych reportaży. Nasze filmy są romantyczne, poruszające i naturalne — bez sztuczności i patosu.
+                </p>
             </div>
 
             {/* Content Grid */}
