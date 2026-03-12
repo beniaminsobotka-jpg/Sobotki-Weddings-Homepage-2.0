@@ -100,7 +100,7 @@ export const PortraitsEventPage: React.FC = () => {
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
       <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-24 px-4 pb-24 md:px-8 md:pb-32">
-        
+
         {/* HERO SECTION - REVERTED TO ORIGINAL LAYOUT BUT WITH NEW FONTS/COLORS */}
         <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
           <img
@@ -147,8 +147,8 @@ export const PortraitsEventPage: React.FC = () => {
 
                 <button
                   onClick={() => {
-                      navigate('/portraits');
-                      window.scrollTo(0,0);
+                    navigate('/portraits');
+                    window.scrollTo(0, 0);
                   }}
                   className="rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
@@ -205,7 +205,7 @@ export const PortraitsEventPage: React.FC = () => {
                 className="rounded-[24px] border border-white/5 bg-[#0a0a0a] p-6 text-white"
               >
                 <div className="p-3 bg-white/5 inline-block rounded-full mb-4">
-                   <item.icon size={20} className="text-white" />
+                  <item.icon size={20} className="text-white" />
                 </div>
                 <h3 className="font-serif text-2xl mb-2">{item.title}</h3>
                 <p className="font-sans text-sm leading-relaxed text-gray-400">{item.text}</p>
@@ -224,9 +224,9 @@ export const PortraitsEventPage: React.FC = () => {
             />
             {/* Liquid Glass Element inside Image container */}
             <div className="absolute bottom-6 left-6 pointer-events-none">
-                <div className="liquid-glass bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
-                    <span className="font-sans text-[10px] uppercase tracking-widest text-white">Behind the scenes</span>
-                </div>
+              <div className="liquid-glass bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
+                <span className="font-sans text-[10px] uppercase tracking-widest text-white">Behind the scenes</span>
+              </div>
             </div>
           </div>
 
@@ -236,7 +236,7 @@ export const PortraitsEventPage: React.FC = () => {
             </span>
             <h2 className="mt-4 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-8">
               Szybko, płynnie,
-              <br/>
+              <br />
               <span className="font-playfair-italic lowercase text-[#d42929]">
                 bez chaosu
               </span>
@@ -290,56 +290,56 @@ export const PortraitsEventPage: React.FC = () => {
 
         {/* PAKIETY I WYCENA - FULL WIDTH IMAGE WITH LIQUID GLASS PANEL AND ANIMATION */}
         <section className="relative rounded-[30px] border border-white/5 shadow-2xl overflow-hidden min-h-[500px] flex items-center p-6 md:p-14">
-            {/* Background Image full width */}
-            <div className="absolute inset-0 z-0 bg-black">
-                <img
-                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_4.avif"
-                    alt="Fotostacja Eventowa Oferta"
-                    className="h-full w-full object-cover filter grayscale contrast-110"
-                />
-                <motion.div 
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: false, amount: 0.4 }}
-                    transition={{ duration: 1 }}
-                    className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none" 
-                />
-            </div>
+          {/* Background Image full width */}
+          <div className="absolute inset-0 z-0 bg-black">
+            <img
+              src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_4.avif"
+              alt="Fotostacja Eventowa Oferta"
+              className="h-full w-full object-cover filter grayscale contrast-110"
+            />
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: false, amount: 0.4 }}
+              transition={{ duration: 1 }}
+              className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none"
+            />
+          </div>
 
-            {/* Text Panel overlapping image */}
-            <motion.div 
-                initial={{ opacity: 0, x: -60 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.4 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-                className="relative z-10 rounded-[24px] bg-black/50 border border-white/5 backdrop-blur-xl p-8 md:p-12 w-full lg:max-w-[55%]"
-            >
-                <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">
-                  Oferta
-                </span>
-                <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-6">
-                  Elastyczne opcje
-                  <br/>
-                  <span className="font-playfair-italic lowercase text-[#d42929]">
-                    dla biznesu
-                  </span>
-                </h2>
-                <div className="space-y-5 font-sans text-sm md:text-base leading-relaxed text-gray-300">
-                  <p>
-                    W zależności od liczby gości oraz wybranych opcji, takich jak druk bez limitu, branding czy
-                    księga gości, przygotowujemy indywidualną wycenę.
-                  </p>
-                  <p>
-                    Możesz zdecydować się na pakiet z limitem odbitek, np. 300, albo postawić
-                    na nielimitowany druk, co świetnie sprawdza się w przypadku dużych wydarzeń.
-                  </p>
-                  <div className="mt-8 inline-block rounded-2xl border border-[#d42929] px-5 py-3">
-                    <p className="font-sans text-xs text-gray-300 m-0">
-                      Cena fotostacji na event firmowy zaczyna się od 4000 zł.
-                    </p>
-                  </div>
-                </div>
-            </motion.div>
+          {/* Text Panel overlapping image */}
+          <motion.div
+            initial={{ opacity: 0, x: -60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: false, amount: 0.4 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            className="relative z-10 rounded-[24px] bg-black/50 border border-white/5 backdrop-blur-xl p-8 md:p-12 w-full lg:max-w-[55%]"
+          >
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">
+              Oferta
+            </span>
+            <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-6">
+              Elastyczne opcje
+              <br />
+              <span className="font-playfair-italic lowercase text-[#d42929]">
+                dla biznesu
+              </span>
+            </h2>
+            <div className="space-y-5 font-sans text-sm md:text-base leading-relaxed text-gray-300">
+              <p>
+                W zależności od liczby gości oraz wybranych opcji, takich jak druk bez limitu, branding czy
+                księga gości, przygotowujemy indywidualną wycenę.
+              </p>
+              <p>
+                Możesz zdecydować się na pakiet z limitem odbitek, np. 300, albo postawić
+                na nielimitowany druk, co świetnie sprawdza się w przypadku dużych wydarzeń.
+              </p>
+              <div className="mt-8 inline-block rounded-2xl border border-[#d42929] px-5 py-3">
+                <p className="font-sans text-xs text-gray-300 m-0">
+                  Cena fotostacji na event firmowy zaczyna się od 4000 zł.
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </section>
 
         {/* FORMULARZ KONTAKTOWY - NORMAL DARK THEME FORM */}
@@ -353,7 +353,7 @@ export const PortraitsEventPage: React.FC = () => {
             </span>
             <h2 className="mt-5 font-serif text-4xl md:text-6xl uppercase leading-none text-white mb-6">
               Otrzymaj
-              <br/>
+              <br />
               <span className="font-playfair-italic lowercase text-[#d42929]">
                 wycenę
               </span>
@@ -497,8 +497,8 @@ export const PortraitsEventPage: React.FC = () => {
             },
           ].map((item) => (
             <div key={item.title} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group" onClick={() => {
-                navigate(item.href);
-                window.scrollTo(0,0);
+              navigate(item.href);
+              window.scrollTo(0, 0);
             }}>
               <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-gray-500">{item.eyebrow}</span>
               <h3 className="mt-5 font-serif text-3xl">{item.title}</h3>
