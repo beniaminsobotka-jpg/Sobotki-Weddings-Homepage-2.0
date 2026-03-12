@@ -340,7 +340,7 @@ export const PortraitsPage: React.FC = () => {
                                  <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
                                      <div className="flex items-center gap-2 mb-3">
                                          <Star size={14} className="text-white fill-white" />
-                                         <span className="font-sans text-[10px] uppercase tracking-widest text-white/80">Wedding</span>
+                                         <span className="font-sans text-[10px] uppercase tracking-widest text-white/80">Wesela i przyjęcia</span>
                                      </div>
                                      <h3 className="font-serif font-black text-3xl text-white mb-2 leading-none">Oferta Ślubna</h3>
                                      <p className="font-playfair-italic text-gray-400 text-lg mb-4">Elegancja i Emocje</p>
@@ -383,7 +383,7 @@ export const PortraitsPage: React.FC = () => {
                                  <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
                                      <div className="flex items-center gap-2 mb-3">
                                          <Briefcase size={14} className="text-white" />
-                                         <span className="font-sans text-[10px] uppercase tracking-widest text-white/80">Corporate</span>
+                                         <span className="font-sans text-[10px] uppercase tracking-widest text-white/80">Imprezy firmowe</span>
                                      </div>
                                      <h3 className="font-serif font-black text-3xl text-white mb-2 leading-none">Oferta Eventowa</h3>
                                      <p className="font-playfair-italic text-gray-400 text-lg mb-4">Wizerunek i Marka</p>
