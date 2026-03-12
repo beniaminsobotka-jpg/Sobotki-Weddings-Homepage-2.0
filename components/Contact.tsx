@@ -51,8 +51,6 @@ export const Contact: React.FC = () => {
     acData.append(AC_CONFIG.FIELDS.DATE, formData.date);
     acData.append(AC_CONFIG.FIELDS.LOCATION, formData.location);
     const message = [
-      '[SW] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ',
-      '---',
       formData.message,
       '---',
       'POWIADOMIENIE: kontakt@sobotkiweddings.pl, kontakt.sobotki@gmail.com',
@@ -61,12 +59,33 @@ export const Contact: React.FC = () => {
     acData.append(AC_CONFIG.FIELDS.MESSAGE, message);
     acData.append(AC_CONFIG.FIELDS.OFFER, formData.offer);
 
+    // Formspree Data
+    const formspreeData = new FormData();
+    formspreeData.append('_subject', '[SW] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ');
+    formspreeData.append('Imię i Nazwisko', formData.fullname);
+    formspreeData.append('Email', formData.email);
+    formspreeData.append('Data Ślubu', formData.date);
+    formspreeData.append('Miejsce', formData.location);
+    formspreeData.append('Wiadomość', formData.message);
+    formspreeData.append('Oferta', formData.offer);
+
     try {
+      // Send to ActiveCampaign
       await fetch(AC_CONFIG.URL, {
         method: 'POST',
         body: acData,
         mode: 'no-cors',
       });
+
+      // Send to Formspree
+      await fetch('https://formspree.io/f/xdawzpab', {
+        method: 'POST',
+        body: formspreeData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
       setStatus('success');
       setFormData({ fullname: '', email: '', date: '', location: '', message: '', offer: 'JESZCZE NIE WIEMY' });
     } catch (error) {

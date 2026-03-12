@@ -355,16 +355,12 @@ export const PortraitsWeddingPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('loading');
-
-    const message = [
-      '[SP] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ',
-      '---',
+      const acMessage = [
       'Fotostacja ślubna',
       formData.guests ? `Liczba gości: ${formData.guests}` : '',
       formData.notes ? `Uwagi: ${formData.notes}` : '',
       '---',
-      'POWIADOMIENIE: sobotki.portraits@gmail.com, kontakt.sobotki@gmail.com',
+      'POWIADOMIENIE: sobotki.portraits@gmail.com, kontakt.sobotki@gmail.com'
     ]
       .filter(Boolean)
       .join('\n');
@@ -382,16 +378,37 @@ export const PortraitsWeddingPage: React.FC = () => {
     acData.append(AC_CONFIG.FIELDS.EMAIL, formData.email);
     acData.append(AC_CONFIG.FIELDS.DATE, formData.date);
     acData.append(AC_CONFIG.FIELDS.LOCATION, formData.location);
-    acData.append(AC_CONFIG.FIELDS.MESSAGE, message);
+    acData.append(AC_CONFIG.FIELDS.MESSAGE, acMessage);
     acData.append(AC_CONFIG.FIELDS.OFFER, 'ZDJĘCIA + FILM');
 
+    // Formspree Data
+    const formspreeData = new FormData();
+    formspreeData.append('_subject', '[SP] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ');
+    formspreeData.append('Imię i Nazwisko', formData.fullname);
+    formspreeData.append('Email', formData.email);
+    formspreeData.append('Data', formData.date);
+    formspreeData.append('Miejsce', formData.location);
+    formspreeData.append('Liczba gości', formData.guests);
+    formspreeData.append('Uwagi', formData.notes);
+
     try {
+      // Send to ActiveCampaign
       await fetch(AC_CONFIG.URL, {
         method: 'POST',
         body: acData,
         mode: 'no-cors',
       });
 
+      // Send to Formspree
+      await fetch('https://formspree.io/f/xvzwrvzr', {
+        method: 'POST',
+        body: formspreeData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      setStatus('success');
       setStatus('success');
       setFormData({
         fullname: '',

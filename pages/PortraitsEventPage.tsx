@@ -45,17 +45,13 @@ export const PortraitsEventPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('loading');
-
-    const message = [
-      '[SP event] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ',
-      '---',
+    setStatus('load    const acMessage = [
       'Fotostacja eventowa',
       formData.company ? `Nazwa firmy: ${formData.company}` : '',
       formData.guests ? `Liczba osób: ${formData.guests}` : '',
       formData.notes ? `Uwagi: ${formData.notes}` : '',
       '---',
-      'POWIADOMIENIE: sobotki.portraits@gmail.com, kontakt.sobotki@gmail.com',
+      'POWIADOMIENIE: sobotki.portraits@gmail.com, kontakt.sobotki@gmail.com'
     ]
       .filter(Boolean)
       .join('\n');
@@ -73,17 +69,38 @@ export const PortraitsEventPage: React.FC = () => {
     acData.append(AC_CONFIG.FIELDS.EMAIL, formData.email);
     acData.append(AC_CONFIG.FIELDS.DATE, formData.date);
     acData.append(AC_CONFIG.FIELDS.LOCATION, formData.location);
-    acData.append(AC_CONFIG.FIELDS.MESSAGE, message);
+    acData.append(AC_CONFIG.FIELDS.MESSAGE, acMessage);
     acData.append(AC_CONFIG.FIELDS.OFFER, 'EVENT FIRMOWY');
 
+    // Formspree Data
+    const formspreeData = new FormData();
+    formspreeData.append('_subject', '[SP event] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ');
+    formspreeData.append('Imię i Nazwisko', formData.fullname);
+    formspreeData.append('Firma', formData.company);
+    formspreeData.append('Email', formData.email);
+    formspreeData.append('Data', formData.date);
+    formspreeData.append('Miejsce', formData.location);
+    formspreeData.append('Liczba gości', formData.guests);
+    formspreeData.append('Uwagi', formData.notes);
+
     try {
+      // Send to ActiveCampaign
       await fetch(AC_CONFIG.URL, {
         method: 'POST',
         body: acData,
         mode: 'no-cors',
       });
 
-      setStatus('success');
+      // Send to Formspree
+      await fetch('https://formspree.io/f/xnjgvojo', {
+        method: 'POST',
+        body: formspreeData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      setStatus('success');uccess');
       setFormData({
         fullname: '',
         company: '',
