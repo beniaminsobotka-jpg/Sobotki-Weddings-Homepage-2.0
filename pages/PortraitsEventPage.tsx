@@ -45,7 +45,8 @@ export const PortraitsEventPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('load    const acMessage = [
+    setStatus('loading');
+    const acMessage = [
       'Fotostacja eventowa',
       formData.company ? `Nazwa firmy: ${formData.company}` : '',
       formData.guests ? `Liczba osób: ${formData.guests}` : '',
@@ -100,7 +101,7 @@ export const PortraitsEventPage: React.FC = () => {
         }
       });
 
-      setStatus('success');uccess');
+      setStatus('success');
       setFormData({
         fullname: '',
         company: '',

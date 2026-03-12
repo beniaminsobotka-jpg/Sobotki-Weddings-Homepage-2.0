@@ -355,7 +355,8 @@ export const PortraitsWeddingPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-      const acMessage = [
+    setStatus('loading');
+    const acMessage = [
       'Fotostacja ślubna',
       formData.guests ? `Liczba gości: ${formData.guests}` : '',
       formData.notes ? `Uwagi: ${formData.notes}` : '',
@@ -408,7 +409,6 @@ export const PortraitsWeddingPage: React.FC = () => {
         }
       });
 
-      setStatus('success');
       setStatus('success');
       setFormData({
         fullname: '',
