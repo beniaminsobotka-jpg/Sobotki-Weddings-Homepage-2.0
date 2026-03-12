@@ -455,8 +455,11 @@ export const PortraitsPage: React.FC = () => {
                     
                     {/* Header with Keywords */}
                     <div className="text-center space-y-6">
-                        <h2 className="font-serif text-3xl md:text-5xl text-white uppercase tracking-widest">
-                            Tworzymy pamiątki na całe życie
+                        <h2 className="font-serif text-3xl md:text-5xl text-white uppercase tracking-widest flex flex-col items-center">
+                            <span>Tworzymy pamiątki</span>
+                            <span className="font-playfair-italic font-light lowercase text-[#d42929] mt-2">
+                                na całe życie
+                            </span>
                         </h2>
                         {/* Infinite Marquee of Keywords */}
                         <div 
@@ -465,7 +468,7 @@ export const PortraitsPage: React.FC = () => {
                         >
                             <motion.div
                                 animate={{ x: ["0%", "-50%"] }}
-                                transition={{ ease: "linear", duration: 40, repeat: Infinity }}
+                                transition={{ ease: "linear", duration: 70, repeat: Infinity }}
                                 className="flex min-w-max"
                             >
                                 {/* Generating 4 identical blocks to fill the screen and allow seamless loop from 0 to -50% */}
