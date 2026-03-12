@@ -457,7 +457,7 @@ export const PortraitsPage: React.FC = () => {
                     <div className="text-center space-y-6">
                         <h2 className="font-serif text-3xl md:text-5xl text-white uppercase tracking-widest flex flex-col items-center">
                             <span>Tworzymy pamiątki</span>
-                            <span className="font-playfair-italic font-light lowercase text-[#d42929] mt-2">
+                            <span className="font-playfair-italic font-light lowercase text-[#d42929] tracking-normal text-4xl md:text-6xl -mt-2 md:-mt-4">
                                 na całe życie
                             </span>
                         </h2>
