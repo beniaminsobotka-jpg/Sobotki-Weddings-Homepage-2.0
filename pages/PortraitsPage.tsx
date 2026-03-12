@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowUpRight, MapPin, Calendar, Briefcase } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, MapPin, Calendar, Briefcase } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 // --- DATA ---
@@ -332,8 +332,8 @@ export const PortraitsPage: React.FC = () => {
                              {/* Content */}
                              <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                  <div className="mb-auto flex justify-end">
-                                      <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">
-                                          <ArrowUpRight className="text-white" size={20} />
+                                      <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/30 text-white transition-all duration-500 group-hover:bg-white group-hover:text-black">
+                                          <ArrowRight size={20} className="transform transition-transform duration-500 group-hover:translate-x-1" />
                                       </div>
                                  </div>
 
@@ -375,8 +375,8 @@ export const PortraitsPage: React.FC = () => {
                              {/* Content */}
                              <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                  <div className="mb-auto flex justify-end">
-                                      <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">
-                                          <ArrowUpRight className="text-white" size={20} />
+                                      <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/30 text-white transition-all duration-500 group-hover:bg-white group-hover:text-black">
+                                          <ArrowRight size={20} className="transform transition-transform duration-500 group-hover:translate-x-1" />
                                       </div>
                                  </div>
 
@@ -418,8 +418,8 @@ export const PortraitsPage: React.FC = () => {
                              {/* Content */}
                              <div className="absolute inset-0 p-8 flex flex-col justify-end">
                                  <div className="mb-auto flex justify-end">
-                                      <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0">
-                                          <ArrowUpRight className="text-white" size={20} />
+                                      <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/30 text-white transition-all duration-500 group-hover:bg-white group-hover:text-black">
+                                          <ArrowRight size={20} className="transform transition-transform duration-500 group-hover:translate-x-1" />
                                       </div>
                                  </div>
 
@@ -458,9 +458,24 @@ export const PortraitsPage: React.FC = () => {
                         <h2 className="font-serif text-3xl md:text-5xl text-white uppercase tracking-widest">
                             Tworzymy pamiątki na całe życie
                         </h2>
-                        <p className="text-[10px] md:text-xs text-gray-500 uppercase tracking-[0.2em] leading-loose max-w-4xl mx-auto opacity-70">
-                            Wyjątkowe / Ponadczasowe / Eleganckie / Klasyczne / Prestiżowe / Luksusowe / Minimalistyczne / Czarno-Białe / Naturalne / Prawdziwe / Trwałe / Profesjonalne / Piękne
-                        </p>
+                        {/* Infinite Marquee of Keywords */}
+                        <div 
+                            className="relative w-full overflow-hidden flex opacity-70"
+                            style={{ maskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 15%, black 85%, transparent)" }}
+                        >
+                            <motion.div
+                                animate={{ x: ["0%", "-50%"] }}
+                                transition={{ ease: "linear", duration: 40, repeat: Infinity }}
+                                className="flex min-w-max"
+                            >
+                                {/* Generating 4 identical blocks to fill the screen and allow seamless loop from 0 to -50% */}
+                                {[...Array(4)].map((_, i) => (
+                                    <span key={i} className="text-[10px] md:text-xs text-gray-500 uppercase tracking-[0.2em] whitespace-nowrap pr-4">
+                                        Wyjątkowe • Ponadczasowe • Eleganckie • Klasyczne • Prestiżowe • Luksusowe • Minimalistyczne • Czarno-Białe • Naturalne • Prawdziwe • Trwałe • Profesjonalne • Piękne •
+                                    </span>
+                                ))}
+                            </motion.div>
+                        </div>
                     </div>
 
                     {/* "Czym jest Fotostacja" Section */}
