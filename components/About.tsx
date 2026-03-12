@@ -40,7 +40,7 @@ export const About: React.FC = () => {
                 transition={{ duration: 0.8, ease: "easeOut" }}
             >
                 <img 
-                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/O-nas-zdjecie02.jpg" 
+                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_1.webp" 
                     alt="Ania" 
                     className="w-full h-full object-cover grayscale md:grayscale-0 transition-all duration-700 md:group-hover:grayscale-[0.5]"
                 />
@@ -103,7 +103,7 @@ export const About: React.FC = () => {
              {/* Zdjęcie środkowe - Zmniejszone (85% szerokości na desktopie) */}
              <div className="relative w-full md:w-[85%] aspect-[4/5] mb-6 md:mb-8 overflow-hidden rounded-2xl shadow-xl mx-auto">
                 <img 
-                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/O-nas-zdjecie01.jpg" 
+                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_2.webp" 
                     alt="Ania i Benek" 
                     className="w-full h-full object-cover"
                 />
@@ -135,7 +135,7 @@ export const About: React.FC = () => {
                 transition={{ duration: 0.8, ease: "easeOut" }}
             >
                 <img 
-                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/O-nas-zdjecie00.jpg" 
+                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_3.webp" 
                     alt="Benek" 
                     className="w-full h-full object-cover grayscale md:grayscale-0 transition-all duration-700 md:group-hover:grayscale-[0.5]"
                 />

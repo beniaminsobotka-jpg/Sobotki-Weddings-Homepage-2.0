@@ -139,10 +139,20 @@ export const HeroPortfolio: React.FC = () => {
                             opacity: style.opacity
                         }}
                         transition={{
-                            type: "spring",
-                            stiffness: 50,
-                            damping: 14,
-                            mass: 1.1
+                            // Layout (x, y, z, rotation, opacity) uses spring for smooth gliding
+                            default: {
+                                type: "spring",
+                                stiffness: 50,
+                                damping: 14,
+                                mass: 1.1
+                            },
+                            // zIndex explicitly sets duration to 0 and type to tween
+                            // This ensures the active image IMMEDIATELY jumps to the front 
+                            // before the other elements have finished sliding out of the way.
+                            zIndex: {
+                                duration: 0,
+                                type: "tween"
+                            }
                         }}
                         style={{
                             transformStyle: "preserve-3d",
