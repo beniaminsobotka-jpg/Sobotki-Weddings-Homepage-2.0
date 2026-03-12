@@ -190,12 +190,12 @@ const GuestbookScrollAnimation: React.FC = () => {
   }, [scrollYProgress, activeIndex, step]);
 
   const bookScale = useTransform(scrollYProgress, [0, 1], [1.2, 0.8]);
-  const titleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["26%", "24%"] : ["15%", "8%"]);
-  const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["63%", "69%"] : ["78%", "83%"]);
+  const titleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["28%", "26%"] : ["22%", "18%"]);
+  const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["65%", "71%"] : ["82%", "87%"]);
 
   return (
     <div ref={containerRef} className={`relative ${isMobile ? 'h-[200vh] mt-4 -mb-[10vh]' : 'h-[400vh] my-4 rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl'} w-full`}>
-      <div className={`sticky top-0 ${isMobile ? 'h-[55vh] rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl' : 'h-[100vh]'} w-full flex flex-col items-center justify-center overflow-hidden rounded-[30px]`}>
+      <div className={`sticky top-0 ${isMobile ? 'h-[60vh] pt-10' : 'h-[100vh] pt-24'} w-full flex flex-col items-center justify-center overflow-hidden rounded-[30px] bg-[#0a0a0a] border border-white/5 shadow-2xl`}>
         {/* Background ambient lighting */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)] pointer-events-none" />
         
