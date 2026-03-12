@@ -37,6 +37,14 @@ const films = [
 export const Portfolio: React.FC = () => {
   const navigate = useNavigate();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <section id="portfolio" className="py-24 md:py-32 bg-brand-paper px-4 md:px-8 relative overflow-hidden">
@@ -95,10 +103,10 @@ export const Portfolio: React.FC = () => {
                                 >
                                     <iframe 
                                         style={{ 
-                                            width: `${film.videoScale * 100}%`, 
-                                            height: `${film.videoScale * 100}%`, 
-                                            marginLeft: `-${(film.videoScale - 1) * 50}%`, 
-                                            marginTop: `-${(film.videoScale - 1) * 50}%` 
+                                            width: `${(isMobile ? 1.2 : film.videoScale) * 100}%`, 
+                                            height: `${(isMobile ? 1.2 : film.videoScale) * 100}%`, 
+                                            marginLeft: `-${((isMobile ? 1.2 : film.videoScale) - 1) * 50}%`, 
+                                            marginTop: `-${((isMobile ? 1.2 : film.videoScale) - 1) * 50}%` 
                                         }}
                                         className="object-cover pointer-events-none max-w-none"
                                         src={`https://www.youtube.com/embed/${film.id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${film.id}${film.startAt ? `&start=${film.startAt}` : ''}`} 
