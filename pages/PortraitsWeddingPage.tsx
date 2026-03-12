@@ -157,23 +157,27 @@ const GuestbookScrollAnimation: React.FC = () => {
     offset: ["start start", "end end"]
   });
 
+  const [isMobile, setIsMobile] = useState(false);
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   const images = Array.from({ length: 14 }, (_, i) => 
     `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka_www_${i + 1}.jpg`
   );
 
-  const turningPagesCount = 13; // 14 images total minus the base left (1) = 13 turning pages
+  const turningPagesCount = 13;
   const step = 1 / turningPagesCount;
 
-  // Track which active page index we are currently looking at based on scroll
   const [activeIndex, setActiveIndex] = useState(0);
 
   React.useEffect(() => {
     const unsub = scrollYProgress.on("change", (latest) => {
         let flippedPagesCount = 0;
         for (let i = 0; i < turningPagesCount; i++) {
-           // Only consider the page "flipped" when its turn animation is 95% complete.
-           // This prevents the Base Left background from updating to the new image
-           // *while* the page is still visibly returning down to the left side!
            if (latest > (i * step) + (step * 0.95)) {
                flippedPagesCount = i + 1;
            }
@@ -185,11 +189,12 @@ const GuestbookScrollAnimation: React.FC = () => {
     return () => unsub();
   }, [scrollYProgress, activeIndex, step]);
 
-  // Zoom effect: starts at 1.2 (120%), ends at 0.8 (80%) based on total scroll progress
   const bookScale = useTransform(scrollYProgress, [0, 1], [1.2, 0.8]);
+  const titleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["10%", "8%"] : ["15%", "8%"]);
+  const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["65%", "72%"] : ["78%", "83%"]);
 
   return (
-    <div ref={containerRef} className="relative h-[400vh] my-4 w-full rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl">
+    <div ref={containerRef} className={`relative ${isMobile ? 'h-[200vh]' : 'h-[400vh]'} my-4 w-full rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl`}>
       <div className="sticky top-0 h-[100vh] w-full flex flex-col items-center justify-center overflow-hidden rounded-[30px]">
         {/* Background ambient lighting */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)] pointer-events-none" />
@@ -198,7 +203,7 @@ const GuestbookScrollAnimation: React.FC = () => {
         <motion.div 
           className="absolute w-full flex items-center justify-center z-0 pointer-events-none"
           style={{ 
-              top: useTransform(scrollYProgress, [0, 1], ["15%", "8%"]),
+              top: titleTop,
               opacity: useTransform(scrollYProgress, [0, 0.15, 1], [0.1, 1, 1])
           }}
         >
@@ -211,7 +216,7 @@ const GuestbookScrollAnimation: React.FC = () => {
         <motion.div 
           className="absolute w-full flex flex-col items-center justify-center z-0 pointer-events-none"
           style={{ 
-              top: useTransform(scrollYProgress, [0, 1], ["78%", "83%"]),
+              top: subtitleTop,
               opacity: useTransform(scrollYProgress, [0, 0.1, 0.3, 1], [0, 0, 1, 1]),
           }}
         >
