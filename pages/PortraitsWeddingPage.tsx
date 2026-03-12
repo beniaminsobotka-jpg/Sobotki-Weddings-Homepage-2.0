@@ -437,7 +437,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                 className="font-serif text-[3.2rem] md:text-8xl lg:text-[7rem] font-black uppercase leading-[0.75] md:leading-[0.84] tracking-tight text-white flex flex-col items-start"
               >
                 <span>Portrety</span>
-                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-5 md:-mt-6 lg:-mt-8">
+                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-2 md:-mt-3 lg:-mt-4">
                   na weselu
                 </span>
               </motion.h1>
