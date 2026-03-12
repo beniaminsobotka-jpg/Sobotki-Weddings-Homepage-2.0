@@ -48,17 +48,13 @@ const generatePortfolio = () => {
 };
 
 const portfolioItems = generatePortfolio();
-const allCategories = ["Wszystkie", ...Array.from(new Set(portfolioItems.map(i => i.category)))];
 
 export const PortfolioPage: React.FC = () => {
-  const [filter, setFilter] = useState("Wszystkie");
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
 
-  // Filter Logic
-  const filteredItems = filter === "Wszystkie" 
-    ? portfolioItems 
-    : portfolioItems.filter(item => item.category === filter);
+  // Filter Logic removed
+  const filteredItems = portfolioItems;
 
   // Error Handler
   const handleImageError = (id: number) => {
@@ -111,24 +107,6 @@ export const PortfolioPage: React.FC = () => {
                         Wasze<br/>
                         <span className="font-playfair-italic text-gray-400 font-light lowercase ml-4 md:ml-8">historie</span>
                     </h1>
-                </div>
-
-                {/* Filters */}
-                <div className="flex flex-wrap justify-end gap-2 md:gap-3 max-w-md">
-                    {allCategories.map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => setFilter(cat)}
-                            className={`px-5 py-2 rounded-full border transition-all duration-300 font-sans text-[9px] md:text-[10px] font-bold uppercase tracking-widest
-                                ${filter === cat 
-                                    ? "bg-brand-black text-white border-brand-black shadow-lg" 
-                                    : "bg-white/50 text-brand-black border-brand-black/10 hover:border-brand-black hover:bg-white"
-                                }
-                            `}
-                        >
-                            {cat}
-                        </button>
-                    ))}
                 </div>
             </div>
 
