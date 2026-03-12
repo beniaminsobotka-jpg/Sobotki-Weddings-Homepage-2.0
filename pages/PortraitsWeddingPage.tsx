@@ -831,7 +831,7 @@ export const PortraitsWeddingPage: React.FC = () => {
               eyebrow: 'Również w portraits',
               title: 'Studio Stacjonarne',
               subtitle: 'Dzień portretu',
-              href: '/portraits',
+              href: '/portraits/stationary',
             },
           ].map((item) => (
             <div key={item.title} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group" onClick={() => {

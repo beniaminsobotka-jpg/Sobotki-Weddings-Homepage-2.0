@@ -171,13 +171,8 @@ export const Navbar: React.FC = () => {
                   {link.name}
                 </a>
               ))}
-            </div>
-            
-            <div className="mt-16 border-t border-brand-black/20 pt-8 w-24 mx-auto border-dashed"></div>
-            <div className="mt-4 font-sans text-xs tracking-widest text-gray-500 uppercase">
-               Est. 2014
-            </div>
-          </motion.div>
+          </div>
+        </motion.div>
         )}
       </AnimatePresence>
     </>
