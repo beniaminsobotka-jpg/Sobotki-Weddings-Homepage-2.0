@@ -552,36 +552,7 @@ export const PortraitsPage: React.FC = () => {
 
                 </div>
 
-                {/* 3. Specs & CTA */}
-                <div className="bg-[#111] border border-white/5 rounded-3xl p-8 md:p-12 flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="max-w-xl">
-                        <h4 className="font-serif text-2xl text-white mb-4">Pakiet Weselny - Szczegóły</h4>
-                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-gray-400 font-sans text-sm list-disc list-inside marker:text-gray-600">
-                            <li>3 godziny pracy fotografa</li>
-                            <li>Profesjonalne oświetlenie studyjne</li>
-                            <li>Tło (Czerń / Biel / Szarość)</li>
-                            <li>Nielimitowana ilość ujęć</li>
-                            <li>Galeria online (prywatne hasło)</li>
-                            <li>Dojazd do 50km w cenie</li>
-                        </ul>
-                    </div>
-                    
-                    <div className="flex flex-col items-center gap-4 shrink-0">
-                        <a 
-                            href="#kontakt" 
-                            onClick={(e) => {
-                                e.preventDefault();
-                                document.getElementById('kontakt')?.scrollIntoView({ behavior: 'smooth' });
-                            }}
-                            className="bg-white text-black px-8 py-4 rounded-full font-sans font-bold text-xs uppercase tracking-[0.2em] hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-                        >
-                            Zapytaj o termin
-                        </a>
-                        <span className="text-gray-600 font-sans text-[10px] uppercase tracking-widest">
-                            Ograniczona dostępność na 2026
-                        </span>
-                    </div>
-                </div>
+
 
             </div>
 
