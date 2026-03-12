@@ -361,6 +361,8 @@ export const PortraitsWeddingPage: React.FC = () => {
       'Fotostacja ślubna',
       formData.guests ? `Liczba gości: ${formData.guests}` : '',
       formData.notes ? `Uwagi: ${formData.notes}` : '',
+      '---',
+      'Powiadomienie wysyłane do: kontakt.sobotki@gmail.com, sobotki.portraits@gmail.com'
     ]
       .filter(Boolean)
       .join('\n');
@@ -798,7 +800,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                     value={formData.notes}
                     onChange={handleChange}
                     rows={4}
-                    placeholder="Napiszcie, jaki klimat planujecie, czy zależy Wam na konkretnym tle albo jak wygląda Wasz dzień."
+                    placeholder="Napiszcie, jaki klimat planujecie albo jak wygląda Wasz dzień."
                     className="resize-none rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                   />
                 </label>
