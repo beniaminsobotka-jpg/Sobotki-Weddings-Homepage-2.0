@@ -190,11 +190,11 @@ const GuestbookScrollAnimation: React.FC = () => {
   }, [scrollYProgress, activeIndex, step]);
 
   const bookScale = useTransform(scrollYProgress, [0, 1], [1.2, 0.8]);
-  const titleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["30%", "26%"] : ["15%", "8%"]);
-  const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["63%", "68%"] : ["78%", "83%"]);
+  const titleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["40%", "38%"] : ["15%", "8%"]);
+  const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["64%", "70%"] : ["78%", "83%"]);
 
   return (
-    <div ref={containerRef} className={`relative ${isMobile ? 'h-[200vh]' : 'h-[400vh]'} my-4 w-full rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl`}>
+    <div ref={containerRef} className={`relative ${isMobile ? 'h-[150vh]' : 'h-[400vh]'} my-4 w-full rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl`}>
       <div className="sticky top-0 h-[100vh] w-full flex flex-col items-center justify-center overflow-hidden rounded-[30px]">
         {/* Background ambient lighting */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)] pointer-events-none" />
