@@ -110,9 +110,9 @@ export const PortraitsPage: React.FC = () => {
                 
                 {/* 1. Hook / Intro */}
                 <div className="text-center">
-                    <h2 className="font-serif text-3xl md:text-5xl text-white mb-8 leading-none flex flex-col items-center">
-                        <span>Więcej niż fotobudka.</span>
-                        <span className="font-playfair-italic font-light lowercase text-[#d42929] tracking-normal text-3xl md:text-5xl -mt-2 md:-mt-4">To ponadczasowe portrety z charakterem.</span>
+                    <h2 className="font-serif text-white mb-8 leading-none flex flex-col items-center">
+                        <span className="uppercase tracking-widest text-2xl md:text-4xl">Więcej niż fotobudka.</span>
+                        <span className="font-playfair-italic font-light lowercase text-[#d42929] tracking-normal text-2xl md:text-4xl -mt-2">To ponadczasowe portrety z charakterem.</span>
                     </h2>
                     <div className="w-24 h-[1px] bg-white/20 mx-auto mb-8"></div>
                     <p className="font-sans text-gray-400 leading-loose tracking-wide text-sm md:text-base max-w-3xl mx-auto">
