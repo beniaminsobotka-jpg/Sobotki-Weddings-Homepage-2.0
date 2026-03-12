@@ -671,14 +671,17 @@ export const PortraitsWeddingPage: React.FC = () => {
                 </h2>
                 <div className="space-y-5 font-sans text-sm md:text-base leading-relaxed text-gray-300">
                   <p>
-                    Fotostacja na weselu wymaga przestrzeni rodem ze studia oraz odpowiednio jednolitego tła, dlatego dostosowujemy ofertę do warunków sali.
+                    Fotostację przygotowujemy kompleksowo — przywozimy ze sobą zarówno profesjonalne tło, jak i oświetlenie, dzięki czemu nie wymaga ona warunków rodem ze studia ani specjalnego zaplecza po stronie sali.
                   </p>
                   <p>
-                    Standardowy czas działania fotostacji to 3 godziny. Opcje podstawowe obejmują limit zdjęć (np. 300) oraz album online, jednak proponujemy również nielimitowany wydruk odbitek na duże wydarzenia.
+                    Standardowy czas działania fotostacji to 3 godziny. W opcji podstawowej pakiet obejmuje do 200 zdjęć oraz galerię online.
+                  </p>
+                  <p>
+                    W przypadku kameralnych przyjęć do 60 osób przygotowujemy indywidualną, odpowiednio niższą wycenę. Na większe wydarzenia możemy zaproponować także rozszerzone warianty, dopasowane do skali wesela i liczby gości.
                   </p>
                   <div className="mt-8 inline-block rounded-2xl border border-[#d42929] px-5 py-3">
                     <p className="font-sans text-xs text-gray-300 m-0">
-                      Cena fotostacji ślubnej zaczyna się od 3500 zł.
+                      Cena fotostacji ślubnej zaczyna się od 2900 zł w wersji standardowego przyjęcia.
                     </p>
                   </div>
                 </div>
