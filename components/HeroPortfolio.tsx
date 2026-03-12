@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-const images = Array.from({ length: 8 }, (_, i) => ({
+const mixedIds = [2, 1, 6, 3, 8, 5, 4, 7];
+
+const images = mixedIds.map((imageId, i) => ({
   id: i,
-  src: `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_${i + 1}.jpg`
+  src: `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_${imageId}.jpg`
 }));
 
 export const HeroPortfolio: React.FC = () => {
