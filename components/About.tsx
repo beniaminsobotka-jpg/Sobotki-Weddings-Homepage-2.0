@@ -26,7 +26,7 @@ export const About: React.FC = () => {
           
           {/* KOLUMNA LEWA - ANIA */}
           <motion.div 
-            className="group relative h-[65vh] md:h-auto overflow-hidden rounded-[30px] shadow-lg cursor-pointer"
+            className="group relative aspect-[4/5] md:aspect-auto md:h-full overflow-hidden rounded-[30px] shadow-lg cursor-pointer"
             initial="initial"
             whileHover="hover"
           >
@@ -121,7 +121,7 @@ export const About: React.FC = () => {
 
           {/* KOLUMNA PRAWA - BENEK */}
           <motion.div 
-            className="group relative h-[65vh] md:h-auto overflow-hidden rounded-[30px] shadow-lg cursor-pointer"
+            className="group relative aspect-[4/5] md:aspect-auto md:h-full overflow-hidden rounded-[30px] shadow-lg cursor-pointer"
             initial="initial"
             whileHover="hover"
           >

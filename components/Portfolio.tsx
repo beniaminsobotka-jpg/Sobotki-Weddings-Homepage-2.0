@@ -68,7 +68,7 @@ export const Portfolio: React.FC = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1, duration: 0.6 }}
-                        className="group relative aspect-[9/16] md:aspect-[3/4] lg:aspect-[4/5] rounded-[20px] overflow-hidden cursor-pointer bg-black shadow-lg"
+                        className="group relative aspect-[16/9] md:aspect-[3/4] lg:aspect-[4/5] rounded-[20px] overflow-hidden cursor-pointer bg-black shadow-lg"
                         onMouseEnter={() => setHoveredIndex(index)}
                         onMouseLeave={() => setHoveredIndex(null)}
                         onClick={() => window.open(`https://www.youtube.com/watch?v=${film.id}`, '_blank')}
