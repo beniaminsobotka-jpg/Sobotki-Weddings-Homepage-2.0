@@ -190,8 +190,8 @@ const GuestbookScrollAnimation: React.FC = () => {
   }, [scrollYProgress, activeIndex, step]);
 
   const bookScale = useTransform(scrollYProgress, [0, 1], [1.2, 0.8]);
-  const titleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["10%", "8%"] : ["15%", "8%"]);
-  const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["65%", "72%"] : ["78%", "83%"]);
+  const titleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["30%", "26%"] : ["15%", "8%"]);
+  const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["63%", "68%"] : ["78%", "83%"]);
 
   return (
     <div ref={containerRef} className={`relative ${isMobile ? 'h-[200vh]' : 'h-[400vh]'} my-4 w-full rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl`}>
