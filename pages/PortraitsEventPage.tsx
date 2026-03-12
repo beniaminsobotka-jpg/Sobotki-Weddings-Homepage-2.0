@@ -48,10 +48,14 @@ export const PortraitsEventPage: React.FC = () => {
     setStatus('loading');
 
     const message = [
+      '[SP event] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ',
+      '---',
       'Fotostacja eventowa',
       formData.company ? `Nazwa firmy: ${formData.company}` : '',
       formData.guests ? `Liczba osób: ${formData.guests}` : '',
       formData.notes ? `Uwagi: ${formData.notes}` : '',
+      '---',
+      'POWIADOMIENIE: sobotki.portraits@gmail.com, kontakt.sobotki@gmail.com',
     ]
       .filter(Boolean)
       .join('\n');

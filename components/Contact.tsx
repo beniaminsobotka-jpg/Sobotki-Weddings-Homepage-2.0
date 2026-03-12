@@ -50,7 +50,15 @@ export const Contact: React.FC = () => {
     acData.append(AC_CONFIG.FIELDS.EMAIL, formData.email);
     acData.append(AC_CONFIG.FIELDS.DATE, formData.date);
     acData.append(AC_CONFIG.FIELDS.LOCATION, formData.location);
-    acData.append(AC_CONFIG.FIELDS.MESSAGE, formData.message);
+    const message = [
+      '[SW] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ',
+      '---',
+      formData.message,
+      '---',
+      'POWIADOMIENIE: kontakt@sobotkiweddings.pl, kontakt.sobotki@gmail.com',
+    ].filter(Boolean).join('\n');
+
+    acData.append(AC_CONFIG.FIELDS.MESSAGE, message);
     acData.append(AC_CONFIG.FIELDS.OFFER, formData.offer);
 
     try {
