@@ -2,17 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
-// Wybieramy 9 zdjęć
-const selectedIds = [5, 12, 3, 9, 1, 8, 11, 2, 7];
-
-const images = selectedIds.map((num, i) => ({
+const images = Array.from({ length: 8 }, (_, i) => ({
   id: i,
-  src: `https://sobotkiweddings.pl/wp-content/uploads/2026/02/image-portfolio-hero-${num}.avif`
+  src: `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_${i + 1}.jpg`
 }));
 
 export const HeroPortfolio: React.FC = () => {
   const navigate = useNavigate();
-  const [activeIndex, setActiveIndex] = useState(4); // Start w środku (4 to środek dla 9 elementów)
+  const [activeIndex, setActiveIndex] = useState(3); // Start w środku (3 to optymalny środek dla 8 elementów)
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
