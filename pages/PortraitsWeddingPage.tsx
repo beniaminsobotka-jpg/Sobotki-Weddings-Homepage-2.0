@@ -22,7 +22,7 @@ const galleryImages = [
   'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
   'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_2.jpg',
   'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_3.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_4.jpg',
+  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_11.jpg',
   'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_5.jpg',
   'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_6.jpg',
   'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_7.jpg',
