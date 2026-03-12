@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Gallery Viewer</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 10px;">
+  <!-- JS will insert images here -->
+</div>
+<script>
+  const div = document.querySelector('div');
+  for (let i = 1; i <= 20; i++) {
+    const img = document.createElement('img');
+    img.src = `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_${i}.jpg`;
+    img.style.width = '200px';
+    const num = document.createElement('div');
+    num.textContent = `ID: ${i}`;
+    const wrap = document.createElement('div');
+    wrap.appendChild(img);
+    wrap.appendChild(num);
+    div.appendChild(wrap);
+  }
+</script>
+</body>
+</html>
