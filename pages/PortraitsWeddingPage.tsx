@@ -358,11 +358,13 @@ export const PortraitsWeddingPage: React.FC = () => {
     setStatus('loading');
 
     const message = [
+      '[SP] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ',
+      '---',
       'Fotostacja ślubna',
       formData.guests ? `Liczba gości: ${formData.guests}` : '',
       formData.notes ? `Uwagi: ${formData.notes}` : '',
       '---',
-      'Powiadomienie wysyłane do: kontakt.sobotki@gmail.com, sobotki.portraits@gmail.com'
+      'POWIADOMIENIE: sobotki.portraits@gmail.com, kontakt.sobotki@gmail.com',
     ]
       .filter(Boolean)
       .join('\n');
