@@ -131,9 +131,11 @@ export const PortraitsEventPage: React.FC = () => {
             className="absolute inset-0 h-full w-full object-cover filter grayscale contrast-110 opacity-70"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent" />
-          <div className="relative grid min-h-[84vh] gap-12 px-6 py-10 md:px-10 md:py-14 lg:grid-cols-[1.1fr_0.9fr] lg:items-end lg:px-14 lg:py-20">
-            <div className="max-w-3xl">
-              <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-md">
+          <div className="relative grid min-h-[92vh] md:min-h-[84vh] gap-0 md:gap-12 px-6 pb-6 pt-10 md:px-10 md:py-14 lg:grid-cols-[1fr_1fr] lg:items-end lg:px-14 lg:py-16">
+            
+            {/* Left side - Title and Text */}
+            <div className="max-w-3xl flex flex-col justify-end pt-40 mt-32 md:mt-0 lg:pt-32">
+              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-md self-start">
                 <Star size={12} className="fill-white text-white" />
                 <span className="font-sans text-[10px] uppercase tracking-[0.26em] text-white/80">
                   Sobotki Portraits / Fotostacja Eventowa
@@ -158,10 +160,14 @@ export const PortraitsEventPage: React.FC = () => {
                 a uczestnicy wychodzą z portretami, które naprawdę chce się zachować.
               </p>
 
-              <div className="mt-10 flex flex-wrap gap-4">
+            </div>
+
+            {/* Right side - Buttons */}
+            <div className="flex flex-col lg:items-end justify-end pb-2 lg:pb-0 -mt-2 md:mt-0 w-full">
+              <div className="flex flex-col sm:flex-row gap-4 justify-start lg:justify-end w-full sm:w-auto">
                 <button
                   onClick={() => document.getElementById('event-offer-form')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-200"
+                  className="w-full sm:w-auto group inline-flex justify-center items-center gap-3 rounded-full bg-white px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-200"
                 >
                   Zapytaj o wycenę
                   <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -172,14 +178,12 @@ export const PortraitsEventPage: React.FC = () => {
                     navigate('/portraits');
                     window.scrollTo(0, 0);
                   }}
-                  className="rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
+                  className="hidden sm:flex justify-center items-center rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
                   Wszystkie usługi
                 </button>
               </div>
             </div>
-
-            <div className="hidden lg:block" />
           </div>
         </section>
 
