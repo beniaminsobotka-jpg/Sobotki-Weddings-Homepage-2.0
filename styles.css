@@ -39,6 +39,11 @@ body {
   font-style: italic;
 }
 
+.font-serif.font-black {
+  font-weight: 800;
+  font-variation-settings: "wght" 800;
+}
+
 .texture-overlay {
   position: fixed;
   inset: 0;

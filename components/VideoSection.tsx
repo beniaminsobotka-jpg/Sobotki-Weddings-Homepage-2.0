@@ -33,7 +33,7 @@ export const VideoSection: React.FC = () => {
       {/* 1. BACKGROUND KINETIC TYPOGRAPHY (Parallax) */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full pointer-events-none opacity-[0.04] select-none z-0">
          <motion.div style={{ x: xMovement }} className="whitespace-nowrap">
-            <span className="font-serif font-[1000] text-[25vw] leading-none text-brand-black uppercase tracking-tighter">
+            <span className="font-serif font-black text-[25vw] leading-none text-brand-black uppercase tracking-tighter">
               Foto & Video &nbsp; Foto & Video
             </span>
          </motion.div>

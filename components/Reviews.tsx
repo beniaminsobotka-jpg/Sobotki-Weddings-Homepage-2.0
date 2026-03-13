@@ -32,7 +32,7 @@ export const Reviews: React.FC = () => {
       <div className="max-w-[1400px] mx-auto">
         <div className="text-center mb-3 md:mb-24">
           <h2 className="text-brand-black flex flex-col items-center leading-none gap-2">
-            <span className="font-serif font-[1000] uppercase text-5xl md:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-sm">
+            <span className="font-serif font-black uppercase text-5xl md:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-sm">
               Miłe
             </span>
             <span className="font-playfair-italic font-normal normal-case tracking-normal text-gray-500/80 text-5xl md:text-7xl">

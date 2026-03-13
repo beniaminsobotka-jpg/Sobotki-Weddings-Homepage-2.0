@@ -101,7 +101,7 @@ export const Contact: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-2 md:mb-12">
           <h2 className="text-brand-black flex flex-col items-center leading-none gap-1 md:gap-2">
-            <span className="font-serif font-[1000] uppercase text-4xl md:text-5xl lg:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-md">
+            <span className="font-serif font-black uppercase text-4xl md:text-5xl lg:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-md">
               Napisz do
             </span>
             <span className="font-playfair-italic font-normal normal-case tracking-normal text-gray-600/80 text-4xl md:text-5xl lg:text-7xl">
