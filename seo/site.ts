@@ -1,4 +1,7 @@
-export const SITE_URL = 'https://sobotkiweddings.pl';
+const DEFAULT_SITE_URL = 'https://sobotkiweddings.pl';
+const configuredSiteUrl = import.meta.env.VITE_SITE_URL?.trim();
+
+export const SITE_URL = (configuredSiteUrl || DEFAULT_SITE_URL).replace(/\/+$/, '');
 export const SITE_NAME = 'Sobotki Weddings';
 export const SITE_LOCALE = 'pl_PL';
 export const DEFAULT_ROBOTS = 'index,follow,max-image-preview:large';

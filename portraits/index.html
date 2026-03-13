@@ -18,7 +18,7 @@
     />
     <meta property="og:image" content="https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_1.jpg" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://sobotkiweddings.pl/portraits" />
+    <meta property="og:url" content="%VITE_SITE_URL%/portraits" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Sobotki Portraits | Fotostacja ślubna i eventowa premium" />
     <meta
@@ -27,7 +27,7 @@
     />
     <meta name="twitter:image" content="https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_1.jpg" />
     <meta name="theme-color" content="#050505" />
-    <link rel="canonical" href="https://sobotkiweddings.pl/portraits" />
+    <link rel="canonical" href="%VITE_SITE_URL%/portraits" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://use.typekit.net" crossorigin />
@@ -38,9 +38,76 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://use.typekit.net/oiv8gfj.css" />
+    <style>
+      .seo-fallback {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "%VITE_SITE_URL%/#website",
+            "url": "%VITE_SITE_URL%",
+            "name": "Sobotki Weddings",
+            "inLanguage": "pl-PL"
+          },
+          {
+            "@type": "ProfessionalService",
+            "@id": "%VITE_SITE_URL%/#service",
+            "name": "Sobotki Weddings",
+            "url": "%VITE_SITE_URL%",
+            "description": "Fotografia i film ślubny oraz fotostacja premium na wesela, eventy firmowe i sesje portretowe.",
+            "email": "kontakt@sobotkiweddings.pl",
+            "sameAs": [
+              "https://www.instagram.com/sobotki.weddings/",
+              "https://www.facebook.com/sobotki.weddings"
+            ],
+            "serviceType": [
+              "Fotografia ślubna",
+              "Film ślubny",
+              "Fotostacja ślubna",
+              "Fotostacja eventowa",
+              "Sesje portretowe"
+            ],
+            "areaServed": [
+              "PL",
+              "Europa"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="seo-fallback">
+        <h1>Sobotki Portraits - fotostacja premium</h1>
+        <p>Elegancka fotostacja premium z czarno-białymi portretami na wesela, eventy firmowe i sesje stacjonarne.</p>
+        <section>
+          <h2>Fotostacja ślubna</h2>
+          <p>Portrety gości na weselu z natychmiastowym wydrukiem i galerią online.</p>
+        </section>
+        <section>
+          <h2>Fotostacja eventowa</h2>
+          <p>Branding, doświadczenie premium i obsługa eventów firmowych, gal i konferencji.</p>
+        </section>
+        <section>
+          <h2>Fotostacja stacjonarna</h2>
+          <p>Sesje portretowe w Gliwicach dla par, rodzin i gości szukających ponadczasowych zdjęć.</p>
+        </section>
+      </main>
+    </div>
     <div class="texture-overlay"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

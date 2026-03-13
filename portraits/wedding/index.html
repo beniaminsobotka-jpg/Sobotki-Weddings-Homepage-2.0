@@ -18,7 +18,7 @@
     />
     <meta property="og:image" content="https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_2.jpg" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://sobotkiweddings.pl/portraits/wedding" />
+    <meta property="og:url" content="%VITE_SITE_URL%/portraits/wedding" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Fotostacja ślubna | Czarno-białe portrety gości - Sobotki Portraits" />
     <meta
@@ -27,7 +27,7 @@
     />
     <meta name="twitter:image" content="https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_2.jpg" />
     <meta name="theme-color" content="#050505" />
-    <link rel="canonical" href="https://sobotkiweddings.pl/portraits/wedding" />
+    <link rel="canonical" href="%VITE_SITE_URL%/portraits/wedding" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://use.typekit.net" crossorigin />
@@ -38,9 +38,76 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="https://use.typekit.net/oiv8gfj.css" />
+    <style>
+      .seo-fallback {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "%VITE_SITE_URL%/#website",
+            "url": "%VITE_SITE_URL%",
+            "name": "Sobotki Weddings",
+            "inLanguage": "pl-PL"
+          },
+          {
+            "@type": "ProfessionalService",
+            "@id": "%VITE_SITE_URL%/#service",
+            "name": "Sobotki Weddings",
+            "url": "%VITE_SITE_URL%",
+            "description": "Fotografia i film ślubny oraz fotostacja premium na wesela, eventy firmowe i sesje portretowe.",
+            "email": "kontakt@sobotkiweddings.pl",
+            "sameAs": [
+              "https://www.instagram.com/sobotki.weddings/",
+              "https://www.facebook.com/sobotki.weddings"
+            ],
+            "serviceType": [
+              "Fotografia ślubna",
+              "Film ślubny",
+              "Fotostacja ślubna",
+              "Fotostacja eventowa",
+              "Sesje portretowe"
+            ],
+            "areaServed": [
+              "PL",
+              "Europa"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="seo-fallback">
+        <h1>Fotostacja ślubna Sobotki Portraits</h1>
+        <p>Mobilne studio portretowe na wesele z czarno-białymi portretami gości, wydrukiem i galerią online.</p>
+        <section>
+          <h2>Portrety gości na weselu</h2>
+          <p>Elegancka atrakcja weselna premium prowadzona przez fotografa, a nie automat.</p>
+        </section>
+        <section>
+          <h2>Galeria i styl</h2>
+          <p>Ponadczasowe portrety w estetyce black and white, które zostają z gośćmi na lata.</p>
+        </section>
+        <section>
+          <h2>Pakiety i wycena</h2>
+          <p>Oferta dopasowana do wielkości wesela, liczby gości i wybranych opcji dodatkowych.</p>
+        </section>
+      </main>
+    </div>
     <div class="texture-overlay"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
