@@ -57,10 +57,10 @@ export const PortraitsStationaryPage: React.FC = () => {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="font-serif text-6xl font-black leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem] flex flex-col items-start"
+                className="font-serif text-[11vw] sm:text-6xl font-black leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem] flex flex-col items-start"
               >
                 <span className="uppercase">Fotostacja</span>
-                <span className="font-playfair-italic font-light text-[#d42929] -mt-3 md:-mt-6 lg:-mt-8 pr-4">
+                <span className="font-playfair-italic font-light text-[#d42929] -mt-1 md:-mt-6 lg:-mt-8">
                   w Gliwicach
                 </span>
               </motion.h1>

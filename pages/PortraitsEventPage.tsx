@@ -146,10 +146,10 @@ export const PortraitsEventPage: React.FC = () => {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="font-serif text-6xl font-black uppercase leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem]"
+                className="font-serif text-[14vw] sm:text-6xl font-black uppercase leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem] flex flex-col"
               >
-                Eventy
-                <span className="ml-3 font-playfair-italic font-light lowercase text-[#d42929]">
+                <span>Eventy</span>
+                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-1 md:-mt-4">
                   firmowe
                 </span>
               </motion.h1>

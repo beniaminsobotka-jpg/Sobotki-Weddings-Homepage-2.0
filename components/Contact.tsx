@@ -95,11 +95,11 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="kontakt" className="py-6 md:py-32 px-6 relative">
+    <section id="kontakt" className="py-2 md:py-32 px-6 relative">
       <div className="max-w-4xl mx-auto relative z-10">
         
         {/* Header */}
-        <div className="text-center mb-6 md:mb-12">
+        <div className="text-center mb-2 md:mb-12">
           <h2 className="text-brand-black flex flex-col items-center leading-none gap-1 md:gap-2">
             <span className="font-serif font-[1000] uppercase text-4xl md:text-5xl lg:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-md">
               Napisz do
@@ -111,7 +111,7 @@ export const Contact: React.FC = () => {
         </div>
 
         {/* GLASS FORM CONTAINER */}
-        <div className="backdrop-blur-[30px] bg-white/40 border border-white/50 rounded-[30px] shadow-[0_20px_60px_rgba(0,0,0,0.05)] p-5 md:p-16">
+        <div className="backdrop-blur-[30px] bg-white/40 border border-white/50 rounded-[30px] shadow-[0_20px_60px_rgba(0,0,0,0.05)] p-4 md:p-16">
             <AnimatePresence mode="wait">
             {status === 'success' ? (
                 <motion.div 
@@ -133,8 +133,8 @@ export const Contact: React.FC = () => {
                 </button>
                 </motion.div>
             ) : (
-                <form className="space-y-5 md:space-y-12" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-12">
+                <form className="space-y-3 md:space-y-12" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-12">
                     <div className="group relative">
                         <label className="block font-sans text-[10px] md:text-xs text-gray-500 uppercase tracking-widest mb-2 ml-1">Imię i Nazwisko</label>
                         <input 
@@ -161,7 +161,7 @@ export const Contact: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-12">
                     <div className="group">
                         <label className="block font-sans text-[10px] md:text-xs text-gray-500 uppercase tracking-widest mb-2 ml-1">Data Ślubu</label>
                         <input 
@@ -224,7 +224,7 @@ export const Contact: React.FC = () => {
                     </div>
                 )}
 
-                <div className="pt-2 md:pt-8 flex justify-center">
+                <div className="pt-0 md:pt-8 flex justify-center">
                     <button 
                     disabled={status === 'loading'}
                     className="group relative bg-brand-black text-white font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] px-10 py-5 rounded-full hover:bg-gray-800 transition-all duration-300 flex items-center gap-3 disabled:opacity-50 w-full md:w-auto justify-center shadow-[0_10px_30px_rgba(0,0,0,0.15)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1"

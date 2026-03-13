@@ -11,18 +11,18 @@ export const About: React.FC = () => {
   }, []);
 
   return (
-    <section id="o-nas" className="py-6 md:py-24 bg-brand-paper relative overflow-hidden px-4 md:px-8">
+    <section id="o-nas" className="py-2 md:py-24 bg-brand-paper relative overflow-hidden px-4 md:px-8">
       <div className="max-w-[1600px] mx-auto">
         
         {/* Header Sekcji - Mobilny (na desktopie jest w środkowej kolumnie) */}
-        <div className="md:hidden text-center mb-4">
+        <div className="md:hidden text-center mb-2">
             <h2 className="font-serif font-black text-5xl uppercase tracking-tighter">
                 Ania & Benek
             </h2>
             <p className="font-playfair-italic text-gray-500 mt-2">Duet w życiu i w pracy</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-8 lg:gap-12 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-8 lg:gap-12 items-stretch">
           
           {/* KOLUMNA LEWA - ANIA */}
           <motion.div 
@@ -49,7 +49,7 @@ export const About: React.FC = () => {
             {/* Liquid Glass Card */}
             {/* Mobile: Scroll Reveal | Desktop: Hover Reveal */}
             <motion.div 
-                className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6"
+                className="absolute bottom-2 left-2 right-2 md:bottom-6 md:left-6 md:right-6"
                 {...(isMobile 
                     ? {
                         initial: { opacity: 0, y: 30 },
@@ -66,7 +66,7 @@ export const About: React.FC = () => {
                       }
                 )}
             >
-                <div className="liquid-glass backdrop-blur-xl bg-white/30 border border-white/40 p-6 rounded-2xl shadow-lg">
+                <div className="liquid-glass backdrop-blur-xl bg-white/30 border border-white/40 p-4 rounded-2xl shadow-lg">
                     <div className="flex flex-col items-start mb-3">
                         <h3 className="font-serif font-black text-2xl md:text-3xl uppercase text-brand-black leading-none mb-1">Ania</h3>
                         <p className="font-sans text-[9px] uppercase tracking-widest text-brand-black/60 font-bold">Fotograf</p>
@@ -80,7 +80,7 @@ export const About: React.FC = () => {
 
 
           {/* KOLUMNA ŚRODKOWA - WSPÓLNE (STATYCZNE) */}
-          <div className="flex flex-col justify-center items-center text-center py-4 md:py-0 order-first md:order-none">
+          <div className="flex flex-col justify-center items-center text-center py-0 md:py-0 order-first md:order-none">
              
              {/* Desktop Header */}
              <div className="hidden md:block mb-6 md:mb-8">
@@ -101,7 +101,7 @@ export const About: React.FC = () => {
              </div>
 
              {/* Zdjęcie środkowe - Zmniejszone (85% szerokości na desktopie) */}
-             <div className="relative w-[90%] md:w-[85%] aspect-[4/5] mb-4 md:mb-8 overflow-hidden rounded-2xl shadow-xl mx-auto">
+             <div className="relative w-[90%] md:w-[85%] aspect-[4/5] mb-2 md:mb-8 overflow-hidden rounded-2xl shadow-xl mx-auto">
                 <img 
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_2.webp" 
                     alt="Ania i Benek" 
@@ -114,7 +114,7 @@ export const About: React.FC = () => {
                 <p className="font-serif text-sm md:text-base leading-relaxed text-brand-black/80">
                    Jesteśmy nierozłącznym duetem już od 14 lat. Kochamy dobry design, harmonię i spokój w życiu, nasze dziecko, psiecko oraz tworzenie dla Was autentycznych zdjęć i filmów pełnych emocji!
                 </p>
-                <div className="w-12 h-[1px] bg-brand-black/20 mx-auto mt-4 md:mt-6"></div>
+                <div className="w-12 h-[1px] bg-brand-black/20 mx-auto mt-2 md:mt-6"></div>
              </div>
           </div>
 

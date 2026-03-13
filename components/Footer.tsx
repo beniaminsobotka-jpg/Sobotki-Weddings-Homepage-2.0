@@ -47,8 +47,8 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative z-20 isolate bg-black px-6 py-12 text-[#F3F2ED] md:px-8 md:py-16">
-      <div className="mx-auto grid max-w-[1500px] gap-12 border-t border-white/10 pt-10 md:grid-cols-[1fr_auto_1fr] md:items-center">
+    <footer className="relative z-20 isolate bg-black px-6 py-6 text-[#F3F2ED] md:px-8 md:py-16">
+      <div className="mx-auto grid max-w-[1500px] gap-8 border-t border-white/10 pt-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
         <div className="flex flex-col items-center gap-5 text-center md:items-start md:text-left">
           <a
             href="mailto:kontakt@sobotkiweddings.pl"
@@ -57,7 +57,7 @@ export const Footer: React.FC = () => {
             kontakt@sobotkiweddings.pl
           </a>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 mt-2 md:mt-0">
             <a
               href="https://www.instagram.com/sobotki.weddings/"
               target="_blank"
@@ -89,7 +89,7 @@ export const Footer: React.FC = () => {
           </span>
         </button>
 
-        <div className="flex flex-col items-center gap-3 text-center md:items-end md:text-right">
+        <div className="flex flex-col items-center gap-2 text-center md:items-end md:text-right">
           {footerLinks.map((link) => (
             <button
               key={link.label}
@@ -102,7 +102,7 @@ export const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-[1500px] text-center font-sans text-[10px] uppercase tracking-[0.22em] text-white/30 md:text-left">
+      <div className="mx-auto mt-6 max-w-[1500px] text-center font-sans text-[10px] uppercase tracking-[0.22em] text-white/30 md:text-left">
         © {new Date().getFullYear()} Sobotki Weddings
       </div>
     </footer>
