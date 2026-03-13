@@ -202,13 +202,13 @@ const GuestbookScrollAnimation: React.FC = () => {
         
         {/* Parallax Main Title */}
         <motion.div 
-          className="absolute w-full flex items-center justify-center z-0 pointer-events-none"
+          className="absolute w-full px-6 md:px-10 flex items-center justify-center z-0 pointer-events-none"
           style={{ 
               top: titleTop,
               opacity: useTransform(scrollYProgress, [0, 0.15, 1], [0.1, 1, 1])
           }}
         >
-          <h2 className="text-[9vw] sm:text-[8vw] md:text-[10vw] px-4 font-serif font-black uppercase text-white tracking-widest text-center whitespace-nowrap drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-none">
+          <h2 className="max-w-full overflow-visible px-2 font-serif font-black uppercase text-white tracking-[0.08em] text-center whitespace-nowrap text-[clamp(3.75rem,8vw,8.5rem)] drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-[0.9]">
             Księga Gości
           </h2>
         </motion.div>
