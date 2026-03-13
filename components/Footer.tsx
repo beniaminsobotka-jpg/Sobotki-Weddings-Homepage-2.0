@@ -47,7 +47,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative z-20 isolate bg-black px-6 py-6 text-[#F3F2ED] md:px-8 md:py-16">
+    <footer className="relative z-20 isolate bg-black px-6 py-10 text-[#F3F2ED] md:px-8 md:py-16">
       <div className="mx-auto grid max-w-[1500px] gap-8 border-t border-white/10 pt-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
         <div className="flex flex-col items-center gap-5 text-center md:items-start md:text-left">
           <a

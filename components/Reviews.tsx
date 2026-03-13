@@ -28,7 +28,7 @@ const reviews: Review[] = [
 
 export const Reviews: React.FC = () => {
   return (
-    <section className="pt-0 pb-4 md:pt-16 md:pb-32 px-4 md:px-8 relative">
+    <section className="pt-8 pb-8 md:pt-16 md:pb-32 px-4 md:px-8 relative">
       <div className="max-w-[1400px] mx-auto">
         <div className="text-center mb-3 md:mb-24">
           <h2 className="text-brand-black flex flex-col items-center leading-none gap-2">

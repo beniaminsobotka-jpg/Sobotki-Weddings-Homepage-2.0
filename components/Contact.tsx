@@ -95,7 +95,7 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="kontakt" className="py-2 md:py-32 px-6 relative">
+    <section id="kontakt" className="py-8 md:py-32 px-6 relative">
       <div className="max-w-4xl mx-auto relative z-10">
         
         {/* Header */}

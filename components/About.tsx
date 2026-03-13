@@ -11,7 +11,7 @@ export const About: React.FC = () => {
   }, []);
 
   return (
-    <section id="o-nas" className="py-2 md:py-24 bg-brand-paper relative overflow-hidden px-4 md:px-8">
+    <section id="o-nas" className="py-8 md:py-24 bg-brand-paper relative overflow-hidden px-4 md:px-8">
       <div className="max-w-[1600px] mx-auto">
         
         {/* Header Sekcji - Mobilny (na desktopie jest w środkowej kolumnie) */}

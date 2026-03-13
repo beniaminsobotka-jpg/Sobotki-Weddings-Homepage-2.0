@@ -110,7 +110,7 @@ export const Portraits: React.FC = () => {
   };
 
   return (
-    <section id="portraits" className="py-4 md:py-32 bg-black text-[#F3F2ED] relative overflow-hidden min-h-[400px] md:min-h-[900px] flex flex-col justify-center">
+    <section id="portraits" className="py-10 md:py-32 bg-black text-[#F3F2ED] relative overflow-hidden min-h-[400px] md:min-h-[900px] flex flex-col justify-center">
       
       <div className="absolute inset-0 bg-[#0a0a0a] pointer-events-none" />
 
