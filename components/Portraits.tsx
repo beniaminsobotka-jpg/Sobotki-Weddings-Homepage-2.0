@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 // Generowanie tablicy 10 zdjęć
 const portraits = Array.from({ length: 10 }, (_, i) => ({
@@ -11,7 +11,6 @@ const portraits = Array.from({ length: 10 }, (_, i) => ({
 export const Portraits: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(4);
   const containerRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   
   // State do wykrywania mobile (do zmiany parametrów 3D)
   const [isMobile, setIsMobile] = useState(false);
@@ -171,7 +170,7 @@ export const Portraits: React.FC = () => {
                                     
                                     <img 
                                         src={item.src} 
-                                        alt={`Portrait ${item.id}`}
+                                        alt="Czarno-biały portret gości wykonany w fotostacji Sobotki Portraits"
                                         className="w-full h-full object-cover select-none"
                                         draggable={false}
                                     />
@@ -226,11 +225,8 @@ export const Portraits: React.FC = () => {
                     </div>
 
                     {/* BUTTON - DOWIEDZ SIĘ WIĘCEJ */}
-                    <button 
-                        onClick={() => {
-                            navigate('/portraits');
-                            window.scrollTo(0,0);
-                        }}
+                    <Link
+                        to="/portraits"
                         className="group flex items-center gap-4 px-8 py-4 border border-white/10 rounded-full bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all duration-500 cursor-pointer shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:shadow-[0_0_40px_rgba(255,0,0,0.1)] hover:border-white/20 inline-flex"
                     >
                         <span className="relative flex h-2 w-2">
@@ -240,7 +236,7 @@ export const Portraits: React.FC = () => {
                         <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-gray-300 group-hover:text-white transition-colors">
                             Dowiedz się więcej
                         </span>
-                    </button>
+                    </Link>
                 </div>
             </div>
 

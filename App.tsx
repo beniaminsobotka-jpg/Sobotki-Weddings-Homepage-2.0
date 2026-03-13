@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Lenis from '@studio-freight/lenis';
 import { AnimatePresence } from 'framer-motion';
-import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -15,21 +15,81 @@ import { PortraitsPage } from './pages/PortraitsPage';
 import { PortraitsEventPage } from './pages/PortraitsEventPage';
 import { PortraitsWeddingPage } from './pages/PortraitsWeddingPage';
 import { PortraitsStationaryPage } from './pages/PortraitsStationaryPage';
+import { FilmPage } from './pages/FilmPage';
+import { ContactPage } from './pages/ContactPage';
 
 // ScrollToTop component to reset scroll on route change
 const ScrollToTop = () => {
-    const { pathname } = useLocation();
+    const { pathname, hash } = useLocation();
     useEffect(() => {
-        if (!pathname.includes('#')) {
-             window.scrollTo(0, 0);
-             const lenis = (window as any).lenis;
-             if (lenis) {
-                 lenis.scrollTo(0, { immediate: true });
-             }
+        const scrollToTarget = () => {
+            const lenis = (window as any).lenis;
+
+            if (hash) {
+                const targetId = decodeURIComponent(hash.replace('#', ''));
+                const targetElement = document.getElementById(targetId);
+
+                if (targetElement) {
+                    if (lenis) {
+                        lenis.scrollTo(`#${targetId}`, { immediate: true });
+                    } else {
+                        targetElement.scrollIntoView({ behavior: 'auto', block: 'start' });
+                    }
+                    return;
+                }
+            }
+
+            window.scrollTo(0, 0);
+            if (lenis) {
+                lenis.scrollTo(0, { immediate: true });
+            }
         }
-    }, [pathname]);
+
+        const timeoutId = window.setTimeout(scrollToTarget, 60);
+        return () => window.clearTimeout(timeoutId);
+    }, [pathname, hash]);
     return null;
-}
+};
+
+const AppShell: React.FC<{
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ isLoading, setIsLoading }) => {
+  const location = useLocation();
+  const showLiquidBackground = ['/', '/portfolio', '/film', '/kontakt'].includes(location.pathname);
+
+  return (
+    <>
+      <ScrollToTop />
+
+      <AnimatePresence mode="wait">
+        {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
+      </AnimatePresence>
+
+      {showLiquidBackground && <LiquidBackground />}
+
+      {!isLoading && (
+        <>
+          <Navbar />
+          <main className="relative z-10">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Navigate to="/" replace />} />
+              <Route path="/portfolio" element={<PortfolioPage />} />
+              <Route path="/film" element={<FilmPage />} />
+              <Route path="/kontakt" element={<ContactPage />} />
+              <Route path="/portraits" element={<PortraitsPage />} />
+              <Route path="/portraits/event" element={<PortraitsEventPage />} />
+              <Route path="/portraits/wedding" element={<PortraitsWeddingPage />} />
+              <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
+            </Routes>
+          </main>
+          <Footer />
+        </>
+      )}
+    </>
+  );
+};
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -64,40 +124,9 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-brand-black selection:bg-brand-black selection:text-white no-scrollbar relative">
-      <HashRouter>
-          <ScrollToTop />
-          
-          <AnimatePresence mode="wait">
-            {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
-          </AnimatePresence>
-
-          {/* Conditional Background render to save GPU on dark pages */}
-          <Routes>
-            <Route path="/" element={<LiquidBackground />} />
-            <Route path="/home" element={<LiquidBackground />} />
-            <Route path="/portfolio" element={<LiquidBackground />} />
-            <Route path="*" element={null} />
-          </Routes>
-
-          {!isLoading && (
-            <>
-              <Navbar />
-              <main className="relative z-10">
-                 <Routes>
-                    {/* UPDATED ROUTING: Home is now default */}
-                    <Route path="/" element={<Home />} />
-                    <Route path="/home" element={<Home />} />
-                    <Route path="/portfolio" element={<PortfolioPage />} />
-                    <Route path="/portraits" element={<PortraitsPage />} />
-                    <Route path="/portraits/event" element={<PortraitsEventPage />} />
-                    <Route path="/portraits/wedding" element={<PortraitsWeddingPage />} />
-                    <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
-                 </Routes>
-              </main>
-              <Footer />
-            </>
-          )}
-      </HashRouter>
+      <BrowserRouter>
+        <AppShell isLoading={isLoading} setIsLoading={setIsLoading} />
+      </BrowserRouter>
     </div>
   );
 };

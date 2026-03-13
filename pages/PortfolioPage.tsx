@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
 import { LiquidBackground } from '../components/LiquidBackground';
+import { Seo } from '../components/Seo';
 
 // --- DATA GENERATION ---
 const generatePortfolio = () => {
@@ -18,6 +19,7 @@ const generatePortfolio = () => {
       title: `Story No. ${id}`,
       category: categories[id % categories.length],
       location: locations[id % locations.length],
+      alt: `Fotografia ślubna Sobotki Weddings - ${categories[id % categories.length]} w ${locations[id % locations.length]}`,
     };
   });
 
@@ -36,6 +38,7 @@ const generatePortfolio = () => {
     title: `Motion Story ${i + 1}`,
     category: 'Wedding', // Assign to a category (or make a new one 'Video')
     location: 'Film',
+    alt: `Film ślubny Sobotki Weddings - realizacja ${i + 1}`,
   }));
 
   // 3. Weave them together (Insert videos at specific indices for visual balance)
@@ -92,12 +95,13 @@ export const PortfolioPage: React.FC = () => {
 
   return (
     <div className="min-h-screen pt-32 pb-12 md:pb-24 px-4 md:px-8 relative selection:bg-brand-black selection:text-white">
+       <Seo page="portfolio" />
        <LiquidBackground />
        
        <div className="max-w-[1800px] mx-auto relative z-10">
             
             {/* --- HEADER --- */}
-            <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-24 gap-8 border-b border-brand-black/10 pb-12">
+            <header className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-24 gap-8 border-b border-brand-black/10 pb-12">
                 <div>
                     <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-gray-500 block mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-brand-black rounded-full"></span>
@@ -108,10 +112,13 @@ export const PortfolioPage: React.FC = () => {
                         <span className="font-playfair-italic text-gray-400 font-light lowercase ml-4 md:ml-8">historie</span>
                     </h1>
                 </div>
-            </div>
+            </header>
 
             {/* --- MASONRY LAYOUT (CSS COLUMNS) --- */}
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-3 space-y-3">
+            <section aria-labelledby="portfolio-gallery-heading" className="columns-1 md:columns-2 lg:columns-3 gap-3 space-y-3">
+                <h2 id="portfolio-gallery-heading" className="sr-only">
+                    Galeria portfolio Sobotki Weddings
+                </h2>
                 <AnimatePresence mode="popLayout">
                     {filteredItems.map((item, index) => (
                         <motion.div
@@ -140,7 +147,7 @@ export const PortfolioPage: React.FC = () => {
                                     !failedImages.has(item.id) ? (
                                         <img 
                                             src={item.src} 
-                                            alt={item.title}
+                                            alt={item.alt}
                                             loading="lazy"
                                             onError={() => handleImageError(item.id)}
                                             className="w-full h-auto block transition-transform duration-[0.8s] ease-out group-hover:scale-105"
@@ -157,7 +164,7 @@ export const PortfolioPage: React.FC = () => {
                         </motion.div>
                     ))}
                 </AnimatePresence>
-            </div>
+            </section>
 
             {/* --- LIGHTBOX MODAL --- */}
             <AnimatePresence>
@@ -209,7 +216,7 @@ export const PortfolioPage: React.FC = () => {
                                  !failedImages.has(filteredItems[selectedImageIndex].id) ? (
                                     <img 
                                         src={filteredItems[selectedImageIndex].src} 
-                                        alt={filteredItems[selectedImageIndex].title}
+                                        alt={filteredItems[selectedImageIndex].alt}
                                         className="max-w-full max-h-[85vh] object-contain"
                                     />
                                  ) : (

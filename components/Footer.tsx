@@ -1,12 +1,13 @@
 import React from 'react';
 import { Facebook, Instagram } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const footerLinks = [
-  { label: 'Home', href: '/home' },
+  { label: 'Home', href: '/' },
   { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Film', href: '/film' },
   { label: 'Portraits', href: '/portraits' },
-  { label: 'Kontakt', href: '/#kontakt' },
+  { label: 'Kontakt', href: '/kontakt' },
 ];
 
 export const Footer: React.FC = () => {
@@ -30,20 +31,11 @@ export const Footer: React.FC = () => {
         return;
       }
 
-      navigate(targetPath);
-      setTimeout(() => {
-        const element = document.getElementById(targetHash);
-        if (element && (window as any).lenis) {
-          (window as any).lenis.scrollTo(`#${targetHash}`);
-          return;
-        }
-        element?.scrollIntoView({ behavior: 'smooth' });
-      }, 600);
+      navigate({ pathname: targetPath || '/', hash: `#${targetHash}` });
       return;
     }
 
     navigate(href);
-    window.scrollTo(0, 0);
   };
 
   return (
@@ -77,8 +69,8 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => handleNavigation('/home')}
+        <Link
+          to="/"
           className="flex flex-col items-center justify-center leading-none text-center transition-opacity duration-300 hover:opacity-75"
         >
           <span className="font-serif font-black text-4xl uppercase tracking-tight text-white md:text-5xl">
@@ -87,17 +79,21 @@ export const Footer: React.FC = () => {
           <span className="mt-1 font-playfair italic text-lg lowercase text-white/65 md:text-xl">
             weddings
           </span>
-        </button>
+        </Link>
 
         <div className="flex flex-col items-center gap-2 text-center md:items-end md:text-right">
           {footerLinks.map((link) => (
-            <button
+            <a
               key={link.label}
-              onClick={() => handleNavigation(link.href)}
+              href={link.href}
+              onClick={(event) => {
+                event.preventDefault();
+                handleNavigation(link.href);
+              }}
               className="font-sans text-[11px] uppercase tracking-[0.22em] text-white/65 transition-colors duration-300 hover:text-white"
             >
               {link.label}
-            </button>
+            </a>
           ))}
         </div>
       </div>

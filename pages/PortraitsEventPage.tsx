@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Briefcase, Check, Download, Printer, QrCode, Sparkles, Star, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Seo } from '../components/Seo';
 
 const AC_CONFIG = {
   URL: 'https://sobotkiportraits44570.activehosted.com/proc.php',
@@ -27,7 +28,6 @@ const audienceItems = [
 ];
 
 export const PortraitsEventPage: React.FC = () => {
-  const navigate = useNavigate();
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState({
     fullname: '',
@@ -118,6 +118,7 @@ export const PortraitsEventPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
+      <Seo page="portraitsEvent" />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
@@ -173,15 +174,12 @@ export const PortraitsEventPage: React.FC = () => {
                   <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </button>
 
-                <button
-                  onClick={() => {
-                    navigate('/portraits');
-                    window.scrollTo(0, 0);
-                  }}
+                <Link
+                  to="/portraits"
                   className="hidden sm:flex justify-center items-center rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
                   Wszystkie usługi
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -522,10 +520,7 @@ export const PortraitsEventPage: React.FC = () => {
               href: '/portraits/stationary',
             },
           ].map((item) => (
-            <div key={item.title} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group" onClick={() => {
-              navigate(item.href);
-              window.scrollTo(0, 0);
-            }}>
+            <Link key={item.title} to={item.href} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group block">
               <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-gray-500">{item.eyebrow}</span>
               <h3 className="mt-5 font-serif text-3xl">{item.title}</h3>
               <p className="mt-2 font-playfair-italic text-xl text-gray-400 mb-8">{item.subtitle}</p>
@@ -533,7 +528,7 @@ export const PortraitsEventPage: React.FC = () => {
                 Zobacz
                 <ArrowUpRight size={15} />
               </div>
-            </div>
+            </Link>
           ))}
         </section>
       </div>

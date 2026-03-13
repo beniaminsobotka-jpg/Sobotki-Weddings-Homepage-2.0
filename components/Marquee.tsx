@@ -19,9 +19,9 @@ export const Marquee: React.FC = () => {
           duration: 20, 
         }}
       >
-        <h3 className="text-black font-playfair italic text-2xl md:text-3xl tracking-wide font-medium opacity-90">
+        <p className="text-black font-playfair italic text-2xl md:text-3xl tracking-wide font-medium opacity-90">
           {repeatedText}
-        </h3>
+        </p>
       </motion.div>
     </div>
   );

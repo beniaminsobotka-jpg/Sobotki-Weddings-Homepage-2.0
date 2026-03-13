@@ -25,7 +25,7 @@ export const About: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-8 lg:gap-12 items-stretch">
           
           {/* KOLUMNA LEWA - ANIA */}
-          <motion.div 
+          <motion.article 
             className="group relative aspect-[4/5] md:aspect-auto md:h-full overflow-hidden rounded-[30px] shadow-lg cursor-pointer"
             initial="initial"
             whileHover="hover"
@@ -41,7 +41,7 @@ export const About: React.FC = () => {
             >
                 <img 
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_1.webp" 
-                    alt="Ania" 
+                    alt="Ania, fotografka i współtwórczyni Sobotki Weddings" 
                     className="w-full h-full object-cover grayscale md:grayscale-0 transition-all duration-700 md:group-hover:grayscale-[0.5]"
                 />
             </motion.div>
@@ -76,7 +76,7 @@ export const About: React.FC = () => {
                     </p>
                 </div>
             </motion.div>
-          </motion.div>
+          </motion.article>
 
 
           {/* KOLUMNA ŚRODKOWA - WSPÓLNE (STATYCZNE) */}
@@ -104,7 +104,7 @@ export const About: React.FC = () => {
              <div className="relative w-[90%] md:w-[85%] aspect-[4/5] mb-2 md:mb-8 overflow-hidden rounded-2xl shadow-xl mx-auto">
                 <img 
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_2.webp" 
-                    alt="Ania i Benek" 
+                    alt="Ania i Benek, duet Sobotki Weddings" 
                     className="w-full h-full object-cover"
                 />
              </div>
@@ -120,7 +120,7 @@ export const About: React.FC = () => {
 
 
           {/* KOLUMNA PRAWA - BENEK */}
-          <motion.div 
+          <motion.article 
             className="group relative aspect-[4/5] md:aspect-auto md:h-full overflow-hidden rounded-[30px] shadow-lg cursor-pointer"
             initial="initial"
             whileHover="hover"
@@ -136,7 +136,7 @@ export const About: React.FC = () => {
             >
                 <img 
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_3.webp" 
-                    alt="Benek" 
+                    alt="Benek, filmowiec i współtwórca Sobotki Weddings" 
                     className="w-full h-full object-cover grayscale md:grayscale-0 transition-all duration-700 md:group-hover:grayscale-[0.5]"
                 />
             </motion.div>
@@ -174,7 +174,7 @@ export const About: React.FC = () => {
                     </p>
                 </div>
             </motion.div>
-          </motion.div>
+          </motion.article>
 
         </div>
       </div>

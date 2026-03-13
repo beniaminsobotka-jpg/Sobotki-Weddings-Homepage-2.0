@@ -58,7 +58,8 @@ export const Hero: React.FC = () => {
   const vignetteOpacity = useTransform(smoothProgress, [0, 0.5], [0.8, 0.4]);
 
   return (
-    <section ref={containerRef} id="home" className="relative w-full h-[110vh] md:h-[250vh]">
+    <header ref={containerRef} id="home" className="relative w-full h-[110vh] md:h-[250vh]">
+      <h1 className="sr-only">Sobotki Weddings - fotografia i film ślubny</h1>
       
       {/* Sticky Viewport */}
       <div className="sticky top-0 w-full h-screen overflow-hidden flex flex-col items-center justify-center">
@@ -273,9 +274,9 @@ export const Hero: React.FC = () => {
                     {/* Power Button */}
                     <div className="relative group cursor-pointer">
                        <div className="absolute -inset-1 bg-gradient-to-br from-gray-800 to-black rounded-full blur-[1px] opacity-70"></div>
-                       <button className="w-10 h-10 rounded-full bg-[#181818] border border-[#2a2a2a] shadow-[inset_0_-3px_5px_rgba(0,0,0,1),0_2px_5px_rgba(0,0,0,0.5)] flex items-center justify-center active:translate-y-[1px] active:shadow-[inset_0_2px_5px_rgba(0,0,0,1)] transition-all">
+                       <div className="w-10 h-10 rounded-full bg-[#181818] border border-[#2a2a2a] shadow-[inset_0_-3px_5px_rgba(0,0,0,1),0_2px_5px_rgba(0,0,0,0.5)] flex items-center justify-center transition-all" aria-hidden="true">
                           <Power size={14} className="text-gray-500 group-hover:text-gray-300 transition-colors" strokeWidth={3} />
-                       </button>
+                       </div>
                     </div>
                 </div>
             </div>
@@ -283,6 +284,6 @@ export const Hero: React.FC = () => {
         </motion.div>
         
       </div>
-    </section>
+    </header>
   );
 };

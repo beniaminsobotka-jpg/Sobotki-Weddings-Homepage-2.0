@@ -111,7 +111,7 @@ export const VideoSection: React.FC = () => {
                         </div>
                     </motion.div>
 
-                    <motion.h3
+                    <motion.h2
                         custom={1}
                         variants={cardContentVariants}
                         initial="hidden"
@@ -120,7 +120,7 @@ export const VideoSection: React.FC = () => {
                         className="font-serif font-black text-4xl md:text-5xl uppercase leading-[0.9] text-brand-black mb-2"
                     >
                         Foto +<br/>Video
-                    </motion.h3>
+                    </motion.h2>
                     
                     <motion.p
                         custom={2}

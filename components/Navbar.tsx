@@ -6,9 +6,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 const links = [
   { name: 'O Nas', href: '/#o-nas' },
   { name: 'Portfolio', href: '/portfolio' },
-  { name: 'Film', href: '/#portfolio' },
+  { name: 'Film', href: '/film' },
   { name: 'Portraits', href: '/portraits' },
-  { name: 'Kontakt', href: '/#kontakt' },
+  { name: 'Kontakt', href: '/kontakt' },
 ];
 
 export const Navbar: React.FC = () => {
@@ -40,21 +40,16 @@ export const Navbar: React.FC = () => {
              if (element && (window as any).lenis) {
                  (window as any).lenis.scrollTo(`#${targetHash}`);
              }
+            navigate(
+              { pathname: targetPath || '/', hash: `#${targetHash}` },
+              { replace: currentIsHome && targetIsHome }
+            );
         } else if (location.pathname !== targetPath) {
-            // Navigate to new page
-            navigate(targetPath);
-            // Wait for navigation then scroll
-            setTimeout(() => {
-                const element = document.getElementById(targetHash);
-                if (element && (window as any).lenis) {
-                    (window as any).lenis.scrollTo(`#${targetHash}`);
-                }
-            }, 600);
+            navigate({ pathname: targetPath || '/', hash: `#${targetHash}` });
         }
     } else {
         // Normal route (e.g., /portfolio)
         navigate(href);
-        window.scrollTo(0,0);
     }
   };
 
@@ -107,7 +102,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] md:w-auto max-w-[1400px]">
+      <nav aria-label="Główna nawigacja" className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] md:w-auto max-w-[1400px]">
         {/* Liquid Glass Container */}
         <div 
             className={`relative rounded-full px-6 py-3 md:px-8 md:py-4 flex justify-between items-center transition-all duration-700
@@ -116,10 +111,10 @@ export const Navbar: React.FC = () => {
         >
             
             {/* Logo - Navigates to Home explicitly now */}
-            <a href="/home" onClick={(e) => handleNavigation(e, '/home')} className={`flex flex-col items-center leading-none mr-8 md:mr-12 group ${isDark ? 'text-white' : 'text-brand-black'} cursor-pointer`}>
+            <Link to="/" className={`flex flex-col items-center leading-none mr-8 md:mr-12 group ${isDark ? 'text-white' : 'text-brand-black'} cursor-pointer`} onClick={() => setIsOpen(false)}>
                 <span className="font-serif font-black text-xl uppercase tracking-tighter">Sobotki</span>
                 <span className="font-playfair italic font-normal lowercase text-sm -mt-1 opacity-90">weddings</span>
-            </a>
+            </Link>
 
             {/* Desktop Nav */}
             <div className="hidden lg:flex gap-8 items-center">
@@ -142,6 +137,7 @@ export const Navbar: React.FC = () => {
             <button 
                 className={`lg:hidden transition-colors ${isDark ? 'text-white' : 'text-brand-black/80'}`} 
                 onClick={() => setIsOpen(true)}
+                aria-label="Otwórz menu"
             >
                 <Menu size={24} />
             </button>
@@ -157,7 +153,7 @@ export const Navbar: React.FC = () => {
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             className="fixed inset-0 z-50 bg-white/60 flex flex-col items-center justify-center p-8"
           >
-            <button className="absolute top-8 right-8 text-brand-black p-2 bg-white/20 rounded-full" onClick={() => setIsOpen(false)}>
+            <button className="absolute top-8 right-8 text-brand-black p-2 bg-white/20 rounded-full" onClick={() => setIsOpen(false)} aria-label="Zamknij menu">
               <X size={28} />
             </button>
             <div className="flex flex-col gap-10 text-center">

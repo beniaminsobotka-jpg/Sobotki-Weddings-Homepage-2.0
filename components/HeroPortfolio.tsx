@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const mixedIds = [2, 1, 6, 3, 8, 5, 4, 7];
 
@@ -10,7 +10,6 @@ const images = mixedIds.map((imageId, i) => ({
 }));
 
 export const HeroPortfolio: React.FC = () => {
-  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(3); // Start w środku (3 to optymalny środek dla 8 elementów)
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -165,7 +164,7 @@ export const HeroPortfolio: React.FC = () => {
                             
                             <img 
                                 src={item.src} 
-                                alt={`Portfolio ${item.id}`}
+                                alt="Wybrany kadr ślubny z portfolio Sobotki Weddings"
                                 className="w-full h-full object-cover select-none"
                                 draggable={false}
                             />
@@ -194,13 +193,8 @@ export const HeroPortfolio: React.FC = () => {
 
         {/* BUTTON - LIQUID GLASS STYLE */}
         <div className="flex justify-center mt-4 md:mt-16 relative z-30 pointer-events-auto">
-            <a 
-              href="#/portfolio"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/portfolio');
-                window.scrollTo(0, 0);
-              }}
+            <Link
+              to="/portfolio"
               className="group flex items-center gap-3 px-8 py-4 rounded-full backdrop-blur-xl bg-white/30 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.05)] hover:bg-white/50 hover:shadow-[0_8px_32px_rgba(0,0,0,0.1)] transition-all duration-500 cursor-pointer hover:scale-105"
             >
                 <span className="relative flex h-2 w-2">
@@ -210,7 +204,7 @@ export const HeroPortfolio: React.FC = () => {
                 <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-widest text-brand-black">
                     Zobacz więcej zdjęć
                 </span>
-            </a>
+            </Link>
         </div>
 
       </div>

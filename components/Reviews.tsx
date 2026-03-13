@@ -47,7 +47,7 @@ export const Reviews: React.FC = () => {
         {/* Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-10 items-stretch">
           {reviews.map((review, i) => (
-            <motion.div 
+            <motion.article 
               key={i} 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -81,7 +81,7 @@ export const Reviews: React.FC = () => {
                   "{review.content}"
                 </p>
               </div>
-            </motion.div>
+            </motion.article>
           ))}
         </div>
       </div>

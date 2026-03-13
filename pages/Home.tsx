@@ -1,4 +1,5 @@
 import React from 'react';
+import { Seo } from '../components/Seo';
 import { Hero } from '../components/Hero';
 import { Marquee } from '../components/Marquee';
 import { HeroPortfolio } from '../components/HeroPortfolio'; 
@@ -13,6 +14,7 @@ import { SectionTransition } from '../components/SectionTransition';
 export const Home: React.FC = () => {
   return (
     <>
+        <Seo page="home" />
         <Hero />
         
         <Marquee />

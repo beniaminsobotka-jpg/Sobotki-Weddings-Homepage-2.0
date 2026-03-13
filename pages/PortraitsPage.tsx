@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, MapPin, Calendar, Briefcase } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Seo } from '../components/Seo';
 
 // --- DATA ---
 const portraitsData = Array.from({ length: 9 }, (_, i) => ({
     id: i + 1,
     src: `https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_${i + 1}.avif`,
     title: `Portrait Session ${i + 1}`,
-    client: "Guest Portrait"
+    client: "Guest Portrait",
+    alt: 'Czarno-biały portret gościa wykonany w fotostacji Sobotki Portraits',
 }));
 
 export const PortraitsPage: React.FC = () => {
     const [selectedindex, setSelectedIndex] = useState<number | null>(null);
-    const navigate = useNavigate();
 
     // --- LIGHTBOX LOGIC ---
     const openLightbox = (index: number) => setSelectedIndex(index);
@@ -46,6 +47,7 @@ export const PortraitsPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-[#050505] text-[#F3F2ED] pt-32 pb-24 relative selection:bg-white selection:text-black">
+            <Seo page="portraits" />
 
             {/* Background Noise for Texture */}
             <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
@@ -96,7 +98,7 @@ export const PortraitsPage: React.FC = () => {
                             >
                                 <img
                                     src={item.src}
-                                    alt={item.title}
+                                    alt={item.alt}
                                     loading="lazy"
                                     className="w-full h-full object-cover transition-transform duration-[1s] ease-out group-hover:scale-105 filter grayscale contrast-110 group-hover:grayscale-0"
                                 />
@@ -351,14 +353,11 @@ export const PortraitsPage: React.FC = () => {
                                 </div>
 
                                 {/* Click Area Link */}
-                                <button
-                                    onClick={() => {
-                                        navigate('/portraits/wedding');
-                                        window.scrollTo(0, 0);
-                                    }}
+                                <Link
+                                    to="/portraits/wedding"
                                     className="absolute inset-0 z-20"
-                                    aria-label="Przejdz do Fotostacji Slubnej"
-                                ></button>
+                                    aria-label="Przejdź do oferty fotostacji ślubnej"
+                                />
                             </div>
 
                             {/* CARD 2: EVENT */}
@@ -394,14 +393,11 @@ export const PortraitsPage: React.FC = () => {
                                 </div>
 
                                 {/* Click Area Link */}
-                                <button
-                                    onClick={() => {
-                                        navigate('/portraits/event');
-                                        window.scrollTo(0, 0);
-                                    }}
+                                <Link
+                                    to="/portraits/event"
                                     className="absolute inset-0 z-20"
-                                    aria-label="Przejdz do Fotostacji Eventowej"
-                                ></button>
+                                    aria-label="Przejdź do oferty fotostacji eventowej"
+                                />
                             </div>
 
                             {/* CARD 3: STUDIO */}
@@ -437,14 +433,11 @@ export const PortraitsPage: React.FC = () => {
                                 </div>
 
                                 {/* Click Area Link */}
-                                <button
-                                    onClick={() => {
-                                        navigate('/portraits/stationary');
-                                        window.scrollTo(0, 0);
-                                    }}
+                                <Link
+                                    to="/portraits/stationary"
                                     className="absolute inset-0 z-20"
-                                    aria-label="Przejdz do Fotostacji Stacjonarnej"
-                                ></button>
+                                    aria-label="Przejdź do fotostacji stacjonarnej w Gliwicach"
+                                />
                             </div>
 
                         </div>
@@ -596,7 +589,7 @@ export const PortraitsPage: React.FC = () => {
                             >
                                 <img
                                     src={portraitsData[selectedindex].src}
-                                    alt={portraitsData[selectedindex].title}
+                                    alt={portraitsData[selectedindex].alt}
                                     className="max-w-full max-h-[85vh] object-contain shadow-[0_0_50px_rgba(0,0,0,0.5)]"
                                 />
                                 <div className="text-center mt-4">

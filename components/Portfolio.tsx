@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Grid } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const films = [
   {
@@ -35,7 +35,6 @@ const films = [
 ];
 
 export const Portfolio: React.FC = () => {
-  const navigate = useNavigate();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
@@ -73,22 +72,25 @@ export const Portfolio: React.FC = () => {
             {/* Content Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 lg:gap-10">
                 {films.map((film, index) => (
-                    <motion.div
+                    <motion.a
                         key={film.id}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.1, duration: 0.6 }}
+                        href={`https://www.youtube.com/watch?v=${film.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Obejrzyj film ślubny ${film.title} na YouTube`}
                         className="group relative aspect-[16/9] md:aspect-[3/4] lg:aspect-[4/5] rounded-[20px] overflow-hidden cursor-pointer bg-black shadow-lg"
                         onMouseEnter={() => setHoveredIndex(index)}
                         onMouseLeave={() => setHoveredIndex(null)}
-                        onClick={() => window.open(`https://www.youtube.com/watch?v=${film.id}`, '_blank')}
                     >
                         {/* 1. Thumbnail Image (Hidden on hover) */}
                         <div className="absolute inset-0 z-0 transition-opacity duration-500 group-hover:opacity-0">
                             <img 
                                 src={film.thumbnail} 
-                                alt={film.title}
+                                alt={`Miniatura filmu ślubnego ${film.title}`}
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80"
                             />
                             <div className="absolute inset-0 bg-black/20"></div>
@@ -169,21 +171,18 @@ export const Portfolio: React.FC = () => {
                             </motion.div>
                         </div>
 
-                    </motion.div>
+                    </motion.a>
                 ))}
             </div>
 
             {/* Mobile View More Button */}
             <div className="mt-4 flex md:hidden justify-center">
-                 <button 
-                    onClick={() => {
-                        navigate('/portfolio');
-                        window.scrollTo(0,0);
-                    }}
+                 <Link
+                    to="/portfolio"
                     className="flex items-center gap-3 px-6 py-3 rounded-full border border-brand-black/20 text-brand-black uppercase text-xs font-bold tracking-widest"
                 >
                     Zobacz więcej
-                </button>
+                </Link>
             </div>
 
         </div>

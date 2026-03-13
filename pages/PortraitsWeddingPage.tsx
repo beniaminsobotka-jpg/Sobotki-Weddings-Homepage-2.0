@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Camera, Check, Download, Printer, Sparkles, Star, Users, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Seo } from '../components/Seo';
 
 const AC_CONFIG = {
   URL: 'https://sobotkiportraits44570.activehosted.com/proc.php',
@@ -207,9 +208,9 @@ const GuestbookScrollAnimation: React.FC = () => {
               opacity: useTransform(scrollYProgress, [0, 0.15, 1], [0.1, 1, 1])
           }}
         >
-          <h1 className="text-[9vw] sm:text-[8vw] md:text-[10vw] px-4 font-serif font-black uppercase text-white tracking-widest text-center whitespace-nowrap drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-none">
+          <h2 className="text-[9vw] sm:text-[8vw] md:text-[10vw] px-4 font-serif font-black uppercase text-white tracking-widest text-center whitespace-nowrap drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-none">
             Księga Gości
-          </h1>
+          </h2>
         </motion.div>
 
         {/* Parallax Subtitle - Emerging from dynamically underneath the book */}
@@ -220,9 +221,9 @@ const GuestbookScrollAnimation: React.FC = () => {
               opacity: useTransform(scrollYProgress, [0, 0.1, 0.3, 1], [0, 0, 1, 1]),
           }}
         >
-          <h2 className="font-playfair-italic text-3xl md:text-[3.5rem] lowercase text-[#d42929] text-center drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-tight">
+          <p className="font-playfair-italic text-3xl md:text-[3.5rem] lowercase text-[#d42929] text-center drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-tight">
             prawdziwa pamiątka na lata
-          </h2>
+          </p>
         </motion.div>
         
         {/* Book Entire Scene Container */}
@@ -329,7 +330,6 @@ const GuestbookScrollAnimation: React.FC = () => {
 };
 
 export const PortraitsWeddingPage: React.FC = () => {
-  const navigate = useNavigate();
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState({
     fullname: '',
@@ -425,6 +425,7 @@ export const PortraitsWeddingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
+      <Seo page="portraitsWedding" />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
@@ -479,15 +480,12 @@ export const PortraitsWeddingPage: React.FC = () => {
                   <ArrowUpRight size={16} className="transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </button>
 
-                <button
-                  onClick={() => {
-                      navigate('/portraits');
-                      window.scrollTo(0,0);
-                  }}
+                <Link
+                  to="/portraits"
                   className="hidden sm:flex justify-center items-center rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
                   Wszystkie usługi
-                </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -855,10 +853,7 @@ export const PortraitsWeddingPage: React.FC = () => {
               href: '/portraits/stationary',
             },
           ].map((item) => (
-            <div key={item.title} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group" onClick={() => {
-                navigate(item.href);
-                window.scrollTo(0,0);
-            }}>
+            <Link key={item.title} to={item.href} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group block">
               <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-gray-500">{item.eyebrow}</span>
               <h3 className="mt-5 font-serif text-3xl">{item.title}</h3>
               <p className="mt-2 font-playfair-italic text-xl text-gray-400 mb-8">{item.subtitle}</p>
@@ -866,7 +861,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                 Zobacz
                 <ArrowUpRight size={15} />
               </div>
-            </div>
+            </Link>
           ))}
         </section>
       </div>
