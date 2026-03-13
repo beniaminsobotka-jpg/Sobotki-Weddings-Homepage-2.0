@@ -35,8 +35,8 @@ export const Hero: React.FC = () => {
   const desktopRadius = useTransform(smoothProgress, [0, 0.5], ["3.5rem", "2.5rem"]);
 
   // 2. TEXT MOVEMENTS
-  const sobotkiY = useTransform(smoothProgress, [0, 0.8], [isMobile ? "-25vh" : "-45vh", "0vh"]);
-  const weddingsY = useTransform(smoothProgress, [0, 0.8], [isMobile ? "25vh" : "45vh", "0vh"]);
+  const sobotkiY = useTransform(smoothProgress, [0, 0.8], [isMobile ? "-15vh" : "-45vh", "0vh"]);
+  const weddingsY = useTransform(smoothProgress, [0, 0.8], [isMobile ? "15vh" : "45vh", "0vh"]);
   
   // Weddings Opacity: Startuje od 0 (niewidoczny), pojawia się przy scrollu (0 -> 0.15)
   const weddingsAppearOpacity = useTransform(smoothProgress, [0, 0.15], [0, 1]);
@@ -58,7 +58,7 @@ export const Hero: React.FC = () => {
   const vignetteOpacity = useTransform(smoothProgress, [0, 0.5], [0.8, 0.4]);
 
   return (
-    <section ref={containerRef} id="home" className="relative w-full h-[140vh] md:h-[250vh]">
+    <section ref={containerRef} id="home" className="relative w-full h-[110vh] md:h-[250vh]">
       
       {/* Sticky Viewport */}
       <div className="sticky top-0 w-full h-screen overflow-hidden flex flex-col items-center justify-center">
@@ -128,10 +128,9 @@ export const Hero: React.FC = () => {
                  </motion.div>
               </motion.div>
 
-              {/* CTA BUTTON */}
               <motion.div
                 style={{ opacity: ctaOpacity, y: ctaY }}
-                className="relative z-20 mt-8 md:mt-12"
+                className="relative z-20 mt-4 md:mt-12"
               >
                 <a 
                   href="#kontakt" 

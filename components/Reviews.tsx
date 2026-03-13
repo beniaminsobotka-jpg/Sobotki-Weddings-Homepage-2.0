@@ -28,9 +28,9 @@ const reviews: Review[] = [
 
 export const Reviews: React.FC = () => {
   return (
-    <section className="pt-6 pb-12 md:pt-16 md:pb-32 px-4 md:px-8 relative">
+    <section className="pt-4 pb-8 md:pt-16 md:pb-32 px-4 md:px-8 relative">
       <div className="max-w-[1400px] mx-auto">
-        <div className="text-center mb-8 md:mb-24">
+        <div className="text-center mb-6 md:mb-24">
           <h2 className="text-brand-black flex flex-col items-center leading-none gap-2">
             <span className="font-serif font-[1000] uppercase text-5xl md:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-sm">
               Miłe
@@ -45,7 +45,7 @@ export const Reviews: React.FC = () => {
         </div>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-10 items-stretch">
           {reviews.map((review, i) => (
             <motion.div 
               key={i} 
@@ -54,10 +54,10 @@ export const Reviews: React.FC = () => {
               viewport={{ once: true, margin: "-10%" }}
               transition={{ delay: i * 0.1, duration: 0.8 }}
               // GLASS CARD STYLE
-              className="flex h-full flex-col group p-6 rounded-3xl backdrop-blur-md bg-white/40 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] transition-all duration-500 hover:-translate-y-2"
+              className="flex h-full flex-col group p-4 md:p-6 rounded-3xl backdrop-blur-md bg-white/40 border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.05)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] transition-all duration-500 hover:-translate-y-2"
             >
               {/* Video Container */}
-              <div className="w-full aspect-[4/3] relative overflow-hidden mb-6 rounded-2xl bg-white/50">
+              <div className="w-full aspect-[4/3] relative overflow-hidden mb-4 md:mb-6 rounded-2xl bg-white/50">
                 {review.video ? (
                   <video 
                     src={review.video}
@@ -72,7 +72,7 @@ export const Reviews: React.FC = () => {
 
               {/* Content */}
               <div className="flex flex-1 flex-col text-center md:text-left">
-                <div className="flex flex-col md:flex-row md:items-baseline md:justify-between mb-4 border-b border-brand-black/10 pb-4">
+                <div className="flex flex-col md:flex-row md:items-baseline md:justify-between mb-3 md:mb-4 border-b border-brand-black/10 pb-3 md:pb-4">
                     <h3 className="font-serif font-bold text-xl uppercase text-brand-black">{review.name}</h3>
                     <span className="font-sans text-[9px] uppercase tracking-widest text-gray-500 mt-1 md:mt-0">{review.role}</span>
                 </div>

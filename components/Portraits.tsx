@@ -110,7 +110,7 @@ export const Portraits: React.FC = () => {
   };
 
   return (
-    <section id="portraits" className="py-12 md:py-32 bg-black text-[#F3F2ED] relative overflow-hidden min-h-[600px] md:min-h-[900px] flex flex-col justify-center">
+    <section id="portraits" className="py-8 md:py-32 bg-black text-[#F3F2ED] relative overflow-hidden min-h-[500px] md:min-h-[900px] flex flex-col justify-center">
       
       <div className="absolute inset-0 bg-[#0a0a0a] pointer-events-none" />
 
@@ -130,7 +130,7 @@ export const Portraits: React.FC = () => {
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
-                    className="relative h-[360px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
+                    className="relative h-[300px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
                     style={{ perspective: isMobile ? '800px' : '1200px' }}
                 >
                     {/* Obszar czuły na hover (niewidoczny layer na wierzchu wewnątrz kontenera zdjęć) */}
@@ -144,7 +144,7 @@ export const Portraits: React.FC = () => {
                             <motion.div
                                 key={item.id}
                                 // Mobile width adjust: w-[260px] pozwala zobaczyć więcej sąsiadów na wąskich ekranach
-                                className="absolute w-[260px] h-[350px] md:w-[380px] md:h-[480px] origin-center pointer-events-none"
+                                className="absolute w-[220px] h-[300px] md:w-[380px] md:h-[480px] origin-center pointer-events-none"
                                 initial={false}
                                 animate={{
                                     x: style.x,
@@ -182,7 +182,7 @@ export const Portraits: React.FC = () => {
                 </div>
 
                 {/* Minimalist Red Slider (Pod zdjęciami) */}
-                <div className="mt-4 md:mt-12 w-full max-w-sm relative px-4">
+                <div className="mt-2 md:mt-12 w-full max-w-sm relative px-4">
                     <div className="w-full h-[1px] bg-gray-800 relative overflow-visible">
                         <motion.div 
                             className="absolute top-1/2 -mt-[2px] h-[5px] w-8 md:w-12 bg-[#ff0000] shadow-[0_0_10px_rgba(255,0,0,0.5)]"
@@ -194,7 +194,7 @@ export const Portraits: React.FC = () => {
                         />
                     </div>
                     {/* Mobile Hint */}
-                    <div className="md:hidden text-center mt-4 text-[9px] text-gray-600 uppercase tracking-widest opacity-60">
+                    <div className="md:hidden text-center mt-2 text-[9px] text-gray-600 uppercase tracking-widest opacity-60">
                         Przesuń palcem
                     </div>
                 </div>
@@ -214,10 +214,10 @@ export const Portraits: React.FC = () => {
                         fotostacja ślubna
                     </p>
                     
-                    <div className="w-12 h-[1px] bg-white/20 my-8 lg:mr-auto lg:ml-0 mx-auto"></div>
+                    <div className="w-12 h-[1px] bg-white/20 my-6 lg:my-8 lg:mr-auto lg:ml-0 mx-auto"></div>
                     
                     {/* Glass Panel Description */}
-                    <div className="p-6 md:p-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.3)] mb-10">
+                    <div className="p-6 md:p-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.3)] mb-6 lg:mb-10">
                         <p className="font-sans text-xs md:text-sm text-gray-300 leading-relaxed tracking-wide">
                             To alternatywa dla klasycznej fotobudki – profesjonalne mini-studio aranżowane w sercu Waszego przyjęcia. 
                             Wykonujemy w nim ponadczasowe, czarno-białe portrety, na których każdy wygląda jak gwiazda filmowa. 

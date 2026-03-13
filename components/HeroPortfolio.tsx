@@ -97,10 +97,10 @@ export const HeroPortfolio: React.FC = () => {
   };
 
   return (
-    <section className="py-6 md:py-24 relative z-20 overflow-hidden flex flex-col items-center">
+    <section className="py-4 md:py-24 relative z-20 overflow-hidden flex flex-col items-center">
       
       {/* Header (Optional aesthetic text) */}
-      <div className="mb-8 md:mb-12 text-center relative z-30 px-4">
+      <div className="mb-4 md:mb-12 text-center relative z-30 px-4">
          <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-gray-400">
             Selected Highlights
          </span>
@@ -115,7 +115,7 @@ export const HeroPortfolio: React.FC = () => {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className="relative h-[360px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
+            className="relative h-[300px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
             style={{ perspective: isMobile ? '800px' : '1200px' }}
         >
             {/* Hover Trap Layer */}
@@ -128,7 +128,7 @@ export const HeroPortfolio: React.FC = () => {
                 return (
                     <motion.div
                         key={item.id}
-                        className="absolute w-[260px] h-[350px] md:w-[380px] md:h-[480px] origin-center pointer-events-none"
+                        className="absolute w-[220px] h-[300px] md:w-[380px] md:h-[480px] origin-center pointer-events-none"
                         initial={false}
                         animate={{
                             x: style.x,
@@ -176,7 +176,7 @@ export const HeroPortfolio: React.FC = () => {
         </div>
 
         {/* PROGRESS BAR */}
-        <div className="mt-4 md:mt-12 w-full max-w-sm relative px-4">
+        <div className="mt-2 md:mt-12 w-full max-w-sm relative px-4">
             <div className="w-full h-[1px] bg-black/10 relative overflow-visible rounded-full">
                 <motion.div 
                     className="absolute top-1/2 -mt-[2px] h-[4px] w-8 md:w-12 bg-brand-black shadow-sm rounded-full"
@@ -187,13 +187,13 @@ export const HeroPortfolio: React.FC = () => {
                     transition={{ type: "spring", stiffness: 60, damping: 20 }}
                 />
             </div>
-            <div className="md:hidden text-center mt-4 text-[9px] text-gray-400 uppercase tracking-widest opacity-60">
+            <div className="md:hidden text-center mt-2 text-[9px] text-gray-400 uppercase tracking-widest opacity-60">
                 Przesuń palcem
             </div>
         </div>
 
         {/* BUTTON - LIQUID GLASS STYLE */}
-        <div className="flex justify-center mt-8 md:mt-16 relative z-30 pointer-events-auto">
+        <div className="flex justify-center mt-4 md:mt-16 relative z-30 pointer-events-auto">
             <a 
               href="#/portfolio"
               onClick={(e) => {

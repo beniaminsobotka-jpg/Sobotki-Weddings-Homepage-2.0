@@ -28,7 +28,7 @@ export const VideoSection: React.FC = () => {
   const yMovement = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
 
   return (
-    <section ref={containerRef} id="film" className="pt-6 pb-6 md:pt-40 md:pb-16 relative overflow-hidden">
+    <section ref={containerRef} id="film" className="pt-4 pb-4 md:pt-40 md:pb-16 relative overflow-hidden">
       
       {/* 1. BACKGROUND KINETIC TYPOGRAPHY (Parallax) */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full pointer-events-none opacity-[0.04] select-none z-0">
@@ -77,9 +77,9 @@ export const VideoSection: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
                 viewport={{ once: true, margin: "-10%" }}
                 transition={{ duration: 1.05, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className="lg:absolute lg:bottom-12 lg:right-12 w-[90%] lg:w-[450px] -mt-12 lg:mt-0 z-20"
+                className="lg:absolute lg:bottom-12 lg:right-12 w-[90%] lg:w-[450px] -mt-16 lg:mt-0 z-20"
             >
-                <div className="liquid-glass liquid-glass-interactive rounded-3xl p-8 md:p-12 backdrop-blur-xl border border-white/60">
+                <div className="liquid-glass liquid-glass-interactive rounded-3xl p-6 md:p-12 backdrop-blur-xl border border-white/60">
                     
                     {/* Badge */}
                     <motion.div
@@ -88,7 +88,7 @@ export const VideoSection: React.FC = () => {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: "-10%" }}
-                        className="flex justify-between items-start mb-8"
+                        className="flex justify-between items-start mb-6"
                     >
                         <div className="flex items-center gap-4">
                              {/* Pstryk */}
@@ -117,7 +117,7 @@ export const VideoSection: React.FC = () => {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: "-10%" }}
-                        className="font-serif font-black text-4xl md:text-5xl uppercase leading-[0.9] text-brand-black mb-6"
+                        className="font-serif font-black text-4xl md:text-5xl uppercase leading-[0.9] text-brand-black mb-4"
                     >
                         Foto +<br/>Video
                     </motion.h3>
@@ -128,7 +128,7 @@ export const VideoSection: React.FC = () => {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: true, margin: "-10%" }}
-                        className="font-sans text-brand-black/70 text-sm leading-relaxed mb-6"
+                        className="font-sans text-brand-black/70 text-sm leading-relaxed mb-3"
                     >
                         Nie interesują nas sztywne pozy. Szukamy ruchu, wiatru we włosach i nieoczywistych kadrów. Tworzymy przestrzeń, w której możecie być sobą, łącząc reporterską uważność z filmową estetyką.
                     </motion.p>
