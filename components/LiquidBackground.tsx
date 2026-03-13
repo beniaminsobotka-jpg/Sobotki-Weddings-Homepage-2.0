@@ -55,7 +55,7 @@ export const LiquidBackground: React.FC = () => {
       />
       
       {/* Noise Texture Overlay - Static, optimized */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light translate-z-0"></div>
+      <div className="absolute inset-0 noise-texture opacity-20 mix-blend-soft-light translate-z-0"></div>
     </div>
   );
 };

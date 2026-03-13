@@ -10,7 +10,7 @@ interface Props {
 export const SectionTransition: React.FC<Props> = ({ children, className = "", delay = 0 }) => {
   return (
     <motion.div
-      className={className}
+      className={`content-visibility-auto ${className}`.trim()}
       initial={{ 
         opacity: 0, 
         y: 60, 
@@ -25,7 +25,7 @@ export const SectionTransition: React.FC<Props> = ({ children, className = "", d
       }}
       // once: false sprawia, że animacja odtwarza się za każdym razem, gdy element wchodzi w widok
       // amount: 0.15 oznacza, że animacja startuje, gdy 15% elementu jest widoczne
-      viewport={{ once: false, amount: 0.15, margin: "0px 0px -50px 0px" }}
+      viewport={{ once: true, amount: 0.15, margin: "0px 0px -50px 0px" }}
       transition={{ 
         duration: 0.9, 
         ease: [0.16, 1, 0.3, 1], // Bardzo płynna krzywa "editorial"

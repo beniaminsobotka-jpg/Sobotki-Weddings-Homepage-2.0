@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Play, Camera } from 'lucide-react';
+import { HERO_VIDEO_POSTER, HERO_VIDEO_SOURCES } from '../utils/media';
 
 const cardContentVariants = {
   hidden: { opacity: 0, y: 18 },
@@ -51,17 +52,22 @@ export const VideoSection: React.FC = () => {
                 {/* Video */}
                 <video 
                     className="w-full h-full object-cover transform scale-105"
-                    src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/hero–video.mp4"
                     autoPlay
                     loop
                     muted
                     playsInline
-                    preload="metadata"
-                />
+                    preload="none"
+                    poster={HERO_VIDEO_POSTER}
+                    aria-hidden="true"
+                >
+                    {HERO_VIDEO_SOURCES.map((source) => (
+                        <source key={source.src} src={source.src} type={source.type} />
+                    ))}
+                </video>
                 
                 {/* Cinematic Overlay (Grain + Grading) */}
                 <div className="absolute inset-0 bg-brand-black/10 mix-blend-overlay pointer-events-none"></div>
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none"></div>
+                <div className="absolute inset-0 noise-texture opacity-20 mix-blend-overlay pointer-events-none"></div>
 
                 {/* Mobile Play Button hint */}
                 <div className="absolute inset-0 flex items-center justify-center lg:hidden pointer-events-none">

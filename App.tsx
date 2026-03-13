@@ -1,5 +1,4 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
-import Lenis from '@studio-freight/lenis';
 import { AnimatePresence } from 'framer-motion';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
@@ -117,7 +116,10 @@ const App: React.FC = () => {
       return true;
     }
   });
-  const lenisRef = useRef<Lenis | null>(null);
+  const lenisRef = useRef<{
+    destroy: () => void;
+    raf: (time: number) => void;
+  } | null>(null);
 
   useEffect(() => {
     if (!isLoading && typeof window !== 'undefined') {
@@ -130,27 +132,68 @@ const App: React.FC = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || typeof window === 'undefined') return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 2,
-    });
-    
-    lenisRef.current = lenis;
-    (window as any).lenis = lenis;
+    const win = window as Window & typeof globalThis & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
+    let frameId = 0;
+    let timeoutId: number | null = null;
+    let idleId: number | null = null;
+    let lenisDestroyed = false;
+
+    const initLenis = async () => {
+      const { default: Lenis } = await import('@studio-freight/lenis');
+
+      if (lenisDestroyed) {
+        return;
+      }
+
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        touchMultiplier: 2,
+      });
+
+      lenisRef.current = lenis;
+      (window as any).lenis = lenis;
+
+      const raf = (time: number) => {
+        lenis.raf(time);
+        frameId = requestAnimationFrame(raf);
+      };
+
+      frameId = requestAnimationFrame(raf);
+    };
+
+    if (win.requestIdleCallback) {
+      idleId = win.requestIdleCallback(() => {
+        void initLenis();
+      }, { timeout: 800 });
+    } else {
+      timeoutId = window.setTimeout(() => {
+        void initLenis();
+      }, 120);
     }
 
-    const frameId = requestAnimationFrame(raf);
-
     return () => {
-      cancelAnimationFrame(frameId);
-      lenis.destroy();
+      lenisDestroyed = true;
+
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+
+      if (idleId !== null && win.cancelIdleCallback) {
+        win.cancelIdleCallback(idleId);
+      }
+
+      if (timeoutId !== null) {
+        window.clearTimeout(timeoutId);
+      }
+
+      lenisRef.current?.destroy();
       lenisRef.current = null;
       (window as any).lenis = null;
     };

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { Volume2, Power, Zap } from 'lucide-react';
+import { HERO_VIDEO_POSTER, HERO_VIDEO_SOURCES } from '../utils/media';
 
 export const Hero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -189,7 +190,7 @@ export const Hero: React.FC = () => {
                 <div className="absolute inset-0 z-40 pointer-events-none rounded-[inherit] shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] md:shadow-[inset_0_0_120px_rgba(0,0,0,0.9)]"></div>
 
                 {/* CRT NOISE & SCANLINES */}
-                <div className="absolute inset-0 pointer-events-none z-30 mix-blend-overlay opacity-40 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+                <div className="absolute inset-0 pointer-events-none z-30 mix-blend-overlay opacity-40 noise-texture"></div>
                 <div className="absolute inset-0 pointer-events-none z-30 opacity-15" style={{
                     background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))",
                     backgroundSize: "100% 2px, 3px 100%"
@@ -208,11 +209,13 @@ export const Hero: React.FC = () => {
                   loop
                   playsInline
                   preload="metadata"
-                  poster="/media/hero-video-poster.jpg"
+                  poster={HERO_VIDEO_POSTER}
+                  aria-hidden="true"
                   className="absolute inset-0 w-full h-full object-cover opacity-90 md:opacity-90"
                 >
-                  <source src="/media/hero-video-hevc.mp4" type='video/mp4; codecs="hvc1"' />
-                  <source src="/media/hero-video-fallback.mp4" type='video/mp4; codecs="avc1.64001f"' />
+                  {HERO_VIDEO_SOURCES.map((source) => (
+                    <source key={source.src} src={source.src} type={source.type} />
+                  ))}
                 </video>
 
                 {/* Inner Content (Fades out quickly) */}
@@ -246,7 +249,7 @@ export const Hero: React.FC = () => {
             {/* === CONTROL PANEL (DESKTOP ONLY) === */}
             <div className="hidden md:flex w-full h-20 bg-[#121212] border-t-4 border-[#0a0a0a] items-center px-10 justify-between relative z-20 rounded-b-xl shadow-2xl mx-auto max-w-[calc(100%-48px)] -mt-1">
                 {/* Texture Overlay for Plastic Look */}
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-overlay"></div>
+                <div className="absolute inset-0 noise-texture opacity-10 pointer-events-none mix-blend-overlay"></div>
                 
                 {/* Left: Branding */}
                 <div className="flex flex-col relative z-10">

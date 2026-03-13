@@ -30,7 +30,7 @@ export default {
         sans: ['DM Sans', 'sans-serif'],
       },
       backgroundImage: {
-        noise: "url('https://grainy-gradients.vercel.app/noise.svg')",
+        noise: "url('/noise.svg')",
       },
       animation: {
         marquee: 'marquee 60s linear infinite',

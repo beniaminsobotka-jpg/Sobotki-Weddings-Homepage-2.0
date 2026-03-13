@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, MapPin, Calendar, Briefcase } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
+import { getPortraitTileSrcSet } from '../utils/media';
 
 // --- DATA ---
 const portraitsData = Array.from({ length: 9 }, (_, i) => ({
@@ -50,7 +51,7 @@ export const PortraitsPage: React.FC = () => {
             <Seo page="portraits" />
 
             {/* Background Noise for Texture */}
-            <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+            <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] noise-texture"></div>
 
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
 
@@ -98,9 +99,14 @@ export const PortraitsPage: React.FC = () => {
                             >
                                 <img
                                     src={item.src}
+                                    srcSet={getPortraitTileSrcSet(item.src)}
+                                    sizes="33vw"
                                     alt={item.alt}
-                                    loading="lazy"
+                                    loading={index < 3 ? 'eager' : 'lazy'}
+                                    fetchPriority={index === 0 ? 'high' : 'auto'}
                                     decoding="async"
+                                    width={2048}
+                                    height={1365}
                                     className="w-full h-full object-cover transition-transform duration-[1s] ease-out group-hover:scale-105 filter grayscale contrast-110 group-hover:grayscale-0"
                                 />
                             </motion.div>
@@ -133,7 +139,8 @@ export const PortraitsPage: React.FC = () => {
                             muted
                             loop
                             playsInline
-                            preload="metadata"
+                            preload="none"
+                            aria-hidden="true"
                             className="w-full h-auto aspect-video md:aspect-[21/9] object-cover opacity-80 transition-transform duration-[3s] group-hover:scale-105"
                         />
 
@@ -212,7 +219,8 @@ export const PortraitsPage: React.FC = () => {
                                 muted
                                 loop
                                 playsInline
-                                preload="metadata"
+                                preload="none"
+                                aria-hidden="true"
                                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                             />
                             {/* Vignette Overlay */}

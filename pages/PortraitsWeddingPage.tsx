@@ -241,7 +241,7 @@ const GuestbookScrollAnimation: React.FC = () => {
                     <div className="w-1/2 h-full relative">
                         {/* Left cover texture/lighting */}
                         <div className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a] via-[#050505] to-[#040404] opacity-80" />
-                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
+                        <div className="absolute inset-0 noise-texture opacity-[0.03]" />
                     </div>
                     {/* Center Spine */}
                     <div className="w-6 md:w-10 h-full bg-gradient-to-r from-[#030303] via-[#151515] to-[#030303] shadow-[inset_0_0_20px_rgba(0,0,0,1)] relative z-0">
@@ -252,7 +252,7 @@ const GuestbookScrollAnimation: React.FC = () => {
                     <div className="w-1/2 h-full relative">
                         {/* Right cover texture/lighting */}
                         <div className="absolute inset-0 bg-gradient-to-l from-[#1a1a1a] via-[#050505] to-[#040404] opacity-80" />
-                        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
+                        <div className="absolute inset-0 noise-texture opacity-[0.03]" />
                     </div>
                 </div>
 
@@ -427,7 +427,7 @@ export const PortraitsWeddingPage: React.FC = () => {
     <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
       <Seo page="portraitsWedding" />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] noise-texture" />
 
       <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-16 md:gap-24 px-4 pb-16 md:px-8 md:pb-32">
         

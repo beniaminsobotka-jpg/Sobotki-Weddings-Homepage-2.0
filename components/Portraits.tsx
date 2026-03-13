@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { getPortraitTileSrcSet } from '../utils/media';
 
 // Generowanie tablicy 10 zdjęć
 const portraits = Array.from({ length: 10 }, (_, i) => ({
@@ -170,9 +171,14 @@ export const Portraits: React.FC = () => {
                                     
                                     <img 
                                         src={item.src} 
+                                        srcSet={getPortraitTileSrcSet(item.src)}
+                                        sizes="(min-width: 768px) 380px, 220px"
                                         alt="Czarno-biały portret gości wykonany w fotostacji Sobotki Portraits"
-                                        loading="lazy"
+                                        loading={Math.abs(index - activeIndex) <= 1 ? 'eager' : 'lazy'}
+                                        fetchPriority={isActive ? 'high' : 'auto'}
                                         decoding="async"
+                                        width={380}
+                                        height={480}
                                         className="w-full h-full object-cover select-none"
                                         draggable={false}
                                     />
