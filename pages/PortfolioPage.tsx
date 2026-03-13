@@ -91,13 +91,13 @@ export const PortfolioPage: React.FC = () => {
   }, [selectedImageIndex]);
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-4 md:px-8 relative selection:bg-brand-black selection:text-white">
+    <div className="min-h-screen pt-32 pb-12 md:pb-24 px-4 md:px-8 relative selection:bg-brand-black selection:text-white">
        <LiquidBackground />
        
        <div className="max-w-[1800px] mx-auto relative z-10">
             
             {/* --- HEADER --- */}
-            <div className="flex flex-col md:flex-row justify-between items-end mb-16 md:mb-24 gap-8 border-b border-brand-black/10 pb-12">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-24 gap-8 border-b border-brand-black/10 pb-12">
                 <div>
                     <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-gray-500 block mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-brand-black rounded-full"></span>
@@ -111,7 +111,7 @@ export const PortfolioPage: React.FC = () => {
             </div>
 
             {/* --- MASONRY LAYOUT (CSS COLUMNS) --- */}
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-2 space-y-2">
+            <div className="columns-1 md:columns-2 lg:columns-3 gap-3 space-y-3">
                 <AnimatePresence mode="popLayout">
                     {filteredItems.map((item, index) => (
                         <motion.div

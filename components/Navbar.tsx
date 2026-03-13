@@ -160,13 +160,13 @@ export const Navbar: React.FC = () => {
             <button className="absolute top-8 right-8 text-brand-black p-2 bg-white/20 rounded-full" onClick={() => setIsOpen(false)}>
               <X size={28} />
             </button>
-            <div className="flex flex-col gap-8 text-center">
+            <div className="flex flex-col gap-10 text-center">
               {links.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavigation(e, link.href)}
-                  className="font-serif font-black text-4xl text-brand-black/90 hover:text-brand-black transition-colors uppercase drop-shadow-sm cursor-pointer"
+                  className="font-serif font-black text-[9vw] sm:text-5xl text-brand-black/90 hover:text-brand-black transition-colors uppercase drop-shadow-sm cursor-pointer"
                 >
                   {link.name}
                 </a>

@@ -121,7 +121,7 @@ export const PortraitsEventPage: React.FC = () => {
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-      <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-24 px-4 pb-24 md:px-8 md:pb-32">
+      <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-16 md:gap-24 px-4 pb-16 md:px-8 md:pb-32">
 
         {/* HERO SECTION - REVERTED TO ORIGINAL LAYOUT BUT WITH NEW FONTS/COLORS */}
         <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">

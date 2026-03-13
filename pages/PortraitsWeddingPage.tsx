@@ -194,7 +194,7 @@ const GuestbookScrollAnimation: React.FC = () => {
   const subtitleTop = useTransform(scrollYProgress, [0, 1], isMobile ? ["65%", "71%"] : ["82%", "87%"]);
 
   return (
-    <div ref={containerRef} className={`relative ${isMobile ? 'h-[200vh] mt-4 -mb-[10vh]' : 'h-[400vh] my-4 rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl'} w-full`}>
+    <div ref={containerRef} className={`relative ${isMobile ? 'h-[200vh] my-8' : 'h-[400vh] my-4 rounded-[30px] border border-white/5 bg-[#0a0a0a] shadow-2xl'} w-full`}>
       <div className={`sticky top-0 ${isMobile ? 'h-[60vh] pt-10' : 'h-[100vh] pt-24'} w-full flex flex-col items-center justify-center overflow-hidden rounded-[30px] bg-[#0a0a0a] border border-white/5 shadow-2xl`}>
         {/* Background ambient lighting */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)] pointer-events-none" />
@@ -428,7 +428,7 @@ export const PortraitsWeddingPage: React.FC = () => {
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
       <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-      <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-24 px-4 pb-24 md:px-8 md:pb-32">
+      <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-16 md:gap-24 px-4 pb-16 md:px-8 md:pb-32">
         
         {/* HERO SECTION */}
         <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">

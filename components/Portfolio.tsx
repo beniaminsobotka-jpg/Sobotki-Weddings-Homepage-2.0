@@ -55,7 +55,7 @@ export const Portfolio: React.FC = () => {
         <div className="max-w-[1600px] mx-auto">
             
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start mb-4 md:mb-24 relative z-10 gap-4 md:gap-16">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-8 md:mb-24 relative z-10 gap-4 md:gap-16">
                 <h2 className="flex flex-col leading-[0.85] shrink-0">
                     <span className="font-serif font-black text-6xl md:text-8xl uppercase tracking-tighter text-brand-black">
                         Wasze Historie
