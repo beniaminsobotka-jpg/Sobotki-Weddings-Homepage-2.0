@@ -47,7 +47,7 @@ export const Portfolio: React.FC = () => {
   }, []);
 
   return (
-    <section id="portfolio" className="py-24 md:py-32 bg-brand-paper px-4 md:px-8 relative overflow-hidden">
+    <section id="portfolio" className="py-12 md:py-32 bg-brand-paper px-4 md:px-8 relative overflow-hidden">
         
         {/* Background Decorative Elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gray-200/50 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none mix-blend-multiply"></div>
@@ -55,7 +55,7 @@ export const Portfolio: React.FC = () => {
         <div className="max-w-[1600px] mx-auto">
             
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start mb-16 md:mb-24 relative z-10 gap-8 md:gap-16">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-8 md:mb-24 relative z-10 gap-8 md:gap-16">
                 <h2 className="flex flex-col leading-[0.85] shrink-0">
                     <span className="font-serif font-black text-6xl md:text-8xl uppercase tracking-tighter text-brand-black">
                         Wasze Historie
@@ -71,7 +71,7 @@ export const Portfolio: React.FC = () => {
             </div>
 
             {/* Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-10">
                 {films.map((film, index) => (
                     <motion.div
                         key={film.id}
@@ -174,7 +174,7 @@ export const Portfolio: React.FC = () => {
             </div>
 
             {/* Mobile View More Button */}
-            <div className="mt-12 flex md:hidden justify-center">
+            <div className="mt-8 flex md:hidden justify-center">
                  <button 
                     onClick={() => {
                         navigate('/portfolio');

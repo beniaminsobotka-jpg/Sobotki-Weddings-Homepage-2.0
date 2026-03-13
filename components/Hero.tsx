@@ -1,9 +1,17 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { Volume2, Power, Zap } from 'lucide-react';
 
 export const Hero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Track scroll within the extended Hero section
   const { scrollYProgress } = useScroll({
@@ -27,8 +35,8 @@ export const Hero: React.FC = () => {
   const desktopRadius = useTransform(smoothProgress, [0, 0.5], ["3.5rem", "2.5rem"]);
 
   // 2. TEXT MOVEMENTS
-  const sobotkiY = useTransform(smoothProgress, [0, 0.8], ["-45vh", "0vh"]);
-  const weddingsY = useTransform(smoothProgress, [0, 0.8], ["45vh", "0vh"]);
+  const sobotkiY = useTransform(smoothProgress, [0, 0.8], [isMobile ? "-25vh" : "-45vh", "0vh"]);
+  const weddingsY = useTransform(smoothProgress, [0, 0.8], [isMobile ? "25vh" : "45vh", "0vh"]);
   
   // Weddings Opacity: Startuje od 0 (niewidoczny), pojawia się przy scrollu (0 -> 0.15)
   const weddingsAppearOpacity = useTransform(smoothProgress, [0, 0.15], [0, 1]);
@@ -50,7 +58,7 @@ export const Hero: React.FC = () => {
   const vignetteOpacity = useTransform(smoothProgress, [0, 0.5], [0.8, 0.4]);
 
   return (
-    <section ref={containerRef} id="home" className="relative w-full h-[190vh] md:h-[250vh]">
+    <section ref={containerRef} id="home" className="relative w-full h-[140vh] md:h-[250vh]">
       
       {/* Sticky Viewport */}
       <div className="sticky top-0 w-full h-screen overflow-hidden flex flex-col items-center justify-center">

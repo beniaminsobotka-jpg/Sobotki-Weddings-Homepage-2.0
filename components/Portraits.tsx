@@ -110,7 +110,7 @@ export const Portraits: React.FC = () => {
   };
 
   return (
-    <section id="portraits" className="py-24 md:py-32 bg-black text-[#F3F2ED] relative overflow-hidden min-h-[800px] md:min-h-[900px] flex flex-col justify-center">
+    <section id="portraits" className="py-12 md:py-32 bg-black text-[#F3F2ED] relative overflow-hidden min-h-[600px] md:min-h-[900px] flex flex-col justify-center">
       
       <div className="absolute inset-0 bg-[#0a0a0a] pointer-events-none" />
 
@@ -130,7 +130,7 @@ export const Portraits: React.FC = () => {
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
-                    className="relative h-[400px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
+                    className="relative h-[360px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
                     style={{ perspective: isMobile ? '800px' : '1200px' }}
                 >
                     {/* Obszar czuły na hover (niewidoczny layer na wierzchu wewnątrz kontenera zdjęć) */}
@@ -182,7 +182,7 @@ export const Portraits: React.FC = () => {
                 </div>
 
                 {/* Minimalist Red Slider (Pod zdjęciami) */}
-                <div className="mt-8 md:mt-12 w-full max-w-sm relative px-4">
+                <div className="mt-4 md:mt-12 w-full max-w-sm relative px-4">
                     <div className="w-full h-[1px] bg-gray-800 relative overflow-visible">
                         <motion.div 
                             className="absolute top-1/2 -mt-[2px] h-[5px] w-8 md:w-12 bg-[#ff0000] shadow-[0_0_10px_rgba(255,0,0,0.5)]"

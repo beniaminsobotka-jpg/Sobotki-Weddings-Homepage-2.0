@@ -11,18 +11,18 @@ export const About: React.FC = () => {
   }, []);
 
   return (
-    <section id="o-nas" className="py-16 md:py-24 bg-brand-paper relative overflow-hidden px-4 md:px-8">
+    <section id="o-nas" className="py-10 md:py-24 bg-brand-paper relative overflow-hidden px-4 md:px-8">
       <div className="max-w-[1600px] mx-auto">
         
         {/* Header Sekcji - Mobilny (na desktopie jest w środkowej kolumnie) */}
-        <div className="md:hidden text-center mb-10">
+        <div className="md:hidden text-center mb-6">
             <h2 className="font-serif font-black text-5xl uppercase tracking-tighter">
                 Ania & Benek
             </h2>
             <p className="font-playfair-italic text-gray-500 mt-2">Duet w życiu i w pracy</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-12 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8 lg:gap-12 items-stretch">
           
           {/* KOLUMNA LEWA - ANIA */}
           <motion.div 

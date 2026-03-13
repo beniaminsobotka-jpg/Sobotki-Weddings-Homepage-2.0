@@ -28,7 +28,7 @@ export const VideoSection: React.FC = () => {
   const yMovement = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
 
   return (
-    <section ref={containerRef} id="film" className="pt-10 pb-8 md:pt-40 md:pb-16 relative overflow-hidden">
+    <section ref={containerRef} id="film" className="pt-6 pb-6 md:pt-40 md:pb-16 relative overflow-hidden">
       
       {/* 1. BACKGROUND KINETIC TYPOGRAPHY (Parallax) */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full pointer-events-none opacity-[0.04] select-none z-0">

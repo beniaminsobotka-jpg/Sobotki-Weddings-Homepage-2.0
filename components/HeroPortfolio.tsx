@@ -97,7 +97,7 @@ export const HeroPortfolio: React.FC = () => {
   };
 
   return (
-    <section className="py-12 md:py-24 relative z-20 overflow-hidden flex flex-col items-center">
+    <section className="py-6 md:py-24 relative z-20 overflow-hidden flex flex-col items-center">
       
       {/* Header (Optional aesthetic text) */}
       <div className="mb-8 md:mb-12 text-center relative z-30 px-4">
@@ -115,7 +115,7 @@ export const HeroPortfolio: React.FC = () => {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className="relative h-[400px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
+            className="relative h-[360px] md:h-[550px] w-full flex justify-center items-center perspective-1000 cursor-crosshair touch-pan-y"
             style={{ perspective: isMobile ? '800px' : '1200px' }}
         >
             {/* Hover Trap Layer */}
@@ -176,7 +176,7 @@ export const HeroPortfolio: React.FC = () => {
         </div>
 
         {/* PROGRESS BAR */}
-        <div className="mt-8 md:mt-12 w-full max-w-sm relative px-4">
+        <div className="mt-4 md:mt-12 w-full max-w-sm relative px-4">
             <div className="w-full h-[1px] bg-black/10 relative overflow-visible rounded-full">
                 <motion.div 
                     className="absolute top-1/2 -mt-[2px] h-[4px] w-8 md:w-12 bg-brand-black shadow-sm rounded-full"
@@ -193,7 +193,7 @@ export const HeroPortfolio: React.FC = () => {
         </div>
 
         {/* BUTTON - LIQUID GLASS STYLE */}
-        <div className="flex justify-center mt-12 md:mt-16 relative z-30 pointer-events-auto">
+        <div className="flex justify-center mt-8 md:mt-16 relative z-30 pointer-events-auto">
             <a 
               href="#/portfolio"
               onClick={(e) => {

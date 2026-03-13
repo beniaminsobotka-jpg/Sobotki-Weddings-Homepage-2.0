@@ -28,9 +28,9 @@ const reviews: Review[] = [
 
 export const Reviews: React.FC = () => {
   return (
-    <section className="pt-10 pb-24 md:pt-16 md:pb-32 px-4 md:px-8 relative">
+    <section className="pt-6 pb-12 md:pt-16 md:pb-32 px-4 md:px-8 relative">
       <div className="max-w-[1400px] mx-auto">
-        <div className="text-center mb-16 md:mb-24">
+        <div className="text-center mb-8 md:mb-24">
           <h2 className="text-brand-black flex flex-col items-center leading-none gap-2">
             <span className="font-serif font-[1000] uppercase text-5xl md:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-sm">
               Miłe
@@ -45,7 +45,7 @@ export const Reviews: React.FC = () => {
         </div>
 
         {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10 items-stretch">
           {reviews.map((review, i) => (
             <motion.div 
               key={i} 

@@ -95,11 +95,11 @@ export const Contact: React.FC = () => {
   };
 
   return (
-    <section id="kontakt" className="py-12 md:py-32 px-6 relative">
+    <section id="kontakt" className="py-8 md:py-32 px-6 relative">
       <div className="max-w-4xl mx-auto relative z-10">
         
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 md:mb-12">
           <h2 className="text-brand-black flex flex-col items-center leading-none gap-1 md:gap-2">
             <span className="font-serif font-[1000] uppercase text-4xl md:text-5xl lg:text-7xl scale-x-[1.32] origin-center inline-block drop-shadow-md">
               Napisz do
@@ -134,7 +134,7 @@ export const Contact: React.FC = () => {
                 </motion.div>
             ) : (
                 <form className="space-y-8 md:space-y-12" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-12">
                     <div className="group relative">
                         <label className="block font-sans text-[10px] md:text-xs text-gray-500 uppercase tracking-widest mb-2 ml-1">Imię i Nazwisko</label>
                         <input 
@@ -161,7 +161,7 @@ export const Contact: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-12">
                     <div className="group">
                         <label className="block font-sans text-[10px] md:text-xs text-gray-500 uppercase tracking-widest mb-2 ml-1">Data Ślubu</label>
                         <input 
