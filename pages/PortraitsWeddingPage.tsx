@@ -476,6 +476,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             <div className="flex flex-col lg:items-end justify-end pb-2 lg:pb-0 -mt-2 md:mt-0 w-full">
               <div className="flex flex-col sm:flex-row gap-4 justify-start lg:justify-end w-full sm:w-auto">
                 <button
+                  type="button"
                   onClick={() => document.getElementById('wedding-offer-form')?.scrollIntoView({ behavior: 'smooth' })}
                   className="w-full sm:w-auto group inline-flex justify-center items-center gap-3 rounded-full bg-white px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-200"
                 >
@@ -743,12 +744,15 @@ export const PortraitsWeddingPage: React.FC = () => {
           <div className="rounded-[24px] border border-white/10 bg-black/40 p-8 shadow-2xl md:p-10">
             {status === 'success' ? (
               <div className="py-10 text-center">
+                <div role="status" aria-live="polite">
                 <Sparkles size={28} className="mx-auto text-[#d42929] mb-6" strokeWidth={1} />
                 <h3 className="font-serif text-3xl text-white mb-4 uppercase">Wiadomość wysłana</h3>
                 <p className="font-sans text-sm md:text-base text-gray-400 mb-8 max-w-sm mx-auto leading-relaxed">
                   Dziękujemy. Wrócimy do Was z ofertą najszybciej jak to możliwe.
                 </p>
+                </div>
                 <button
+                  type="button"
                   onClick={() => setStatus('idle')}
                   className="rounded-full bg-white px-8 py-3 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-gray-200"
                 >
@@ -766,6 +770,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                       value={formData.fullname}
                       onChange={handleChange}
                       placeholder="Wasze imiona i nazwisko"
+                      autoComplete="name"
                       className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
                   </label>
@@ -778,6 +783,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                       onChange={handleChange}
                       placeholder="kontakt@waszadres.pl"
                       type="email"
+                      autoComplete="email"
                       className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
                   </label>
@@ -801,6 +807,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                       value={formData.location}
                       onChange={handleChange}
                       placeholder="Miasto, sala, plener..."
+                      autoComplete="address-level2"
                       className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
                   </label>
@@ -830,7 +837,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                 </label>
 
                 {status === 'error' && (
-                  <p className="font-sans text-sm text-[#d42929] text-center">Coś poszło nie tak. Spróbuj ponownie.</p>
+                  <p className="font-sans text-sm text-[#d42929] text-center" role="alert">Coś poszło nie tak. Spróbuj ponownie.</p>
                 )}
 
                 <button

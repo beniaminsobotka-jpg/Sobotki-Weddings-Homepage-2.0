@@ -135,6 +135,7 @@ export const Hero: React.FC = () => {
               >
                 <a 
                   href="#kontakt" 
+                  aria-label="Przejdź do formularza kontaktowego"
                   onClick={(e) => {
                     e.preventDefault();
                     const target = document.getElementById('kontakt');
@@ -202,10 +203,17 @@ export const Hero: React.FC = () => {
                 
                 {/* The Video */}
                 <video 
-                  src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/hero–video.mp4" 
-                  autoPlay muted loop playsInline preload="auto"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  poster="/media/hero-video-poster.jpg"
                   className="absolute inset-0 w-full h-full object-cover opacity-90 md:opacity-90"
-                />
+                >
+                  <source src="/media/hero-video-hevc.mp4" type='video/mp4; codecs="hvc1"' />
+                  <source src="/media/hero-video-fallback.mp4" type='video/mp4; codecs="avc1.64001f"' />
+                </video>
 
                 {/* Inner Content (Fades out quickly) */}
                 <motion.div 

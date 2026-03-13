@@ -12,7 +12,6 @@ export default defineConfig({
           motion: ['framer-motion'],
           lenis: ['@studio-freight/lenis'],
           icons: ['lucide-react'],
-          three: ['three', '@react-three/fiber', '@react-three/drei'],
         },
       },
       input: {

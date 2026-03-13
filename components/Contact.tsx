@@ -118,6 +118,8 @@ export const Contact: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                role="status"
+                aria-live="polite"
                 className="text-center py-12"
                 >
                 <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
@@ -126,6 +128,7 @@ export const Contact: React.FC = () => {
                 <h3 className="font-serif text-3xl text-brand-black italic mb-2 uppercase">Wiadomość Wysłana</h3>
                 <p className="font-sans text-gray-600 text-sm tracking-wide">Dziękujemy. Odpowiemy najszybciej jak to możliwe.</p>
                 <button 
+                    type="button"
                     onClick={() => setStatus('idle')}
                     className="mt-8 text-brand-black border-b border-brand-black font-sans uppercase tracking-widest text-xs pb-1 hover:opacity-60 transition-opacity"
                 >
@@ -143,6 +146,7 @@ export const Contact: React.FC = () => {
                             value={formData.fullname}
                             onChange={handleChange}
                             type="text" 
+                            autoComplete="name"
                             className="w-full bg-white/30 rounded-lg px-4 py-3 border border-white/40 text-brand-black font-playfair-italic text-lg md:text-xl focus:outline-none focus:bg-white/50 focus:border-brand-black/20 transition-all placeholder-gray-400 backdrop-blur-sm" 
                             placeholder="Twoje imię" 
                         />
@@ -155,6 +159,7 @@ export const Contact: React.FC = () => {
                             value={formData.email}
                             onChange={handleChange}
                             type="email" 
+                            autoComplete="email"
                             className="w-full bg-white/30 rounded-lg px-4 py-3 border border-white/40 text-brand-black font-playfair-italic text-lg md:text-xl focus:outline-none focus:bg-white/50 focus:border-brand-black/20 transition-all placeholder-gray-400 backdrop-blur-sm" 
                             placeholder="twoj@email.com" 
                         />
@@ -179,6 +184,7 @@ export const Contact: React.FC = () => {
                             value={formData.location}
                             onChange={handleChange}
                             type="text" 
+                            autoComplete="address-level2"
                             className="w-full bg-white/30 rounded-lg px-4 py-3 border border-white/40 text-brand-black font-playfair-italic text-lg md:text-xl focus:outline-none focus:bg-white/50 focus:border-brand-black/20 transition-all placeholder-gray-400 backdrop-blur-sm" 
                             placeholder="Miasto, Sala..." 
                         />
@@ -219,7 +225,7 @@ export const Contact: React.FC = () => {
                 </div>
 
                 {status === 'error' && (
-                    <div className="text-red-500 font-sans text-xs text-center bg-red-100/50 p-2 rounded-lg">
+                    <div className="text-red-500 font-sans text-xs text-center bg-red-100/50 p-2 rounded-lg" role="alert">
                     Coś poszło nie tak. Spróbuj ponownie.
                     </div>
                 )}
