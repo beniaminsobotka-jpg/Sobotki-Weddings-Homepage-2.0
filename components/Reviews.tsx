@@ -65,6 +65,7 @@ export const Reviews: React.FC = () => {
                     muted 
                     loop 
                     playsInline 
+                    preload="metadata"
                     className="w-full h-full object-cover opacity-90 grayscale group-hover:grayscale-0 transition-all duration-700 mix-blend-multiply"
                   />
                 ) : null}

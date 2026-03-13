@@ -39,6 +39,9 @@ export const PortraitsStationaryPage: React.FC = () => {
           <img
             src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-119-min-1024x683.avif"
             alt="Fotostacja stacjonarna hero"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover filter grayscale contrast-110 opacity-70"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent" />
@@ -237,6 +240,8 @@ export const PortraitsStationaryPage: React.FC = () => {
                     <img
                       src={src}
                       alt="Fotostacja stacjonarna - galeria"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full object-cover grayscale transition-all duration-700 hover:scale-[1.02] hover:grayscale-0"
                     />
                   </motion.div>

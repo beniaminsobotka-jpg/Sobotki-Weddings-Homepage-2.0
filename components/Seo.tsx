@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { DEFAULT_ROBOTS, SITE_LOCALE, SITE_NAME, SeoPageKey, getSeoForPage, getStructuredData } from '../seo/site';
+import { SITE_LOCALE, SITE_NAME, SeoPageKey, getSeoForPage, getStructuredData } from '../seo/site';
 
 type SeoProps = {
   page: SeoPageKey;
@@ -46,7 +46,7 @@ export const Seo = ({ page }: SeoProps) => {
     });
     upsertMetaTag('meta[name="robots"]', {
       name: 'robots',
-      content: DEFAULT_ROBOTS,
+      content: meta.robots,
     });
     upsertMetaTag('meta[property="og:locale"]', {
       property: 'og:locale',

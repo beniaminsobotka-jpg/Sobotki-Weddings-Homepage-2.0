@@ -203,7 +203,7 @@ export const Hero: React.FC = () => {
                 {/* The Video */}
                 <video 
                   src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/hero–video.mp4" 
-                  autoPlay muted loop playsInline 
+                  autoPlay muted loop playsInline preload="auto"
                   className="absolute inset-0 w-full h-full object-cover opacity-90 md:opacity-90"
                 />
 

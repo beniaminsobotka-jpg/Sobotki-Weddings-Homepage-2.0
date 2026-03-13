@@ -100,6 +100,7 @@ export const PortraitsPage: React.FC = () => {
                                     src={item.src}
                                     alt={item.alt}
                                     loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-[1s] ease-out group-hover:scale-105 filter grayscale contrast-110 group-hover:grayscale-0"
                                 />
                             </motion.div>
@@ -132,6 +133,7 @@ export const PortraitsPage: React.FC = () => {
                             muted
                             loop
                             playsInline
+                            preload="metadata"
                             className="w-full h-auto aspect-video md:aspect-[21/9] object-cover opacity-80 transition-transform duration-[3s] group-hover:scale-105"
                         />
 
@@ -210,6 +212,7 @@ export const PortraitsPage: React.FC = () => {
                                 muted
                                 loop
                                 playsInline
+                                preload="metadata"
                                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700"
                             />
                             {/* Vignette Overlay */}
@@ -326,6 +329,8 @@ export const PortraitsPage: React.FC = () => {
                                 <img
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-50-min.avif"
                                     alt="Oferta Ślubna"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-700 transform group-hover:scale-105"
                                 />
                                 {/* Gradient Overlay */}
@@ -366,6 +371,8 @@ export const PortraitsPage: React.FC = () => {
                                 <img
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
                                     alt="Oferta Eventowa"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-700 transform group-hover:scale-105"
                                 />
                                 {/* Gradient Overlay */}
@@ -406,6 +413,8 @@ export const PortraitsPage: React.FC = () => {
                                 <img
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/OlgaxFranek_Fotostacja_-51-min.avif"
                                     alt="Studio Stacjonarne"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-700 transform group-hover:scale-105"
                                 />
                                 {/* Gradient Overlay */}
@@ -480,6 +489,8 @@ export const PortraitsPage: React.FC = () => {
                                 <img
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-1-min-1024x683.avif"
                                     alt="Fotostacja portretowa"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-1000"
                                 />
                                 {/* Overlay Vignette */}
@@ -560,6 +571,8 @@ export const PortraitsPage: React.FC = () => {
                             onClick={closeLightbox}
                         >
                             <button
+                                type="button"
+                                aria-label="Zamknij podgląd portretu"
                                 onClick={closeLightbox}
                                 className="absolute top-6 right-6 z-[110] w-12 h-12 flex items-center justify-center text-white/50 hover:text-white transition-colors"
                             >
@@ -567,6 +580,8 @@ export const PortraitsPage: React.FC = () => {
                             </button>
 
                             <button
+                                type="button"
+                                aria-label="Poprzedni portret"
                                 onClick={prevImage}
                                 className="hidden md:flex absolute left-8 z-[110] w-16 h-full items-center justify-start text-white/30 hover:text-white transition-all"
                             >
@@ -574,6 +589,8 @@ export const PortraitsPage: React.FC = () => {
                             </button>
 
                             <button
+                                type="button"
+                                aria-label="Następny portret"
                                 onClick={nextImage}
                                 className="hidden md:flex absolute right-8 z-[110] w-16 h-full items-center justify-end text-white/30 hover:text-white transition-all"
                             >

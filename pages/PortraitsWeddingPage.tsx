@@ -436,6 +436,9 @@ export const PortraitsWeddingPage: React.FC = () => {
           <img
             src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/NataliaxMateusz_Fotostacja_-123.avif"
             alt="Fotostacja ślubna hero"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover filter grayscale contrast-110 opacity-70"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/70 to-transparent" />
@@ -648,6 +651,8 @@ export const PortraitsWeddingPage: React.FC = () => {
                     <img
                       src={src}
                       alt="Fotostacja ślubna - galeria"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full object-cover grayscale transition-all duration-700 hover:scale-[1.02] hover:grayscale-0"
                     />
                   </motion.div>
@@ -664,6 +669,8 @@ export const PortraitsWeddingPage: React.FC = () => {
                 <img
                     src="https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp"
                     alt="Fotostacja Ślubna Oferta"
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover filter grayscale contrast-110"
                 />
                 <motion.div 

@@ -165,6 +165,8 @@ export const HeroPortfolio: React.FC = () => {
                             <img 
                                 src={item.src} 
                                 alt="Wybrany kadr ślubny z portfolio Sobotki Weddings"
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover select-none"
                                 draggable={false}
                             />

@@ -129,6 +129,9 @@ export const PortraitsEventPage: React.FC = () => {
           <img
             src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
             alt="Fotostacja eventowa hero"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover filter grayscale contrast-110 opacity-70"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent" />
@@ -244,6 +247,8 @@ export const PortraitsEventPage: React.FC = () => {
             <img
               src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/IMG_0485-min-kopia-3-1024x768.avif"
               alt="Realizacja fotostacji eventowej"
+              loading="lazy"
+              decoding="async"
               className="aspect-[4/4.2] w-full object-cover filter grayscale contrast-110 group-hover:grayscale-0 transition-all duration-[1.5s]"
             />
             {/* Liquid Glass Element inside Image container */}
@@ -319,6 +324,8 @@ export const PortraitsEventPage: React.FC = () => {
             <img
               src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_4.avif"
               alt="Fotostacja Eventowa Oferta"
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover filter grayscale contrast-110"
             />
             <motion.div

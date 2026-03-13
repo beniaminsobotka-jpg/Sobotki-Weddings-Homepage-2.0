@@ -18,6 +18,16 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isPortraitsRoute = location.pathname.startsWith('/portraits');
+  const isHomePath = (path: string) => path === '/' || path === '/home';
+
+  const isActiveHref = (href: string) => {
+    if (href.includes('#')) {
+      const [targetPath] = href.split('#');
+      return isHomePath(location.pathname) && isHomePath(targetPath || '/');
+    }
+
+    return location.pathname === href;
+  };
 
   // Handle Navigation with Paths and Hashes
   const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -30,7 +40,6 @@ export const Navbar: React.FC = () => {
         
         // If we are already on the target path (e.g. "/" or "/home")
         // We need to handle both "/" and "/home" as the same "Home" page
-        const isHomePath = (p: string) => p === '/' || p === '/home';
         const currentIsHome = isHomePath(location.pathname);
         const targetIsHome = isHomePath(targetPath);
 
@@ -111,7 +120,7 @@ export const Navbar: React.FC = () => {
         >
             
             {/* Logo - Navigates to Home explicitly now */}
-            <Link to="/" className={`flex flex-col items-center leading-none mr-8 md:mr-12 group ${isDark ? 'text-white' : 'text-brand-black'} cursor-pointer`} onClick={() => setIsOpen(false)}>
+            <Link to="/" aria-label="Przejdź do strony głównej Sobotki Weddings" className={`flex flex-col items-center leading-none mr-8 md:mr-12 group ${isDark ? 'text-white' : 'text-brand-black'} cursor-pointer`} onClick={() => setIsOpen(false)}>
                 <span className="font-serif font-black text-xl uppercase tracking-tighter">Sobotki</span>
                 <span className="font-playfair italic font-normal lowercase text-sm -mt-1 opacity-90">weddings</span>
             </Link>
@@ -123,6 +132,7 @@ export const Navbar: React.FC = () => {
                 key={link.name}
                 href={link.href}
                 onClick={(e) => handleNavigation(e, link.href)}
+                aria-current={isActiveHref(link.href) ? 'page' : undefined}
                 className={`font-sans text-[10px] font-bold tracking-[0.2em] uppercase transition-colors relative group cursor-pointer
                     ${isDark ? 'text-white/80 hover:text-white' : 'text-brand-black/80 hover:text-brand-black'}
                 `}
@@ -162,6 +172,7 @@ export const Navbar: React.FC = () => {
                   key={link.name}
                   href={link.href}
                   onClick={(e) => handleNavigation(e, link.href)}
+                  aria-current={isActiveHref(link.href) ? 'page' : undefined}
                   className="font-serif font-black text-[9vw] sm:text-5xl text-brand-black/90 hover:text-brand-black transition-colors uppercase drop-shadow-sm cursor-pointer"
                 >
                   {link.name}

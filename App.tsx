@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import Lenis from '@studio-freight/lenis';
 import { AnimatePresence } from 'framer-motion';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
@@ -10,13 +10,15 @@ import { LiquidBackground } from './components/LiquidBackground';
 
 // Pages
 import { Home } from './pages/Home';
-import { PortfolioPage } from './pages/PortfolioPage';
-import { PortraitsPage } from './pages/PortraitsPage';
-import { PortraitsEventPage } from './pages/PortraitsEventPage';
-import { PortraitsWeddingPage } from './pages/PortraitsWeddingPage';
-import { PortraitsStationaryPage } from './pages/PortraitsStationaryPage';
-import { FilmPage } from './pages/FilmPage';
-import { ContactPage } from './pages/ContactPage';
+import { NotFoundPage } from './pages/NotFoundPage';
+
+const PortfolioPage = lazy(async () => ({ default: (await import('./pages/PortfolioPage')).PortfolioPage }));
+const PortraitsPage = lazy(async () => ({ default: (await import('./pages/PortraitsPage')).PortraitsPage }));
+const PortraitsEventPage = lazy(async () => ({ default: (await import('./pages/PortraitsEventPage')).PortraitsEventPage }));
+const PortraitsWeddingPage = lazy(async () => ({ default: (await import('./pages/PortraitsWeddingPage')).PortraitsWeddingPage }));
+const PortraitsStationaryPage = lazy(async () => ({ default: (await import('./pages/PortraitsStationaryPage')).PortraitsStationaryPage }));
+const FilmPage = lazy(async () => ({ default: (await import('./pages/FilmPage')).FilmPage }));
+const ContactPage = lazy(async () => ({ default: (await import('./pages/ContactPage')).ContactPage }));
 
 // ScrollToTop component to reset scroll on route change
 const ScrollToTop = () => {
@@ -56,7 +58,7 @@ const AppShell: React.FC<{
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ isLoading, setIsLoading }) => {
   const location = useLocation();
-  const showLiquidBackground = ['/', '/portfolio', '/film', '/kontakt'].includes(location.pathname);
+  const showLiquidBackground = ['/', '/film', '/kontakt'].includes(location.pathname);
 
   return (
     <>
@@ -71,18 +73,28 @@ const AppShell: React.FC<{
       {!isLoading && (
         <>
           <Navbar />
-          <main className="relative z-10">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/home" element={<Navigate to="/" replace />} />
-              <Route path="/portfolio" element={<PortfolioPage />} />
-              <Route path="/film" element={<FilmPage />} />
-              <Route path="/kontakt" element={<ContactPage />} />
-              <Route path="/portraits" element={<PortraitsPage />} />
-              <Route path="/portraits/event" element={<PortraitsEventPage />} />
-              <Route path="/portraits/wedding" element={<PortraitsWeddingPage />} />
-              <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
-            </Routes>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120] focus:rounded-full focus:bg-brand-black focus:px-5 focus:py-3 focus:font-sans focus:text-xs focus:font-bold focus:uppercase focus:tracking-[0.2em] focus:text-white"
+          >
+            Przejdź do treści
+          </a>
+          <main id="main-content" className="relative z-10">
+            <Suspense fallback={<div className="min-h-screen" aria-hidden="true" />}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Navigate to="/" replace />} />
+                <Route path="/contact" element={<Navigate to="/kontakt" replace />} />
+                <Route path="/portfolio" element={<PortfolioPage />} />
+                <Route path="/film" element={<FilmPage />} />
+                <Route path="/kontakt" element={<ContactPage />} />
+                <Route path="/portraits" element={<PortraitsPage />} />
+                <Route path="/portraits/event" element={<PortraitsEventPage />} />
+                <Route path="/portraits/wedding" element={<PortraitsWeddingPage />} />
+                <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
           </main>
           <Footer />
         </>
@@ -92,8 +104,30 @@ const AppShell: React.FC<{
 };
 
 const App: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    if (typeof window === 'undefined') {
+      return true;
+    }
+
+    try {
+      const hasSeenIntro = window.sessionStorage.getItem('sw-intro-seen') === '1';
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      return !(hasSeenIntro || prefersReducedMotion);
+    } catch {
+      return true;
+    }
+  });
   const lenisRef = useRef<Lenis | null>(null);
+
+  useEffect(() => {
+    if (!isLoading && typeof window !== 'undefined') {
+      try {
+        window.sessionStorage.setItem('sw-intro-seen', '1');
+      } catch {
+        // Ignore storage errors and continue rendering normally.
+      }
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     if (isLoading) return;

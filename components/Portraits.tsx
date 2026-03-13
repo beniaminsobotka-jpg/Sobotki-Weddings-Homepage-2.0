@@ -171,6 +171,8 @@ export const Portraits: React.FC = () => {
                                     <img 
                                         src={item.src} 
                                         alt="Czarno-biały portret gości wykonany w fotostacji Sobotki Portraits"
+                                        loading="lazy"
+                                        decoding="async"
                                         className="w-full h-full object-cover select-none"
                                         draggable={false}
                                     />

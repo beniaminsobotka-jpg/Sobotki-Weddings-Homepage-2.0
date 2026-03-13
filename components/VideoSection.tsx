@@ -56,6 +56,7 @@ export const VideoSection: React.FC = () => {
                     loop
                     muted
                     playsInline
+                    preload="metadata"
                 />
                 
                 {/* Cinematic Overlay (Grain + Grading) */}

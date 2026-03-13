@@ -11,7 +11,8 @@ export type SeoPageKey =
   | 'portraitsWedding'
   | 'portraitsEvent'
   | 'portraitsStationary'
-  | 'contact';
+  | 'contact'
+  | 'notFound';
 
 type PageSeo = {
   path: string;
@@ -19,6 +20,7 @@ type PageSeo = {
   description: string;
   image: string;
   ogType: 'website';
+  robots?: string;
 };
 
 export const seoPages: Record<SeoPageKey, PageSeo> = {
@@ -86,6 +88,15 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_2.webp',
     ogType: 'website',
   },
+  notFound: {
+    path: '/404',
+    title: '404 | Sobotki Weddings',
+    description:
+      'Ta podstrona nie istnieje. Wróć do strony głównej Sobotki Weddings i przejdź do portfolio, filmu, portraits lub kontaktu.',
+    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_2.jpg',
+    ogType: 'website',
+    robots: 'noindex,follow',
+  },
 };
 
 export const buildAbsoluteUrl = (path: string) => new URL(path, SITE_URL).toString();
@@ -97,6 +108,7 @@ export const getSeoForPage = (page: SeoPageKey) => {
     ...config,
     canonical: buildAbsoluteUrl(config.path),
     image: config.image.startsWith('http') ? config.image : buildAbsoluteUrl(config.image),
+    robots: config.robots ?? DEFAULT_ROBOTS,
   };
 };
 

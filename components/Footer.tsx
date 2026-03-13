@@ -13,6 +13,7 @@ const footerLinks = [
 export const Footer: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isActiveHref = (href: string) => location.pathname === href;
 
   const handleNavigation = (href: string) => {
     if (href.includes('#')) {
@@ -44,6 +45,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col items-center gap-5 text-center md:items-start md:text-left">
           <a
             href="mailto:kontakt@sobotkiweddings.pl"
+            aria-label="Napisz maila do Sobotki Weddings"
             className="font-sans text-xs uppercase tracking-[0.22em] text-white/72 transition-opacity duration-300 hover:opacity-60"
           >
             kontakt@sobotkiweddings.pl
@@ -54,6 +56,7 @@ export const Footer: React.FC = () => {
               href="https://www.instagram.com/sobotki.weddings/"
               target="_blank"
               rel="noreferrer"
+              aria-label="Instagram Sobotki Weddings"
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 text-white/78 transition-all duration-300 hover:border-white/30 hover:text-white"
             >
               <Instagram size={17} strokeWidth={1.8} />
@@ -62,6 +65,7 @@ export const Footer: React.FC = () => {
               href="https://www.facebook.com/sobotki.weddings"
               target="_blank"
               rel="noreferrer"
+              aria-label="Facebook Sobotki Weddings"
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 text-white/78 transition-all duration-300 hover:border-white/30 hover:text-white"
             >
               <Facebook size={17} strokeWidth={1.8} />
@@ -71,6 +75,7 @@ export const Footer: React.FC = () => {
 
         <Link
           to="/"
+          aria-label="Przejdź do strony głównej Sobotki Weddings"
           className="flex flex-col items-center justify-center leading-none text-center transition-opacity duration-300 hover:opacity-75"
         >
           <span className="font-serif font-black text-4xl uppercase tracking-tight text-white md:text-5xl">
@@ -86,6 +91,7 @@ export const Footer: React.FC = () => {
             <a
               key={link.label}
               href={link.href}
+              aria-current={isActiveHref(link.href) ? 'page' : undefined}
               onClick={(event) => {
                 event.preventDefault();
                 handleNavigation(link.href);

@@ -140,6 +140,7 @@ export const PortfolioPage: React.FC = () => {
                                             muted
                                             loop
                                             playsInline
+                                            preload="metadata"
                                             className="w-full h-auto block object-cover transition-transform duration-[0.8s] ease-out group-hover:scale-105"
                                         />
                                     </div>
@@ -149,6 +150,7 @@ export const PortfolioPage: React.FC = () => {
                                             src={item.src} 
                                             alt={item.alt}
                                             loading="lazy"
+                                            decoding="async"
                                             onError={() => handleImageError(item.id)}
                                             className="w-full h-auto block transition-transform duration-[0.8s] ease-out group-hover:scale-105"
                                         />
@@ -177,6 +179,8 @@ export const PortfolioPage: React.FC = () => {
                         onClick={closeLightbox}
                     >
                         <button 
+                            type="button"
+                            aria-label="Zamknij podgląd"
                             onClick={closeLightbox}
                             className="absolute top-6 right-6 md:top-10 md:right-10 z-[110] w-12 h-12 rounded-full border border-brand-black/20 flex items-center justify-center hover:bg-brand-black hover:text-white transition-colors"
                         >
@@ -184,6 +188,8 @@ export const PortfolioPage: React.FC = () => {
                         </button>
 
                         <button 
+                            type="button"
+                            aria-label="Poprzedni element"
                             onClick={prevImage}
                             className="hidden md:flex absolute left-10 z-[110] w-14 h-14 rounded-full border border-brand-black/20 items-center justify-center hover:bg-brand-black hover:text-white transition-all"
                         >
@@ -191,6 +197,8 @@ export const PortfolioPage: React.FC = () => {
                         </button>
                         
                         <button 
+                            type="button"
+                            aria-label="Następny element"
                             onClick={nextImage}
                             className="hidden md:flex absolute right-10 z-[110] w-14 h-14 rounded-full border border-brand-black/20 items-center justify-center hover:bg-brand-black hover:text-white transition-all"
                         >

@@ -6,7 +6,17 @@ export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          motion: ['framer-motion'],
+          lenis: ['@studio-freight/lenis'],
+          icons: ['lucide-react'],
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
+        },
+      },
       input: {
+        notFound: new URL('./404.html', import.meta.url).pathname,
         main: new URL('./index.html', import.meta.url).pathname,
         portfolio: new URL('./portfolio/index.html', import.meta.url).pathname,
         film: new URL('./film/index.html', import.meta.url).pathname,
