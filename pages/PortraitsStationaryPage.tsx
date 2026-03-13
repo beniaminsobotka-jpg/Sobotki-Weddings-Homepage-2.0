@@ -80,6 +80,7 @@ export const PortraitsStationaryPage: React.FC = () => {
                   href="https://calendly.com/sobotki-portraits/30min"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Zapisz się online na sesję w fotostacji stacjonarnej"
                   className="w-full sm:w-auto flex justify-center group items-center gap-3 rounded-full bg-white px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:bg-gray-200"
                 >
                   Zapisz się online
@@ -205,6 +206,7 @@ export const PortraitsStationaryPage: React.FC = () => {
                 href="https://calendly.com/sobotki-portraits/30min"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Wybierz termin sesji na Calendly"
                 className="self-start rounded-full bg-white px-8 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-gray-200 inline-flex items-center gap-3"
               >
                   Wybierz termin na Calendly

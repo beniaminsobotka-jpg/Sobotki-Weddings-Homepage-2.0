@@ -19,3 +19,9 @@ export const getPortraitTileSrcSet = (src: string) =>
     `${withSizeSuffix(src, '-1536x1024')} 1536w`,
     `${src} 2048w`,
   ].join(', ');
+
+export const getPortfolioImageSrcSet = (src: string) =>
+  [
+    `${withSizeSuffix(src, '-1024x1536')} 1024w`,
+    `${src} 1365w`,
+  ].join(', ');

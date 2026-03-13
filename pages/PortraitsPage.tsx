@@ -575,6 +575,9 @@ export const PortraitsPage: React.FC = () => {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label="Podgląd portretu"
                             className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-sm flex items-center justify-center p-4"
                             onClick={closeLightbox}
                         >

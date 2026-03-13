@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
 import { LiquidBackground } from '../components/LiquidBackground';
 import { Seo } from '../components/Seo';
+import { getPortfolioImageSrcSet } from '../utils/media';
 
 // --- DATA GENERATION ---
 const generatePortfolio = () => {
@@ -140,7 +141,8 @@ export const PortfolioPage: React.FC = () => {
                                             muted
                                             loop
                                             playsInline
-                                            preload="metadata"
+                                            preload="none"
+                                            aria-hidden="true"
                                             className="w-full h-auto block object-cover transition-transform duration-[0.8s] ease-out group-hover:scale-105"
                                         />
                                     </div>
@@ -148,9 +150,13 @@ export const PortfolioPage: React.FC = () => {
                                     !failedImages.has(item.id) ? (
                                         <img 
                                             src={item.src} 
+                                            srcSet={getPortfolioImageSrcSet(item.src)}
+                                            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                                             alt={item.alt}
                                             loading="lazy"
                                             decoding="async"
+                                            width={1365}
+                                            height={2048}
                                             onError={() => handleImageError(item.id)}
                                             className="w-full h-auto block transition-transform duration-[0.8s] ease-out group-hover:scale-105"
                                         />
@@ -175,6 +181,9 @@ export const PortfolioPage: React.FC = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Podgląd elementu portfolio"
                         className="fixed inset-0 z-[100] bg-brand-paper/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
                         onClick={closeLightbox}
                     >

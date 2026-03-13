@@ -145,8 +145,11 @@ export const Navbar: React.FC = () => {
 
             {/* Mobile Toggle */}
             <button 
-                className={`lg:hidden transition-colors ${isDark ? 'text-white' : 'text-brand-black/80'}`} 
+                type="button"
+                className={`lg:hidden min-h-11 min-w-11 transition-colors ${isDark ? 'text-white' : 'text-brand-black/80'}`} 
                 onClick={() => setIsOpen(true)}
+                aria-expanded={isOpen}
+                aria-controls="mobile-navigation"
                 aria-label="Otwórz menu"
             >
                 <Menu size={24} />
@@ -161,12 +164,15 @@ export const Navbar: React.FC = () => {
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(15px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu mobilne"
             className="fixed inset-0 z-50 bg-white/60 flex flex-col items-center justify-center p-8"
           >
-            <button className="absolute top-8 right-8 text-brand-black p-2 bg-white/20 rounded-full" onClick={() => setIsOpen(false)} aria-label="Zamknij menu">
+            <button type="button" className="absolute top-8 right-8 min-h-11 min-w-11 text-brand-black p-2 bg-white/20 rounded-full" onClick={() => setIsOpen(false)} aria-label="Zamknij menu">
               <X size={28} />
             </button>
-            <div className="flex flex-col gap-10 text-center">
+            <div id="mobile-navigation" className="flex flex-col gap-10 text-center">
               {links.map((link) => (
                 <a
                   key={link.name}

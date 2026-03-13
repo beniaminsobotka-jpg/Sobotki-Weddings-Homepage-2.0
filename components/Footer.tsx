@@ -3,7 +3,7 @@ import { Facebook, Instagram } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const footerLinks = [
-  { label: 'Home', href: '/' },
+  { label: 'Start', href: '/' },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Film', href: '/film' },
   { label: 'Portraits', href: '/portraits' },
@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
           <a
             href="mailto:kontakt@sobotkiweddings.pl"
             aria-label="Napisz maila do Sobotki Weddings"
-            className="font-sans text-xs uppercase tracking-[0.22em] text-white/72 transition-opacity duration-300 hover:opacity-60"
+            className="py-1 font-sans text-xs uppercase tracking-[0.22em] text-white/72 transition-opacity duration-300 hover:opacity-60"
           >
             kontakt@sobotkiweddings.pl
           </a>
@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
             <a
               href="https://www.instagram.com/sobotki.weddings/"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label="Instagram Sobotki Weddings"
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 text-white/78 transition-all duration-300 hover:border-white/30 hover:text-white"
             >
@@ -64,7 +64,7 @@ export const Footer: React.FC = () => {
             <a
               href="https://www.facebook.com/sobotki.weddings"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               aria-label="Facebook Sobotki Weddings"
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 text-white/78 transition-all duration-300 hover:border-white/30 hover:text-white"
             >
@@ -96,7 +96,7 @@ export const Footer: React.FC = () => {
                 event.preventDefault();
                 handleNavigation(link.href);
               }}
-              className="font-sans text-[11px] uppercase tracking-[0.22em] text-white/65 transition-colors duration-300 hover:text-white"
+              className="py-1 font-sans text-[11px] uppercase tracking-[0.22em] text-white/65 transition-colors duration-300 hover:text-white"
             >
               {link.label}
             </a>
