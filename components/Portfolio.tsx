@@ -92,6 +92,7 @@ export const Portfolio: React.FC = () => {
                                 src={film.thumbnail} 
                                 alt={`Miniatura filmu ślubnego ${film.title}`}
                                 loading="lazy"
+                                fetchPriority="low"
                                 decoding="async"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80"
                             />

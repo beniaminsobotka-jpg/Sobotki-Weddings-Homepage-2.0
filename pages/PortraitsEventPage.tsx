@@ -249,6 +249,7 @@ export const PortraitsEventPage: React.FC = () => {
               src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/IMG_0485-min-kopia-3-1024x768.avif"
               alt="Realizacja fotostacji eventowej"
               loading="lazy"
+              fetchPriority="low"
               decoding="async"
               className="aspect-[4/4.2] w-full object-cover filter grayscale contrast-110 group-hover:grayscale-0 transition-all duration-[1.5s]"
             />
@@ -326,6 +327,7 @@ export const PortraitsEventPage: React.FC = () => {
               src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_4.avif"
               alt="Fotostacja Eventowa Oferta"
               loading="lazy"
+              fetchPriority="low"
               decoding="async"
               className="h-full w-full object-cover filter grayscale contrast-110"
             />

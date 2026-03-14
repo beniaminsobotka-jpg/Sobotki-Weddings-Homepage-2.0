@@ -653,6 +653,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                       src={src}
                       alt="Fotostacja ślubna - galeria"
                       loading="lazy"
+                      fetchPriority="low"
                       decoding="async"
                       className="w-full object-cover grayscale transition-all duration-700 hover:scale-[1.02] hover:grayscale-0"
                     />
@@ -671,6 +672,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                     src="https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp"
                     alt="Fotostacja Ślubna Oferta"
                     loading="lazy"
+                    fetchPriority="low"
                     decoding="async"
                     className="h-full w-full object-cover filter grayscale contrast-110"
                 />

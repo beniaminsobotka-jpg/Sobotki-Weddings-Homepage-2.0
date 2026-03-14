@@ -175,7 +175,7 @@ export const Portraits: React.FC = () => {
                                         sizes="(min-width: 768px) 380px, 220px"
                                         alt="Czarno-biały portret gości wykonany w fotostacji Sobotki Portraits"
                                         loading={Math.abs(index - activeIndex) <= 1 ? 'eager' : 'lazy'}
-                                        fetchPriority={isActive ? 'high' : 'auto'}
+                                        fetchPriority={isActive ? 'high' : 'low'}
                                         decoding="async"
                                         width={380}
                                         height={480}

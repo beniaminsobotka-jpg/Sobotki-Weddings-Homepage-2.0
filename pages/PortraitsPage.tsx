@@ -103,7 +103,7 @@ export const PortraitsPage: React.FC = () => {
                                     sizes="33vw"
                                     alt={item.alt}
                                     loading={index < 3 ? 'eager' : 'lazy'}
-                                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                                    fetchPriority={index === 0 ? 'high' : 'low'}
                                     decoding="async"
                                     width={2048}
                                     height={1365}
@@ -338,6 +338,7 @@ export const PortraitsPage: React.FC = () => {
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-50-min.avif"
                                     alt="Oferta Ślubna"
                                     loading="lazy"
+                                    fetchPriority="low"
                                     decoding="async"
                                     className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-700 transform group-hover:scale-105"
                                 />
@@ -380,6 +381,7 @@ export const PortraitsPage: React.FC = () => {
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
                                     alt="Oferta Eventowa"
                                     loading="lazy"
+                                    fetchPriority="low"
                                     decoding="async"
                                     className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-700 transform group-hover:scale-105"
                                 />
@@ -422,6 +424,7 @@ export const PortraitsPage: React.FC = () => {
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/OlgaxFranek_Fotostacja_-51-min.avif"
                                     alt="Studio Stacjonarne"
                                     loading="lazy"
+                                    fetchPriority="low"
                                     decoding="async"
                                     className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-700 transform group-hover:scale-105"
                                 />
@@ -498,6 +501,7 @@ export const PortraitsPage: React.FC = () => {
                                     src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-1-min-1024x683.avif"
                                     alt="Fotostacja portretowa"
                                     loading="lazy"
+                                    fetchPriority="low"
                                     decoding="async"
                                     className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-1000"
                                 />

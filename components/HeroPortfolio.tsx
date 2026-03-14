@@ -166,7 +166,7 @@ export const HeroPortfolio: React.FC = () => {
                                 src={item.src} 
                                 alt="Wybrany kadr ślubny z portfolio Sobotki Weddings"
                                 loading={Math.abs(index - activeIndex) <= 1 ? 'eager' : 'lazy'}
-                                fetchPriority={isActive ? 'high' : 'auto'}
+                                fetchPriority={isActive ? 'high' : 'low'}
                                 decoding="async"
                                 sizes="(min-width: 768px) 380px, 220px"
                                 width={380}

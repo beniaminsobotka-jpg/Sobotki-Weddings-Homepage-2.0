@@ -243,6 +243,7 @@ export const PortraitsStationaryPage: React.FC = () => {
                       src={src}
                       alt="Fotostacja stacjonarna - galeria"
                       loading="lazy"
+                      fetchPriority="low"
                       decoding="async"
                       className="w-full object-cover grayscale transition-all duration-700 hover:scale-[1.02] hover:grayscale-0"
                     />

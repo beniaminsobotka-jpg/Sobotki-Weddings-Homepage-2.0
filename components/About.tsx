@@ -43,6 +43,7 @@ export const About: React.FC = () => {
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_1.webp" 
                     alt="Ania, fotografka i współtwórczyni Sobotki Weddings" 
                     loading="lazy"
+                    fetchPriority="low"
                     decoding="async"
                     className="w-full h-full object-cover grayscale md:grayscale-0 transition-all duration-700 md:group-hover:grayscale-[0.5]"
                 />
@@ -108,6 +109,7 @@ export const About: React.FC = () => {
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_2.webp" 
                     alt="Ania i Benek, duet Sobotki Weddings" 
                     loading="lazy"
+                    fetchPriority="low"
                     decoding="async"
                     className="w-full h-full object-cover"
                 />
@@ -142,6 +144,7 @@ export const About: React.FC = () => {
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_3.webp" 
                     alt="Benek, filmowiec i współtwórca Sobotki Weddings" 
                     loading="lazy"
+                    fetchPriority="low"
                     decoding="async"
                     className="w-full h-full object-cover grayscale md:grayscale-0 transition-all duration-700 md:group-hover:grayscale-[0.5]"
                 />

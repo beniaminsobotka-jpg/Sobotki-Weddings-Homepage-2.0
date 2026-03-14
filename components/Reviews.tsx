@@ -26,6 +26,62 @@ const reviews: Review[] = [
   }
 ];
 
+const ReviewVideo: React.FC<{ src: string; title: string }> = ({ src, title }) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = React.useState(false);
+  const [isReady, setIsReady] = React.useState(false);
+
+  React.useEffect(() => {
+    const element = containerRef.current;
+    if (!element || shouldLoad) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '280px 0px' }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative w-full h-full overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24),rgba(255,255,255,0.08)_38%,rgba(255,255,255,0)_70%)]"
+    >
+      <div
+        className={`absolute inset-0 transition-opacity duration-500 ${isReady ? 'opacity-0' : 'opacity-100'}`}
+        aria-hidden="true"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-white/35 via-white/10 to-black/10" />
+        <div className="absolute inset-0 noise-texture opacity-[0.05]" />
+      </div>
+
+      {shouldLoad ? (
+        <video
+          src={src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          onLoadedData={() => setIsReady(true)}
+          className={`w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[opacity,filter] duration-700 mix-blend-multiply ${
+            isReady ? 'opacity-90' : 'opacity-0'
+          }`}
+        />
+      ) : null}
+    </div>
+  );
+};
+
 export const Reviews: React.FC = () => {
   return (
     <section className="pt-8 pb-8 md:pt-16 md:pb-32 px-4 md:px-8 relative">
@@ -59,16 +115,7 @@ export const Reviews: React.FC = () => {
               {/* Video Container */}
               <div className="w-full aspect-[4/3] relative overflow-hidden mb-2 md:mb-6 rounded-2xl bg-white/50">
                 {review.video ? (
-                  <video 
-                    src={review.video}
-                    autoPlay 
-                    muted 
-                    loop 
-                    playsInline 
-                    preload="none"
-                    aria-hidden="true"
-                    className="w-full h-full object-cover opacity-90 grayscale group-hover:grayscale-0 transition-all duration-700 mix-blend-multiply"
-                  />
+                  <ReviewVideo src={review.video} title={review.name} />
                 ) : null}
               </div>
 
