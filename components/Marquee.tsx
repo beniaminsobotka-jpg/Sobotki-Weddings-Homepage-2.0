@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 
 export const Marquee: React.FC = () => {
   const items = [
-    'ponadczasowe zdjecia',
+    'ponadczasowe zdjęcia',
     'filmowe kadry',
-    'wzruszajace filmy',
+    'wzruszające filmy',
     'autentyczne uczucia',
   ];
   const repeatedItems = [...items, ...items, ...items, ...items];
@@ -21,7 +21,7 @@ export const Marquee: React.FC = () => {
         transition={{
           repeat: Infinity,
           ease: "linear",
-          duration: 22,
+          duration: 48,
         }}
       >
         {[0, 1].map((track) => (
