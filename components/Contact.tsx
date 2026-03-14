@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
+import { submitToActiveCampaign } from '../utils/activeCampaign';
 
 const AC_CONFIG = {
   URL: 'https://sobotkiportraits44570.activehosted.com/proc.php',
   U: '1', 
   F: '1', 
-  OR: '0fd08757-ee5d-4dfa-9f7d-85ee6f058941',
+  OR: '81774679-e2a9-4425-8ac6-cdf021c0bdf6',
   FIELDS: {
     FULLNAME: 'fullname',
     EMAIL: 'email',
@@ -36,28 +37,27 @@ export const Contact: React.FC = () => {
     e.preventDefault();
     setStatus('loading');
 
-    const acData = new FormData();
-    acData.append('u', AC_CONFIG.U);
-    acData.append('f', AC_CONFIG.F);
-    acData.append('s', '');
-    acData.append('c', '0');
-    acData.append('m', '0');
-    acData.append('act', 'sub');
-    acData.append('v', '2');
-    acData.append('or', AC_CONFIG.OR);
-
-    acData.append(AC_CONFIG.FIELDS.FULLNAME, formData.fullname);
-    acData.append(AC_CONFIG.FIELDS.EMAIL, formData.email);
-    acData.append(AC_CONFIG.FIELDS.DATE, formData.date);
-    acData.append(AC_CONFIG.FIELDS.LOCATION, formData.location);
     const message = [
       formData.message,
       '---',
       'POWIADOMIENIE: kontakt@sobotkiweddings.pl, kontakt.sobotki@gmail.com',
     ].filter(Boolean).join('\n');
-
-    acData.append(AC_CONFIG.FIELDS.MESSAGE, message);
-    acData.append(AC_CONFIG.FIELDS.OFFER, formData.offer);
+    const acPayload = {
+      u: AC_CONFIG.U,
+      f: AC_CONFIG.F,
+      s: '',
+      c: '0',
+      m: '0',
+      act: 'sub',
+      v: '2',
+      or: AC_CONFIG.OR,
+      [AC_CONFIG.FIELDS.FULLNAME]: formData.fullname,
+      [AC_CONFIG.FIELDS.EMAIL]: formData.email,
+      [AC_CONFIG.FIELDS.DATE]: formData.date,
+      [AC_CONFIG.FIELDS.LOCATION]: formData.location,
+      [AC_CONFIG.FIELDS.MESSAGE]: message,
+      [AC_CONFIG.FIELDS.OFFER]: formData.offer,
+    };
 
     // Formspree Data
     const formspreeData = new FormData();
@@ -72,11 +72,7 @@ export const Contact: React.FC = () => {
     try {
       // ActiveCampaign is supplementary; Formspree is the authoritative delivery path.
       try {
-        await fetch(AC_CONFIG.URL, {
-          method: 'POST',
-          body: acData,
-          mode: 'no-cors',
-        });
+        submitToActiveCampaign(AC_CONFIG.URL, acPayload);
       } catch (acError) {
         console.warn('ActiveCampaign submit failed:', acError);
       }
