@@ -5,6 +5,7 @@ export interface Review {
   content: string;
   image?: string;
   video?: string;
+  poster?: string;
   rating?: number;
 }
 

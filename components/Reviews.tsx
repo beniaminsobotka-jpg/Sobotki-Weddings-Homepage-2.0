@@ -8,6 +8,7 @@ const reviews: Review[] = [
     role: "Pani Młoda",
     date: "2023",
     video: "https://sobotkiweddings.pl/wp-content/uploads/2026/02/Na-strone-testimonal-1-Ada-i-Marcin.mp4",
+    poster: "/media/review-ada-poster.jpg",
     content: "Z całego serca mogę polecić wszystkim Sobotki Weddings! Beniamin towarzyszył nam z kamerą w naszym wyjątkowym dniu. Ma niezwykłą umiejętność - był obecny, ale nie nachalnie. Potrafi wyczarować cudowne kadry."
   },
   {
@@ -15,6 +16,7 @@ const reviews: Review[] = [
     role: "Para Młoda",
     date: "Czerwiec 2023",
     video: "https://sobotkiweddings.pl/wp-content/uploads/2024/01/wycinek-1080.mov",
+    poster: "/media/review-aleksandra-poster.jpg",
     content: "Ania i Benek to strzał w dziesiątkę! Życzliwi, pomocni, wykonują swoją pracę 'po cichu', łapiąc najbardziej wzruszające momenty. Dziękujemy za wspaniałe zdjęcia i film."
   },
   {
@@ -22,11 +24,12 @@ const reviews: Review[] = [
     role: "Pani Młoda",
     date: "2024",
     video: "https://sobotkiweddings.pl/wp-content/uploads/2026/02/Na-strone-testimonal-2-Weronika-x-Felix.mp4",
+    poster: "/media/review-weronika-poster.jpg",
     content: "Zdjęcia i filmy są tak naturalne i takie nasze, lepiej nie moglibyśmy ich sobie wyobrazić. No dobra, może mają jedną wadę - oglądając je nie ma szans wyjść z tego o suchych policzkach…"
   }
 ];
 
-const ReviewVideo: React.FC<{ src: string; title: string }> = ({ src, title }) => {
+const ReviewVideo: React.FC<{ src: string; poster: string; title: string }> = ({ src, poster, title }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [shouldLoad, setShouldLoad] = React.useState(false);
   const [isReady, setIsReady] = React.useState(false);
@@ -53,15 +56,19 @@ const ReviewVideo: React.FC<{ src: string; title: string }> = ({ src, title }) =
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.24),rgba(255,255,255,0.08)_38%,rgba(255,255,255,0)_70%)]"
+      className="relative w-full h-full overflow-hidden rounded-2xl bg-black"
     >
-      <div
-        className={`absolute inset-0 transition-opacity duration-500 ${isReady ? 'opacity-0' : 'opacity-100'}`}
+      <img
+        src={poster}
+        alt=""
+        loading="lazy"
+        fetchPriority="low"
+        decoding="async"
         aria-hidden="true"
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-white/35 via-white/10 to-black/10" />
-        <div className="absolute inset-0 noise-texture opacity-[0.05]" />
-      </div>
+        className={`absolute inset-0 h-full w-full object-cover grayscale transition-opacity duration-500 mix-blend-multiply ${
+          isReady ? 'opacity-0' : 'opacity-90'
+        }`}
+      />
 
       {shouldLoad ? (
         <video
@@ -71,8 +78,9 @@ const ReviewVideo: React.FC<{ src: string; title: string }> = ({ src, title }) =
           loop
           playsInline
           preload="metadata"
+          poster={poster}
           aria-hidden="true"
-          onLoadedData={() => setIsReady(true)}
+          onCanPlay={() => setIsReady(true)}
           className={`w-full h-full object-cover grayscale group-hover:grayscale-0 transition-[opacity,filter] duration-700 mix-blend-multiply ${
             isReady ? 'opacity-90' : 'opacity-0'
           }`}
@@ -115,7 +123,7 @@ export const Reviews: React.FC = () => {
               {/* Video Container */}
               <div className="w-full aspect-[4/3] relative overflow-hidden mb-2 md:mb-6 rounded-2xl bg-white/50">
                 {review.video ? (
-                  <ReviewVideo src={review.video} title={review.name} />
+                  <ReviewVideo src={review.video} poster={review.poster ?? ''} title={review.name} />
                 ) : null}
               </div>
 
