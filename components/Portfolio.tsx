@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -36,14 +36,43 @@ const films = [
 
 export const Portfolio: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  
+  const [loadedPreviews, setLoadedPreviews] = useState<Record<number, boolean>>({});
+  const hoverTimeoutRef = useRef<number | null>(null);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current !== null) {
+        window.clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleMouseEnter = (index: number) => {
+    if (hoverTimeoutRef.current !== null) {
+      window.clearTimeout(hoverTimeoutRef.current);
+    }
+
+    hoverTimeoutRef.current = window.setTimeout(() => {
+      setLoadedPreviews((prev) => (prev[index] ? prev : { ...prev, [index]: true }));
+      setHoveredIndex(index);
+    }, 160);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeoutRef.current !== null) {
+      window.clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+
+    setHoveredIndex(null);
+  };
 
   return (
     <section id="portfolio" className="py-8 md:py-32 bg-brand-paper px-4 md:px-8 relative overflow-hidden">
@@ -83,8 +112,8 @@ export const Portfolio: React.FC = () => {
                         rel="noopener noreferrer"
                         aria-label={`Obejrzyj film ślubny ${film.title} na YouTube`}
                         className="group relative aspect-[16/9] md:aspect-[3/4] lg:aspect-[4/5] rounded-[20px] overflow-hidden cursor-pointer bg-black shadow-lg"
-                        onMouseEnter={() => setHoveredIndex(index)}
-                        onMouseLeave={() => setHoveredIndex(null)}
+                        onMouseEnter={() => handleMouseEnter(index)}
+                        onMouseLeave={handleMouseLeave}
                     >
                         {/* 1. Thumbnail Image (Hidden on hover) */}
                         <div className="absolute inset-0 z-0 transition-opacity duration-500 group-hover:opacity-0">
@@ -100,37 +129,39 @@ export const Portfolio: React.FC = () => {
                         </div>
 
                         {/* 2. Video Preview (Visible on Hover) */}
-                        <AnimatePresence>
-                            {hoveredIndex === index && (
-                                <motion.div 
-                                    initial={{ opacity: 0, y: 18, scale: 1.03 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 10, scale: 1.01 }}
-                                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                                    className="absolute inset-0 z-10 pointer-events-none overflow-hidden"
-                                >
-                                    <iframe 
-                                        style={{ 
-                                            width: `${(isMobile ? 1.2 : film.videoScale) * 100}%`, 
-                                            height: `${(isMobile ? 1.2 : film.videoScale) * 100}%`, 
-                                            marginLeft: `-${((isMobile ? 1.2 : film.videoScale) - 1) * 50}%`, 
-                                            marginTop: `-${((isMobile ? 1.2 : film.videoScale) - 1) * 50}%` 
-                                        }}
-                                        className="object-cover pointer-events-none max-w-none"
-                                        src={`https://www.youtube.com/embed/${film.id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${film.id}${film.startAt ? `&start=${film.startAt}` : ''}`} 
-                                        title={film.title}
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                    ></iframe>
-                                    <motion.div
-                                        initial={{ opacity: 0.24 }}
-                                        animate={{ opacity: 0 }}
-                                        exit={{ opacity: 0.18 }}
-                                        transition={{ duration: 0.45, ease: "easeOut" }}
-                                        className="absolute inset-0 bg-black/20"
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        {loadedPreviews[index] ? (
+                            <motion.div
+                                initial={false}
+                                animate={
+                                    hoveredIndex === index
+                                        ? { opacity: 1, y: 0, scale: 1 }
+                                        : { opacity: 0, y: 10, scale: 1.01 }
+                                }
+                                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                                className="absolute inset-0 z-10 pointer-events-none overflow-hidden will-change-transform"
+                            >
+                                <iframe
+                                    style={{
+                                        width: `${(isMobile ? 1.2 : film.videoScale) * 100}%`,
+                                        height: `${(isMobile ? 1.2 : film.videoScale) * 100}%`,
+                                        marginLeft: `-${((isMobile ? 1.2 : film.videoScale) - 1) * 50}%`,
+                                        marginTop: `-${((isMobile ? 1.2 : film.videoScale) - 1) * 50}%`
+                                    }}
+                                    className="object-cover pointer-events-none max-w-none"
+                                    src={`https://www.youtube-nocookie.com/embed/${film.id}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${film.id}${film.startAt ? `&start=${film.startAt}` : ''}`}
+                                    title={`${film.title} - podgląd filmu`}
+                                    loading="lazy"
+                                    referrerPolicy="strict-origin-when-cross-origin"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                ></iframe>
+                                <motion.div
+                                    initial={false}
+                                    animate={hoveredIndex === index ? { opacity: 0 } : { opacity: 0.18 }}
+                                    transition={{ duration: 0.35, ease: "easeOut" }}
+                                    className="absolute inset-0 bg-black/20"
+                                />
+                            </motion.div>
+                        ) : null}
 
                         {/* 3. Play Icon (Centered) */}
                         <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
