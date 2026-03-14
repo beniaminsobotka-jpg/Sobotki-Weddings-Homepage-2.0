@@ -85,21 +85,28 @@ export const PortraitsEventPage: React.FC = () => {
     formspreeData.append('Uwagi', formData.notes);
 
     try {
-      // Send to ActiveCampaign
-      await fetch(AC_CONFIG.URL, {
-        method: 'POST',
-        body: acData,
-        mode: 'no-cors',
-      });
+      // ActiveCampaign is supplementary; Formspree is the authoritative delivery path.
+      try {
+        await fetch(AC_CONFIG.URL, {
+          method: 'POST',
+          body: acData,
+          mode: 'no-cors',
+        });
+      } catch (acError) {
+        console.warn('ActiveCampaign submit failed:', acError);
+      }
 
-      // Send to Formspree
-      await fetch('https://formspree.io/f/xnjgvojo', {
+      const formspreeResponse = await fetch('https://formspree.io/f/xnjgvojo', {
         method: 'POST',
         body: formspreeData,
         headers: {
           'Accept': 'application/json'
         }
       });
+
+      if (!formspreeResponse.ok) {
+        throw new Error(`Formspree submit failed with status ${formspreeResponse.status}`);
+      }
 
       setStatus('success');
       setFormData({
