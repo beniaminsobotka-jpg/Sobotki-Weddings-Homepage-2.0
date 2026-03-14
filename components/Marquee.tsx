@@ -2,26 +2,43 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export const Marquee: React.FC = () => {
-  // Używamy "•" (bullet) jako separatora
-  const content = "ponadczasowe zdjęcia   •   filmowe kadry   •   wzruszające filmy   •   autentyczne uczucia   •   ";
-  // Zwiększamy ilość powtórzeń, ponieważ tekst jest mniejszy
-  const repeatedText = Array(20).fill(content).join("");
+  const items = [
+    'ponadczasowe zdjecia',
+    'filmowe kadry',
+    'wzruszajace filmy',
+    'autentyczne uczucia',
+  ];
+  const repeatedItems = [...items, ...items, ...items, ...items];
 
   return (
-    <div className="w-full bg-[#FDF107] py-2.5 md:py-4 overflow-hidden relative z-30 border-y border-black/5">
+    <div
+      data-typography-skip="true"
+      className="w-full overflow-hidden border-y border-black/5 bg-[#FDF107] py-2 md:py-4 relative z-30"
+    >
       <motion.div
-        className="flex whitespace-nowrap"
-        // Przesuwamy o znaczną wartość, aby pętla była płynna
-        animate={{ x: [0, -2000] }}
+        className="flex min-w-max whitespace-nowrap"
+        animate={{ x: ['0%', '-50%'] }}
         transition={{
           repeat: Infinity,
           ease: "linear",
-          duration: 20, 
+          duration: 22,
         }}
       >
-        <p className="whitespace-nowrap leading-none text-black font-playfair italic text-xl md:text-3xl tracking-wide font-medium opacity-90">
-          {repeatedText}
-        </p>
+        {[0, 1].map((track) => (
+          <div key={track} className="flex min-w-max shrink-0 items-center whitespace-nowrap">
+            {repeatedItems.map((item, index) => (
+              <span
+                key={`${track}-${item}-${index}`}
+                className="shrink-0 whitespace-nowrap px-3 text-black font-playfair text-[1.65rem] italic font-medium leading-none opacity-90 md:px-5 md:text-3xl"
+              >
+                {item}
+                <span className="px-3 md:px-5" aria-hidden="true">
+                  •
+                </span>
+              </span>
+            ))}
+          </div>
+        ))}
       </motion.div>
     </div>
   );

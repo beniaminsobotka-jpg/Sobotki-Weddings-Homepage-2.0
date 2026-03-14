@@ -20,7 +20,7 @@ const fixWidow = (text: string) => {
 
 const shouldSkipTextNode = (node: Text) => {
   const parent = node.parentElement;
-  return !parent || EXCLUDED_TAGS.has(parent.tagName);
+  return !parent || EXCLUDED_TAGS.has(parent.tagName) || Boolean(parent.closest('[data-typography-skip="true"]'));
 };
 
 const polishTextNode = (node: Text) => {
@@ -39,6 +39,10 @@ export const applyPolishTypography = (root: ParentNode) => {
   const elements = root.querySelectorAll<HTMLElement>(TYPOGRAPHY_SELECTOR);
 
   elements.forEach((element) => {
+    if (element.closest('[data-typography-skip="true"]')) {
+      return;
+    }
+
     element.classList.add('text-pretty');
 
     if (element.children.length === 0) {
