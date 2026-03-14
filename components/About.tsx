@@ -15,14 +15,14 @@ export const About: React.FC = () => {
       <div className="max-w-[1600px] mx-auto">
         
         {/* Header Sekcji - Mobilny (na desktopie jest w środkowej kolumnie) */}
-        <div className="md:hidden text-center mb-2">
+        <div className="md:hidden text-center mb-4">
             <h2 className="font-serif font-black text-5xl uppercase tracking-tighter">
                 Ania & Benek
             </h2>
             <p className="font-playfair-italic text-gray-500 mt-2">Duet w życiu i w pracy</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-8 lg:gap-12 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8 lg:gap-12 items-stretch">
           
           {/* KOLUMNA LEWA - ANIA */}
           <motion.article 
@@ -83,7 +83,7 @@ export const About: React.FC = () => {
 
 
           {/* KOLUMNA ŚRODKOWA - WSPÓLNE (STATYCZNE) */}
-          <div className="flex flex-col justify-center items-center text-center py-0 md:py-0 order-first md:order-none">
+          <div className="flex flex-col justify-center items-center text-center py-0 md:py-0 order-first md:order-none pb-1 md:pb-0">
              
              {/* Desktop Header */}
              <div className="hidden md:block mb-6 md:mb-8">
@@ -104,7 +104,7 @@ export const About: React.FC = () => {
              </div>
 
              {/* Zdjęcie środkowe - Zmniejszone (85% szerokości na desktopie) */}
-             <div className="relative w-[90%] md:w-[85%] aspect-[4/5] mb-2 md:mb-8 overflow-hidden rounded-2xl shadow-xl mx-auto">
+             <div className="relative w-[90%] md:w-[85%] aspect-[4/5] mb-5 md:mb-8 overflow-hidden rounded-2xl shadow-xl mx-auto">
                 <img 
                     src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_2.webp" 
                     alt="Ania i Benek, duet Sobotki Weddings" 
@@ -116,11 +116,11 @@ export const About: React.FC = () => {
              </div>
 
              {/* Opis wspólny */}
-             <div className="max-w-md px-4">
+             <div className="max-w-md px-4 pb-2 md:pb-0">
                 <p className="font-serif text-sm md:text-base leading-relaxed text-brand-black/80">
                    Jesteśmy nierozłącznym duetem już od 14 lat. Kochamy dobry design, harmonię i spokój w życiu, nasze dziecko, psiecko oraz tworzenie dla Was autentycznych zdjęć i filmów pełnych emocji!
                 </p>
-                <div className="w-12 h-[1px] bg-brand-black/20 mx-auto mt-2 md:mt-6"></div>
+                <div className="w-12 h-[1px] bg-brand-black/20 mx-auto mt-4 md:mt-6"></div>
              </div>
           </div>
 

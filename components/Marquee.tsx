@@ -8,7 +8,7 @@ export const Marquee: React.FC = () => {
   const repeatedText = Array(20).fill(content).join("");
 
   return (
-    <div className="w-full bg-[#FDF107] py-4 overflow-hidden relative z-30 border-y border-black/5">
+    <div className="w-full bg-[#FDF107] py-2.5 md:py-4 overflow-hidden relative z-30 border-y border-black/5">
       <motion.div
         className="flex whitespace-nowrap"
         // Przesuwamy o znaczną wartość, aby pętla była płynna
@@ -19,7 +19,7 @@ export const Marquee: React.FC = () => {
           duration: 20, 
         }}
       >
-        <p className="text-black font-playfair italic text-2xl md:text-3xl tracking-wide font-medium opacity-90">
+        <p className="whitespace-nowrap leading-none text-black font-playfair italic text-xl md:text-3xl tracking-wide font-medium opacity-90">
           {repeatedText}
         </p>
       </motion.div>
