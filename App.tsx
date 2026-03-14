@@ -6,6 +6,7 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Loader } from './components/Loader';
 import { LiquidBackground } from './components/LiquidBackground';
+import { applyPolishTypography } from './utils/typography';
 
 // Pages
 import { Home } from './pages/Home';
@@ -58,6 +59,43 @@ const AppShell: React.FC<{
 }> = ({ isLoading, setIsLoading }) => {
   const location = useLocation();
   const showLiquidBackground = ['/', '/film', '/kontakt'].includes(location.pathname);
+
+  useEffect(() => {
+    if (isLoading || typeof window === 'undefined') {
+      return;
+    }
+
+    const main = document.getElementById('main-content');
+
+    if (!main) {
+      return;
+    }
+
+    let frameId = 0;
+
+    const runTypographyPass = () => {
+      applyPolishTypography(main);
+    };
+
+    frameId = window.requestAnimationFrame(() => {
+      runTypographyPass();
+    });
+
+    const observer = new MutationObserver(() => {
+      runTypographyPass();
+    });
+
+    observer.observe(main, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      observer.disconnect();
+    };
+  }, [isLoading, location.pathname, location.hash]);
 
   return (
     <>

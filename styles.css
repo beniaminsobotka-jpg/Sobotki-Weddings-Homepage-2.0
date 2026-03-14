@@ -74,6 +74,10 @@ body {
   contain-intrinsic-size: 1px 900px;
 }
 
+.text-pretty {
+  text-wrap: pretty;
+}
+
 .backface-hidden {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
