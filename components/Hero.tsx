@@ -59,7 +59,7 @@ export const Hero: React.FC = () => {
   const vignetteOpacity = useTransform(smoothProgress, [0, 0.5], [0.8, 0.4]);
 
   return (
-    <header ref={containerRef} id="home" className="relative w-full h-[160vh] md:h-[250vh]">
+    <header ref={containerRef} id="home" className="relative w-full h-[110vh] md:h-[250vh]">
       <h1 className="sr-only">Sobotki Weddings - fotografia i film ślubny</h1>
       
       {/* Sticky Viewport */}
