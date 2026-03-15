@@ -3,23 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Camera, Check, Download, Printer, Sparkles, Star, Users, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
-import { submitToActiveCampaign } from '../utils/activeCampaign';
 import { subscribeToBrevo } from '../utils/brevo';
-
-const AC_CONFIG = {
-  URL: 'https://sobotkiportraits44570.activehosted.com/proc.php',
-  U: '1',
-  F: '1',
-  OR: '81774679-e2a9-4425-8ac6-cdf021c0bdf6',
-  FIELDS: {
-    FULLNAME: 'fullname',
-    EMAIL: 'email',
-    DATE: 'field[1]',
-    LOCATION: 'field[2]',
-    MESSAGE: 'field[8]',
-    OFFER: 'field[9]',
-  },
-};
 
 const galleryImages = [
   'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
@@ -358,66 +342,12 @@ export const PortraitsWeddingPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
-    const acMessage = [
-      'Fotostacja ślubna',
-      formData.guests ? `Liczba gości: ${formData.guests}` : '',
-      formData.notes ? `Uwagi: ${formData.notes}` : '',
-      '---',
-      'POWIADOMIENIE: sobotki.portraits@gmail.com, kontakt.sobotki@gmail.com'
-    ]
-      .filter(Boolean)
-      .join('\n');
-
-    const acPayload = {
-      u: AC_CONFIG.U,
-      f: AC_CONFIG.F,
-      s: '',
-      c: '0',
-      m: '0',
-      act: 'sub',
-      v: '2',
-      or: AC_CONFIG.OR,
-      [AC_CONFIG.FIELDS.FULLNAME]: formData.fullname,
-      [AC_CONFIG.FIELDS.EMAIL]: formData.email,
-      [AC_CONFIG.FIELDS.DATE]: formData.date,
-      [AC_CONFIG.FIELDS.LOCATION]: formData.location,
-      [AC_CONFIG.FIELDS.MESSAGE]: acMessage,
-      [AC_CONFIG.FIELDS.OFFER]: 'ZDJĘCIA + FILM',
-    };
-
-    // Formspree Data
-    const formspreeData = new FormData();
-    formspreeData.append('_subject', '[SP] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ');
-    formspreeData.append('Imię i Nazwisko', formData.fullname);
-    formspreeData.append('Email', formData.email);
-    formspreeData.append('Data', formData.date);
-    formspreeData.append('Miejsce', formData.location);
-    formspreeData.append('Liczba gości', formData.guests);
-    formspreeData.append('Uwagi', formData.notes);
 
     try {
-      void submitToActiveCampaign(AC_CONFIG.URL, acPayload).catch((acError) => {
-        console.warn('ActiveCampaign submit failed:', acError);
-      });
-
-      void subscribeToBrevo({
+      await subscribeToBrevo({
         email: formData.email,
         formType: 'portraits_wedding',
-      }).catch((brevoError) => {
-        console.warn('Brevo subscribe failed:', brevoError);
       });
-
-      const formspreeResponse = await fetch('https://formspree.io/f/xvzwrvzr', {
-        method: 'POST',
-        body: formspreeData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!formspreeResponse.ok) {
-        throw new Error(`Formspree submit failed with status ${formspreeResponse.status}`);
-      }
 
       setStatus('success');
       setFormData({

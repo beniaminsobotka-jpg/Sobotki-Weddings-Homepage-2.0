@@ -1,23 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
-import { submitToActiveCampaign } from '../utils/activeCampaign';
 import { subscribeToBrevo } from '../utils/brevo';
-
-const AC_CONFIG = {
-  URL: 'https://sobotkiportraits44570.activehosted.com/proc.php',
-  U: '1', 
-  F: '1', 
-  OR: '81774679-e2a9-4425-8ac6-cdf021c0bdf6',
-  FIELDS: {
-    FULLNAME: 'fullname',
-    EMAIL: 'email',
-    DATE: 'field[1]',
-    LOCATION: 'field[2]',
-    MESSAGE: 'field[8]',
-    OFFER: 'field[9]'
-  }
-};
 
 export const Contact: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -38,61 +22,11 @@ export const Contact: React.FC = () => {
     e.preventDefault();
     setStatus('loading');
 
-    const message = [
-      formData.message,
-      '---',
-      'POWIADOMIENIE: kontakt@sobotkiweddings.pl, kontakt.sobotki@gmail.com',
-    ].filter(Boolean).join('\n');
-    const acPayload = {
-      u: AC_CONFIG.U,
-      f: AC_CONFIG.F,
-      s: '',
-      c: '0',
-      m: '0',
-      act: 'sub',
-      v: '2',
-      or: AC_CONFIG.OR,
-      [AC_CONFIG.FIELDS.FULLNAME]: formData.fullname,
-      [AC_CONFIG.FIELDS.EMAIL]: formData.email,
-      [AC_CONFIG.FIELDS.DATE]: formData.date,
-      [AC_CONFIG.FIELDS.LOCATION]: formData.location,
-      [AC_CONFIG.FIELDS.MESSAGE]: message,
-      [AC_CONFIG.FIELDS.OFFER]: formData.offer,
-    };
-
-    // Formspree Data
-    const formspreeData = new FormData();
-    formspreeData.append('_subject', '[SW] NOWE ZAPYTANIE ZE STRONY INTERNETOWEJ');
-    formspreeData.append('Imię i Nazwisko', formData.fullname);
-    formspreeData.append('Email', formData.email);
-    formspreeData.append('Data Ślubu', formData.date);
-    formspreeData.append('Miejsce', formData.location);
-    formspreeData.append('Wiadomość', formData.message);
-    formspreeData.append('Oferta', formData.offer);
-
     try {
-      void submitToActiveCampaign(AC_CONFIG.URL, acPayload).catch((acError) => {
-        console.warn('ActiveCampaign submit failed:', acError);
-      });
-
-      void subscribeToBrevo({
+      await subscribeToBrevo({
         email: formData.email,
         formType: 'weddings_main',
-      }).catch((brevoError) => {
-        console.warn('Brevo subscribe failed:', brevoError);
       });
-
-      const formspreeResponse = await fetch('https://formspree.io/f/xdawzpab', {
-        method: 'POST',
-        body: formspreeData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!formspreeResponse.ok) {
-        throw new Error(`Formspree submit failed with status ${formspreeResponse.status}`);
-      }
 
       setStatus('success');
       setFormData({ fullname: '', email: '', date: '', location: '', message: '', offer: 'JESZCZE NIE WIEMY' });
