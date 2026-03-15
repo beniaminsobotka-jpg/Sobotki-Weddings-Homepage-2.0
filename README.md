@@ -18,3 +18,42 @@ View your app in AI Studio: https://ai.studio/apps/33e815fe-e079-4945-9e1c-9c951
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Brevo lead sync
+
+Form submissions are synced to Brevo through the Vercel endpoint at `/api/lead`.
+
+Required environment variables:
+
+- `BREVO_API_KEY`
+- `BREVO_LIST_ID_WEDDINGS`
+- `BREVO_LIST_ID_PORTRAITS_WEDDING`
+- `BREVO_LIST_ID_PORTRAITS_BOOTH`
+
+Supported `formType` values:
+
+- `weddings`
+- `portraits_wedding`
+- `portraits_booth`
+
+Brevo template personalization:
+
+- `{{ contact.FULLNAME }}`
+- `{{ contact.FIRSTNAME }}`
+- `{{ contact.LASTNAME }}`
+
+Mapped Brevo attributes:
+
+- `FULLNAME`
+- `FIRSTNAME`
+- `LASTNAME`
+- `PHONE`
+- `WEDDING_DATE`
+- `VENUE`
+- `SERVICE_TYPE`
+- `MESSAGE`
+
+Additional optional attributes:
+
+- `COMPANY`
+- `GUEST_COUNT`

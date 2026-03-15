@@ -317,6 +317,7 @@ const GuestbookScrollAnimation: React.FC = () => {
 
 export const PortraitsWeddingPage: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('Coś poszło nie tak. Spróbuj ponownie.');
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
@@ -342,11 +343,19 @@ export const PortraitsWeddingPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('Coś poszło nie tak. Spróbuj ponownie.');
 
     try {
       await subscribeToBrevo({
-        email: formData.email,
         formType: 'portraits_wedding',
+        email: formData.email,
+        fullName: formData.fullname,
+        phone: '',
+        weddingDate: formData.date,
+        venue: formData.location,
+        serviceType: 'Fotostacja ślubna',
+        message: formData.notes,
+        guestCount: formData.guests,
       });
 
       setStatus('success');
@@ -358,7 +367,10 @@ export const PortraitsWeddingPage: React.FC = () => {
         guests: '',
         notes: '',
       });
-    } catch {
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      }
       setStatus('error');
     }
   };
@@ -779,7 +791,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                 </label>
 
                 {status === 'error' && (
-                  <p className="font-sans text-sm text-[#d42929] text-center" role="alert">Coś poszło nie tak. Spróbuj ponownie.</p>
+                  <p className="font-sans text-sm text-[#d42929] text-center" role="alert">{errorMessage}</p>
                 )}
 
                 <button

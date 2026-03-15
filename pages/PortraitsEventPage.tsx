@@ -15,6 +15,7 @@ const audienceItems = [
 
 export const PortraitsEventPage: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('Coś poszło nie tak. Spróbuj ponownie.');
   const [formData, setFormData] = useState({
     fullname: '',
     company: '',
@@ -32,11 +33,20 @@ export const PortraitsEventPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('Coś poszło nie tak. Spróbuj ponownie.');
 
     try {
       await subscribeToBrevo({
+        formType: 'portraits_booth',
         email: formData.email,
-        formType: 'portraits_event',
+        fullName: formData.fullname,
+        phone: '',
+        weddingDate: formData.date,
+        venue: formData.location,
+        serviceType: 'Fotostacja eventowa',
+        message: formData.notes,
+        company: formData.company,
+        guestCount: formData.guests,
       });
 
       setStatus('success');
@@ -49,7 +59,10 @@ export const PortraitsEventPage: React.FC = () => {
         guests: '',
         notes: '',
       });
-    } catch {
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      }
       setStatus('error');
     }
   };
@@ -445,7 +458,7 @@ export const PortraitsEventPage: React.FC = () => {
                 </label>
 
                 {status === 'error' && (
-                  <p className="font-sans text-sm text-red-500 text-center" role="alert">Coś poszło nie tak. Spróbuj ponownie.</p>
+                  <p className="font-sans text-sm text-red-500 text-center" role="alert">{errorMessage}</p>
                 )}
 
                 <button

@@ -5,6 +5,7 @@ import { subscribeToBrevo } from '../utils/brevo';
 
 export const Contact: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('Coś poszło nie tak. Spróbuj ponownie.');
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
@@ -21,17 +22,27 @@ export const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('Coś poszło nie tak. Spróbuj ponownie.');
 
     try {
       await subscribeToBrevo({
+        formType: 'weddings',
         email: formData.email,
-        formType: 'weddings_main',
+        fullName: formData.fullname,
+        phone: '',
+        weddingDate: formData.date,
+        venue: formData.location,
+        serviceType: formData.offer,
+        message: formData.message,
       });
 
       setStatus('success');
       setFormData({ fullname: '', email: '', date: '', location: '', message: '', offer: 'JESZCZE NIE WIEMY' });
     } catch (error) {
       console.error('Error:', error);
+      if (error instanceof Error) {
+        setErrorMessage(error.message);
+      }
       setStatus('error');
     }
   };
@@ -168,7 +179,7 @@ export const Contact: React.FC = () => {
 
                 {status === 'error' && (
                     <div className="text-red-500 font-sans text-xs text-center bg-red-100/50 p-2 rounded-lg" role="alert">
-                    Coś poszło nie tak. Spróbuj ponownie.
+                    {errorMessage}
                     </div>
                 )}
 
