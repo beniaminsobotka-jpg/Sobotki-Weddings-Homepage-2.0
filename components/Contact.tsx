@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { submitToActiveCampaign } from '../utils/activeCampaign';
+import { subscribeToBrevo } from '../utils/brevo';
 
 const AC_CONFIG = {
   URL: 'https://sobotkiportraits44570.activehosted.com/proc.php',
@@ -70,12 +71,16 @@ export const Contact: React.FC = () => {
     formspreeData.append('Oferta', formData.offer);
 
     try {
-      // ActiveCampaign is supplementary; Formspree is the authoritative delivery path.
-      try {
-        submitToActiveCampaign(AC_CONFIG.URL, acPayload);
-      } catch (acError) {
+      void submitToActiveCampaign(AC_CONFIG.URL, acPayload).catch((acError) => {
         console.warn('ActiveCampaign submit failed:', acError);
-      }
+      });
+
+      void subscribeToBrevo({
+        email: formData.email,
+        formType: 'weddings_main',
+      }).catch((brevoError) => {
+        console.warn('Brevo subscribe failed:', brevoError);
+      });
 
       const formspreeResponse = await fetch('https://formspree.io/f/xdawzpab', {
         method: 'POST',

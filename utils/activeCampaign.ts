@@ -1,4 +1,6 @@
 const ACTIVE_CAMPAIGN_TARGET = 'ac-hidden-submit-target';
+const SUBMIT_START_DELAY_MS = 0;
+const FORM_CLEANUP_DELAY_MS = 15000;
 
 const ensureSubmitTarget = () => {
   let iframe = document.getElementById(ACTIVE_CAMPAIGN_TARGET) as HTMLIFrameElement | null;
@@ -17,7 +19,7 @@ const ensureSubmitTarget = () => {
   return iframe;
 };
 
-export const submitToActiveCampaign = (
+export const submitToActiveCampaign = async (
   url: string,
   fields: Record<string, string>
 ) => {
@@ -38,6 +40,15 @@ export const submitToActiveCampaign = (
   });
 
   document.body.appendChild(form);
-  form.submit();
-  form.remove();
+
+  await new Promise<void>((resolve) => {
+    window.setTimeout(() => {
+      form.submit();
+      resolve();
+    }, SUBMIT_START_DELAY_MS);
+  });
+
+  window.setTimeout(() => {
+    form.remove();
+  }, FORM_CLEANUP_DELAY_MS);
 };

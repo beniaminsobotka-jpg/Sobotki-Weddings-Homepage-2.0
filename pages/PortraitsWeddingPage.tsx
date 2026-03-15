@@ -4,6 +4,7 @@ import { ArrowUpRight, Camera, Check, Download, Printer, Sparkles, Star, Users, 
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { submitToActiveCampaign } from '../utils/activeCampaign';
+import { subscribeToBrevo } from '../utils/brevo';
 
 const AC_CONFIG = {
   URL: 'https://sobotkiportraits44570.activehosted.com/proc.php',
@@ -395,12 +396,16 @@ export const PortraitsWeddingPage: React.FC = () => {
     formspreeData.append('Uwagi', formData.notes);
 
     try {
-      // ActiveCampaign is supplementary; Formspree is the authoritative delivery path.
-      try {
-        submitToActiveCampaign(AC_CONFIG.URL, acPayload);
-      } catch (acError) {
+      void submitToActiveCampaign(AC_CONFIG.URL, acPayload).catch((acError) => {
         console.warn('ActiveCampaign submit failed:', acError);
-      }
+      });
+
+      void subscribeToBrevo({
+        email: formData.email,
+        formType: 'portraits_wedding',
+      }).catch((brevoError) => {
+        console.warn('Brevo subscribe failed:', brevoError);
+      });
 
       const formspreeResponse = await fetch('https://formspree.io/f/xvzwrvzr', {
         method: 'POST',
