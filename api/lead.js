@@ -1,4 +1,5 @@
-const BREVO_API_URL = 'https://api.brevo.com/v3/contacts';
+const BREVO_CONTACTS_API_URL = 'https://api.brevo.com/v3/contacts';
+const BREVO_SMTP_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 const FORM_TYPE_TO_LIST_ENV = {
   weddings: 'BREVO_LIST_ID_WEDDINGS',
@@ -10,6 +11,14 @@ const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json');
   response.end(JSON.stringify(body));
 };
+
+const escapeHtml = (value) =>
+  String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 
 const normalizeString = (value) => {
   if (typeof value !== 'string') {
@@ -54,12 +63,91 @@ const parseJsonBody = (body) => {
   return body ?? {};
 };
 
+const buildInternalRows = (entries) =>
+  entries
+    .map(
+      ([label, value]) => `
+        <tr>
+          <td style="padding:10px 14px; border:1px solid #e5e5e5; font-family:Arial, Helvetica, sans-serif; font-size:12px; font-weight:700; color:#1a1a1a; width:180px; vertical-align:top;">
+            ${escapeHtml(label)}
+          </td>
+          <td style="padding:10px 14px; border:1px solid #e5e5e5; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:22px; color:#333333; vertical-align:top;">
+            ${escapeHtml(value || '-')}
+          </td>
+        </tr>
+      `
+    )
+    .join('');
+
+const buildInternalHtml = (leadData) => `
+  <!doctype html>
+  <html>
+    <body style="margin:0; padding:24px; background:#f3f2ed;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:720px; margin:0 auto; background:#ffffff; border:1px solid #e5e5e5; border-radius:16px; overflow:hidden;">
+        <tr>
+          <td style="padding:24px 28px; background:#1a1a1a;">
+            <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#bcbcbc;">Nowy lead WWW</div>
+            <div style="margin-top:8px; font-family:Arial, Helvetica, sans-serif; font-size:28px; line-height:32px; font-weight:700; color:#ffffff;">
+              ${escapeHtml(leadData.serviceType)}
+            </div>
+            <div style="margin-top:6px; font-family:Georgia, serif; font-size:20px; line-height:26px; font-style:italic; color:#d42929;">
+              ${escapeHtml(leadData.fullName)}
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 28px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+              ${buildInternalRows([
+                ['formType', leadData.formType],
+                ['FULLNAME', leadData.fullName],
+                ['FIRSTNAME', leadData.firstName],
+                ['LASTNAME', leadData.lastName],
+                ['email', leadData.email],
+                ['phone', leadData.phone],
+                ['weddingDate', leadData.weddingDate],
+                ['venue', leadData.venue],
+                ['serviceType', leadData.serviceType],
+                ['guestCount', leadData.guestCount],
+                ['company', leadData.company],
+                ['message', leadData.message],
+                ['listId', String(leadData.listId)],
+              ])}
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+`;
+
+const buildInternalText = (leadData) => [
+  'Nowy lead WWW',
+  '',
+  `formType: ${leadData.formType}`,
+  `FULLNAME: ${leadData.fullName}`,
+  `FIRSTNAME: ${leadData.firstName}`,
+  `LASTNAME: ${leadData.lastName}`,
+  `email: ${leadData.email}`,
+  `phone: ${leadData.phone || '-'}`,
+  `weddingDate: ${leadData.weddingDate || '-'}`,
+  `venue: ${leadData.venue || '-'}`,
+  `serviceType: ${leadData.serviceType}`,
+  `guestCount: ${leadData.guestCount || '-'}`,
+  `company: ${leadData.company || '-'}`,
+  `message: ${leadData.message || '-'}`,
+  `listId: ${leadData.listId}`,
+].join('\n');
+
 export default async function handler(request, response) {
   if (request.method !== 'POST') {
     return sendJson(response, 405, { error: 'Method not allowed' });
   }
 
   const apiKey = process.env.BREVO_API_KEY;
+  const notifyToEmail = process.env.BREVO_NOTIFY_TO_EMAIL;
+  const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
+  const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME;
 
   if (!apiKey) {
     return sendJson(response, 500, { error: 'Brevo API key is not configured' });
@@ -135,7 +223,7 @@ export default async function handler(request, response) {
   };
 
   try {
-    const brevoResponse = await fetch(BREVO_API_URL, {
+    const brevoResponse = await fetch(BREVO_CONTACTS_API_URL, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -169,6 +257,87 @@ export default async function handler(request, response) {
       hasFirstName: Boolean(firstName),
       hasLastName: Boolean(lastName),
     });
+
+    if (notifyToEmail && notifyFromEmail && notifyFromName) {
+      const internalSubject = `[Nowy lead WWW] ${serviceType} | ${fullName} | ${normalizedEmail}`;
+      const internalLeadData = {
+        formType,
+        fullName,
+        firstName,
+        lastName,
+        email: normalizedEmail,
+        phone,
+        weddingDate,
+        venue,
+        serviceType,
+        guestCount,
+        company,
+        message,
+        listId,
+      };
+
+      try {
+        const internalResponse = await fetch(BREVO_SMTP_API_URL, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'api-key': apiKey,
+          },
+          body: JSON.stringify({
+            sender: {
+              email: notifyFromEmail,
+              name: notifyFromName,
+            },
+            to: [
+              {
+                email: notifyToEmail,
+              },
+            ],
+            replyTo: {
+              email: normalizedEmail,
+              name: fullName,
+            },
+            subject: internalSubject,
+            htmlContent: buildInternalHtml(internalLeadData),
+            textContent: buildInternalText(internalLeadData),
+          }),
+        });
+
+        if (!internalResponse.ok) {
+          const internalErrorBody = await internalResponse.text();
+
+          console.error('[Brevo] Internal notify failed', {
+            formType,
+            listId,
+            emailDomain: getEmailDomain(normalizedEmail),
+            status: internalResponse.status,
+            body: internalErrorBody.slice(0, 1000),
+          });
+        } else {
+          console.info('[Brevo] Internal notify sent', {
+            formType,
+            listId,
+            emailDomain: getEmailDomain(normalizedEmail),
+            notifyToEmail,
+          });
+        }
+      } catch (error) {
+        console.error('[Brevo] Internal notify failed', {
+          formType,
+          listId,
+          emailDomain: getEmailDomain(normalizedEmail),
+          message: error instanceof Error ? error.message : 'Unknown internal notify error',
+        });
+      }
+    } else {
+      console.warn('[Brevo] Internal notify skipped', {
+        reason: 'Missing notify env configuration',
+        hasNotifyToEmail: Boolean(notifyToEmail),
+        hasNotifyFromEmail: Boolean(notifyFromEmail),
+        hasNotifyFromName: Boolean(notifyFromName),
+      });
+    }
 
     return sendJson(response, 200, { ok: true });
   } catch (error) {

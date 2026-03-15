@@ -22,6 +22,7 @@ View your app in AI Studio: https://ai.studio/apps/33e815fe-e079-4945-9e1c-9c951
 ## Brevo lead sync
 
 Form submissions are synced to Brevo through the Vercel endpoint at `/api/lead`.
+After a successful contact sync, the same endpoint sends an internal notification through Brevo Transactional API.
 
 Required environment variables:
 
@@ -29,6 +30,9 @@ Required environment variables:
 - `BREVO_LIST_ID_WEDDINGS`
 - `BREVO_LIST_ID_PORTRAITS_WEDDING`
 - `BREVO_LIST_ID_PORTRAITS_BOOTH`
+- `BREVO_NOTIFY_TO_EMAIL`
+- `BREVO_NOTIFY_FROM_EMAIL`
+- `BREVO_NOTIFY_FROM_NAME`
 
 Supported `formType` values:
 
@@ -57,3 +61,10 @@ Additional optional attributes:
 
 - `COMPANY`
 - `GUEST_COUNT`
+
+How to test:
+
+1. Submit one of the website forms.
+2. Confirm that the contact appears in Brevo on the expected list with populated attributes.
+3. Confirm that the internal notification email arrives at `BREVO_NOTIFY_TO_EMAIL`.
+4. Confirm that the email contains the submitted fields and the correct `listId`.
