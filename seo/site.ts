@@ -8,7 +8,7 @@ export const DEFAULT_ROBOTS = 'index,follow,max-image-preview:large';
 export const SITE_DESCRIPTION =
   'Fotografia i film ślubny oraz fotostacja premium na wesela, eventy firmowe i sesje portretowe.';
 export const SITE_LOGO =
-  '/uploads/2026/03/Sobotki_Weddings_Logo.png';
+  '/favicon.svg';
 export const SITE_DEFAULT_IMAGE =
   '/uploads/2026/03/Karuzela_homepage_2.jpg';
 
