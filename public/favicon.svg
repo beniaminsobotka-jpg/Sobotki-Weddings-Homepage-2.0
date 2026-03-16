@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>Sobotki Weddings favicon</title>
+  <rect width="64" height="64" rx="14" fill="#050505" />
+  <text
+    x="17"
+    y="39"
+    fill="#f5f1e8"
+    font-family="'Arial Black', Arial, sans-serif"
+    font-size="31"
+    font-weight="900"
+    letter-spacing="-2"
+  >
+    S
+  </text>
+  <text
+    x="32"
+    y="42"
+    fill="#f5f1e8"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="24"
+    font-style="italic"
+    letter-spacing="-1"
+  >
+    w
+  </text>
+</svg>
