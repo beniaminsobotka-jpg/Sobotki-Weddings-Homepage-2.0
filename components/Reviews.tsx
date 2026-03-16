@@ -14,7 +14,7 @@ const reviews: Review[] = [
     name: "Aleksandra & Patryk",
     role: "Para Młoda",
     date: "Czerwiec 2023",
-    video: "/uploads/2024/01/wycinek-1080.mov",
+    video: "/uploads/2024/01/wycinek-1080.mp4",
     content: "Ania i Benek to strzał w dziesiątkę! Życzliwi, pomocni, wykonują swoją pracę 'po cichu', łapiąc najbardziej wzruszające momenty. Dziękujemy za wspaniałe zdjęcia i film."
   },
   {
