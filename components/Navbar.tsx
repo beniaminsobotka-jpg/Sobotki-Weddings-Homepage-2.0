@@ -19,6 +19,16 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const isPortraitsRoute = location.pathname.startsWith('/portraits');
   const isHomePath = (path: string) => path === '/' || path === '/home';
+  const isDarkRef = React.useRef(isDark);
+
+  const setDarkModeIfChanged = React.useCallback((next: boolean) => {
+    if (isDarkRef.current === next) {
+      return;
+    }
+
+    isDarkRef.current = next;
+    setIsDark(next);
+  }, []);
 
   const isActiveHref = (href: string) => {
     if (href.includes('#')) {
@@ -81,30 +91,33 @@ export const Navbar: React.FC = () => {
         }
 
         if (inHeroDarkPart || inPortraits) {
-            setIsDark(true);
+            setDarkModeIfChanged(true);
         } else {
-            setIsDark(false);
+            setDarkModeIfChanged(false);
         }
         return;
     }
 
     // PORTRAITS PAGE LOGIC (Now at /portraits) - Always Dark
     if (isPortraitsRoute) {
-        setIsDark(true);
+        setDarkModeIfChanged(true);
         return;
     }
 
     // DEFAULT (e.g. Portfolio) - Always Light (Dark Text)
-    setIsDark(false);
+    setDarkModeIfChanged(false);
   });
 
   // Reset dark mode immediately on route change
   useEffect(() => {
     if (isPortraitsRoute) {
+        isDarkRef.current = true;
         setIsDark(true);
     } else if (location.pathname === '/home' || location.pathname === '/') {
+        isDarkRef.current = true;
         setIsDark(true); // Start dark on Home (Hero)
     } else {
+        isDarkRef.current = false;
         setIsDark(false); // Portfolio etc.
     }
   }, [isPortraitsRoute, location]);

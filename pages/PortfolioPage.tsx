@@ -119,15 +119,9 @@ export const PortfolioPage: React.FC = () => {
                 <h2 id="portfolio-gallery-heading" className="sr-only">
                     Galeria portfolio Sobotki Weddings
                 </h2>
-                <AnimatePresence mode="popLayout">
-                    {filteredItems.map((item, index) => (
-                        <motion.div
-                            layout
+                {filteredItems.map((item, index) => (
+                        <div
                             key={item.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.5, ease: "easeOut" }}
                             onClick={() => openLightbox(index)}
                             className="break-inside-avoid mb-2 relative group overflow-hidden cursor-zoom-in bg-gray-200"
                         >
@@ -167,9 +161,8 @@ export const PortfolioPage: React.FC = () => {
                                     )
                                 )}
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
-                </AnimatePresence>
             </section>
 
             {/* --- LIGHTBOX MODAL --- */}

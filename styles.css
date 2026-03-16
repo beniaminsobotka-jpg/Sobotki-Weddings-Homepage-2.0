@@ -134,3 +134,68 @@ body {
     inset 0 2px 20px rgba(255, 255, 255, 0.8);
   transform: translateY(-2px);
 }
+
+.liquid-orb {
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+  transform: translate3d(0, 0, 0);
+}
+
+.liquid-orb-1 {
+  animation-duration: 20s;
+  animation-name: liquid-float-1;
+}
+
+.liquid-orb-2 {
+  animation-duration: 25s;
+  animation-name: liquid-float-2;
+}
+
+.liquid-orb-3 {
+  animation-duration: 18s;
+  animation-name: liquid-float-3;
+}
+
+@keyframes liquid-float-1 {
+  0% {
+    transform: translate3d(-80px, -40px, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(40px, 60px, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-24px, -72px, 0) scale(1);
+  }
+}
+
+@keyframes liquid-float-2 {
+  0% {
+    transform: translate3d(48px, 72px, 0) scale(1.08);
+  }
+  50% {
+    transform: translate3d(-64px, -32px, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(72px, 24px, 0) scale(1.04);
+  }
+}
+
+@keyframes liquid-float-3 {
+  0% {
+    transform: translate3d(-28px, 36px, 0);
+  }
+  50% {
+    transform: translate3d(24px, -48px, 0);
+  }
+  100% {
+    transform: translate3d(-60px, 24px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-orb {
+    animation: none;
+  }
+}

@@ -172,6 +172,14 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isLoading || typeof window === 'undefined') return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const isSmallViewport = window.innerWidth < 960;
+
+    if (prefersReducedMotion || prefersCoarsePointer || isSmallViewport) {
+      return;
+    }
+
     const win = window as Window & typeof globalThis & {
       requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
       cancelIdleCallback?: (handle: number) => void;
@@ -190,9 +198,10 @@ const App: React.FC = () => {
       }
 
       const lenis = new Lenis({
-        duration: 1.2,
+        duration: 0.85,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        touchMultiplier: 2,
+        wheelMultiplier: 0.95,
+        touchMultiplier: 1,
       });
 
       lenisRef.current = lenis;
