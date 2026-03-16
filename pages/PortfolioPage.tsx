@@ -127,8 +127,8 @@ export const PortfolioPage: React.FC = () => {
        <div className="max-w-[1800px] mx-auto relative z-10">
             
             {/* --- HEADER --- */}
-            <header className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-24 gap-8 border-b border-brand-black/10 pb-12">
-                <div>
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-24 gap-8 border-b border-brand-black/10 pb-12">
+                <div className="w-full md:w-auto text-left">
                     <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-gray-500 block mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-brand-black rounded-full"></span>
                         Portfolio 2026
