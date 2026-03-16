@@ -4,13 +4,24 @@ import { X, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
 import { LiquidBackground } from '../components/LiquidBackground';
 import { Seo } from '../components/Seo';
 
+type PortfolioItem = {
+  id: number;
+  type: 'image' | 'video';
+  src: string;
+  title: string;
+  category: string;
+  location: string;
+  alt: string;
+  aspectRatio: string;
+};
+
 // --- DATA GENERATION ---
 const generatePortfolio = () => {
   const categories = ["Wedding", "Elopement", "Editorial", "Black & White"];
   const locations = ["Toskania", "Warszawa", "Tatry", "Sycylia", "Mazury", "Kraków", "Islandia"];
 
   // 1. Generate Images
-  const images = Array.from({ length: 35 }, (_, i) => {
+  const images: PortfolioItem[] = Array.from({ length: 35 }, (_, i) => {
     const id = i + 1;
     return {
       id,
@@ -20,6 +31,7 @@ const generatePortfolio = () => {
       category: categories[id % categories.length],
       location: locations[id % locations.length],
       alt: `Fotografia ślubna Sobotki Weddings - ${categories[id % categories.length]} w ${locations[id % locations.length]}`,
+      aspectRatio: '2 / 3',
     };
   });
 
@@ -31,7 +43,7 @@ const generatePortfolio = () => {
       "/uploads/2026/02/do-Portfolio-3.mp4"
   ];
 
-  const videos = videoUrls.map((src, i) => ({
+  const videos: PortfolioItem[] = videoUrls.map((src, i) => ({
     id: 1000 + i + 1, // Unique IDs for videos
     type: 'video',
     src: src,
@@ -39,6 +51,7 @@ const generatePortfolio = () => {
     category: 'Wedding', // Assign to a category (or make a new one 'Video')
     location: 'Film',
     alt: `Film ślubny Sobotki Weddings - realizacja ${i + 1}`,
+    aspectRatio: '4 / 5',
   }));
 
   // 3. Weave them together (Insert videos at specific indices for visual balance)
@@ -55,6 +68,7 @@ const portfolioItems = generatePortfolio();
 export const PortfolioPage: React.FC = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [failedImages, setFailedImages] = useState<Set<number>>(new Set());
+  const [loadedItems, setLoadedItems] = useState<Set<number>>(new Set());
 
   // Filter Logic removed
   const filteredItems = portfolioItems;
@@ -62,6 +76,18 @@ export const PortfolioPage: React.FC = () => {
   // Error Handler
   const handleImageError = (id: number) => {
     setFailedImages(prev => new Set(prev).add(id));
+  };
+
+  const markItemAsLoaded = (id: number) => {
+    setLoadedItems((prev) => {
+      if (prev.has(id)) {
+        return prev;
+      }
+
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
   };
 
   // --- LIGHTBOX LOGIC ---
@@ -125,9 +151,18 @@ export const PortfolioPage: React.FC = () => {
                             onClick={() => openLightbox(index)}
                             className="break-inside-avoid mb-2 relative group overflow-hidden cursor-zoom-in bg-gray-200"
                         >
-                            <div className="w-full relative">
+                            <div
+                                className="relative w-full overflow-hidden bg-gray-200/80"
+                                style={{ aspectRatio: item.aspectRatio }}
+                            >
+                                <div
+                                    aria-hidden="true"
+                                    className={`absolute inset-0 bg-[linear-gradient(110deg,rgba(255,255,255,0.42),rgba(255,255,255,0.14),rgba(255,255,255,0.42))] bg-[length:200%_100%] transition-opacity duration-500 ${
+                                        loadedItems.has(item.id) ? 'opacity-0' : 'animate-pulse opacity-100'
+                                    }`}
+                                />
                                 {item.type === 'video' ? (
-                                    <div className="relative w-full">
+                                    <div className="relative h-full w-full">
                                         <video
                                             src={item.src}
                                             autoPlay
@@ -136,7 +171,10 @@ export const PortfolioPage: React.FC = () => {
                                             playsInline
                                             preload="none"
                                             aria-hidden="true"
-                                            className="w-full h-auto block object-cover transition-transform duration-[0.8s] ease-out group-hover:scale-105"
+                                            onLoadedData={() => markItemAsLoaded(item.id)}
+                                            className={`absolute inset-0 h-full w-full object-cover transition-[transform,opacity] duration-[0.8s] ease-out group-hover:scale-105 ${
+                                                loadedItems.has(item.id) ? 'opacity-100' : 'opacity-0'
+                                            }`}
                                         />
                                     </div>
                                 ) : (
@@ -149,11 +187,14 @@ export const PortfolioPage: React.FC = () => {
                                             decoding="async"
                                             width={1365}
                                             height={2048}
+                                            onLoad={() => markItemAsLoaded(item.id)}
                                             onError={() => handleImageError(item.id)}
-                                            className="w-full h-auto block transition-transform duration-[0.8s] ease-out group-hover:scale-105"
+                                            className={`absolute inset-0 h-full w-full object-cover transition-[transform,opacity] duration-[0.8s] ease-out group-hover:scale-105 ${
+                                                loadedItems.has(item.id) ? 'opacity-100' : 'opacity-0'
+                                            }`}
                                         />
                                     ) : (
-                                        <div className="w-full aspect-[3/4] flex flex-col items-center justify-center text-gray-400 p-4 border-2 border-dashed border-gray-300 bg-gray-50">
+                                        <div className="flex h-full w-full flex-col items-center justify-center border-2 border-dashed border-gray-300 bg-gray-50 p-4 text-gray-400">
                                             <ImageOff size={32} className="mb-2 opacity-50" />
                                             <span className="font-sans text-[10px] uppercase tracking-widest text-center">Story #{item.id}</span>
                                             <span className="font-serif text-xs italic opacity-50 text-center mt-1">{item.title}</span>
@@ -235,16 +276,6 @@ export const PortfolioPage: React.FC = () => {
                                  )
                              )}
 
-                            <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent text-white flex justify-between items-end pointer-events-none">
-                                <div>
-                                    <p className="font-sans text-[10px] uppercase tracking-widest opacity-80 mb-1">
-                                        {filteredItems[selectedImageIndex].location}
-                                    </p>
-                                    <h3 className="font-serif text-2xl">
-                                        {filteredItems[selectedImageIndex].title}
-                                    </h3>
-                                </div>
-                            </div>
                         </motion.div>
                     </motion.div>
                 )}
