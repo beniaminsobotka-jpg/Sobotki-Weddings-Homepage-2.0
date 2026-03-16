@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
 import { LiquidBackground } from '../components/LiquidBackground';
 import { Seo } from '../components/Seo';
-import { getPortfolioImageSrcSet } from '../utils/media';
 
 // --- DATA GENERATION ---
 const generatePortfolio = () => {
@@ -150,7 +149,6 @@ export const PortfolioPage: React.FC = () => {
                                     !failedImages.has(item.id) ? (
                                         <img 
                                             src={item.src} 
-                                            srcSet={getPortfolioImageSrcSet(item.src)}
                                             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                                             alt={item.alt}
                                             loading="lazy"
