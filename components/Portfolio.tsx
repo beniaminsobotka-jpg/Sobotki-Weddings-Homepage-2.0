@@ -10,7 +10,7 @@ const films = [
     subtitle: "02.08.2025",
     date: "2024",
     description: "Ślub w stylu południowej siesty w hotelu Jakubus! Było wzruszająco, kolorowo i pięknie!",
-    thumbnail: "https://sobotkiweddings.pl/wp-content/uploads/2026/03/AdaxMarcin-miniaturka-www.avif",
+    thumbnail: "/uploads/2026/03/AdaxMarcin-miniaturka-www.avif",
     videoScale: 3.2,
     startAt: 8
   },
@@ -20,7 +20,7 @@ const films = [
     subtitle: "10.10.2025",
     date: "2024",
     description: "Dworzyszcze Wola wybrzmiało przepięknymi przysięgami Julii i Szymona. Miłość, którą czuć w każdym kadrze z tego dnia!",
-    thumbnail: "https://sobotkiweddings.pl/wp-content/uploads/2026/03/JuliaxSzymon-miniaturka-www.avif",
+    thumbnail: "/uploads/2026/03/JuliaxSzymon-miniaturka-www.avif",
     videoScale: 3.2
   },
   {
@@ -29,7 +29,7 @@ const films = [
     subtitle: "29.06.2024",
     date: "2024",
     description: "Międzynarodowe wesele polsko-norweskiej pary, która po 7 latach od poznania wraca do Krakowa, aby powiedzieć sobie magiczne \"tak\"",
-    thumbnail: "https://sobotkiweddings.pl/wp-content/uploads/2026/03/AgnieszkaxChris-miniaturka-www.avif",
+    thumbnail: "/uploads/2026/03/AgnieszkaxChris-miniaturka-www.avif",
     videoScale: 3.5
   }
 ];

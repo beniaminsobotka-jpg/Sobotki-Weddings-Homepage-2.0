@@ -6,15 +6,15 @@ import { Seo } from '../components/Seo';
 import { subscribeToBrevo } from '../utils/brevo';
 
 const galleryImages = [
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_2.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_3.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_11.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_5.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_6.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_7.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_8.jpg',
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_9.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_2.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_3.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_11.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_5.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_6.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_7.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_8.jpg',
+  '/uploads/2026/03/Portraits_Wybrane_www_9.jpg',
 ];
 
 const comparisonPhotobooth = [
@@ -153,7 +153,7 @@ const GuestbookScrollAnimation: React.FC = () => {
   }, []);
 
   const images = Array.from({ length: 14 }, (_, i) => 
-    `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Rozkladowka_www_${i + 1}.jpg`
+    `/uploads/2026/03/Rozkladowka_www_${i + 1}.jpg`
   );
 
   const turningPagesCount = 13;
@@ -386,7 +386,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         {/* HERO SECTION */}
         <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
           <img
-            src="https://sobotkiweddings.pl/wp-content/uploads/2026/03/NataliaxMateusz_Fotostacja_-123.avif"
+            src="/uploads/2026/03/NataliaxMateusz_Fotostacja_-123.avif"
             alt="Fotostacja ślubna hero"
             loading="eager"
             fetchPriority="high"
@@ -621,7 +621,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             {/* Background Image full width */}
             <div className="absolute inset-0 z-0 bg-black">
                 <img
-                    src="https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp"
+                    src="/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp"
                     alt="Fotostacja Ślubna Oferta"
                     loading="lazy"
                     fetchPriority="low"

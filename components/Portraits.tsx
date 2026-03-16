@@ -6,7 +6,7 @@ import { getPortraitTileSrcSet } from '../utils/media';
 // Generowanie tablicy 10 zdjęć
 const portraits = Array.from({ length: 10 }, (_, i) => ({
   id: i + 1,
-  src: `https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_${i + 1}.avif`,
+  src: `/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_${i + 1}.avif`,
 }));
 
 export const Portraits: React.FC = () => {

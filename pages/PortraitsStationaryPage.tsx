@@ -5,15 +5,15 @@ import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 
 const galleryImages = [
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Basia-x-Szymon_-2-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Kamila-x-Konrad_-76-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2025/07/IsmenaxTomasz_Fotostacja_-37-1024x683.avif',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2025/07/OlgaxFranek_Fotostacja_-136-1024x683.avif',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Kamila-x-Konrad_-54-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2025/07/IsmenaxTomasz_Fotostacja_-134-e1752095442720-1024x789.avif',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Basia-x-Szymon_-22-1024x683.webp',
-  'https://sobotkiweddings.pl/wp-content/uploads/2024/11/Marta-x-Alfred_-42-1024x683.webp',
+  '/uploads/2024/11/Basia-x-Szymon_-2-1024x683.webp',
+  '/uploads/2024/11/Kamila-x-Konrad_-76-1024x683.webp',
+  '/uploads/2025/07/IsmenaxTomasz_Fotostacja_-37-1024x683.avif',
+  '/uploads/2024/11/Marta-x-Alfred_-124-1024x683.webp',
+  '/uploads/2025/07/OlgaxFranek_Fotostacja_-136-1024x683.avif',
+  '/uploads/2024/11/Kamila-x-Konrad_-54-1024x683.webp',
+  '/uploads/2025/07/IsmenaxTomasz_Fotostacja_-134-e1752095442720-1024x789.avif',
+  '/uploads/2024/11/Basia-x-Szymon_-22-1024x683.webp',
+  '/uploads/2024/11/Marta-x-Alfred_-42-1024x683.webp',
 ];
 
 export const PortraitsStationaryPage: React.FC = () => {
@@ -37,7 +37,7 @@ export const PortraitsStationaryPage: React.FC = () => {
         {/* HERO SECTION */}
         <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
           <img
-            src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-119-min-1024x683.avif"
+            src="/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-119-min-1024x683.avif"
             alt="Fotostacja stacjonarna hero"
             loading="eager"
             fetchPriority="high"

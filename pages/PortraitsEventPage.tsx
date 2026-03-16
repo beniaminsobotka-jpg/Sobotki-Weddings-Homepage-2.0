@@ -78,7 +78,7 @@ export const PortraitsEventPage: React.FC = () => {
         {/* HERO SECTION - REVERTED TO ORIGINAL LAYOUT BUT WITH NEW FONTS/COLORS */}
         <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
           <img
-            src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
+            src="/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
             alt="Fotostacja eventowa hero"
             loading="eager"
             fetchPriority="high"
@@ -197,7 +197,7 @@ export const PortraitsEventPage: React.FC = () => {
         <section className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[1.12fr_0.88fr] lg:items-center md:px-10 md:py-14">
           <div className="order-1 relative rounded-[24px] bg-[#050505] lg:order-1 overflow-hidden group">
             <img
-              src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/IMG_0485-min-kopia-3-1024x768.avif"
+              src="/uploads/2025/07/IMG_0485-min-kopia-3-1024x768.avif"
               alt="Realizacja fotostacji eventowej"
               loading="lazy"
               fetchPriority="low"
@@ -275,7 +275,7 @@ export const PortraitsEventPage: React.FC = () => {
           {/* Background Image full width */}
           <div className="absolute inset-0 z-0 bg-black">
             <img
-              src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_4.avif"
+              src="/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_4.avif"
               alt="Fotostacja Eventowa Oferta"
               loading="lazy"
               fetchPriority="low"

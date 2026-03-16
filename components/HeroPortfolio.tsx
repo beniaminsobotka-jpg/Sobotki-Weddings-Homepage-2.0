@@ -6,7 +6,7 @@ const mixedIds = [2, 1, 6, 3, 8, 5, 4, 7];
 
 const images = mixedIds.map((imageId, i) => ({
   id: i,
-  src: `https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_${imageId}.jpg`
+  src: `/uploads/2026/03/Karuzela_homepage_${imageId}.jpg`
 }));
 
 export const HeroPortfolio: React.FC = () => {

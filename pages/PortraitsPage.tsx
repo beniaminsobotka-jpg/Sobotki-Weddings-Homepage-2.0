@@ -8,7 +8,7 @@ import { getPortraitTileSrcSet } from '../utils/media';
 // --- DATA ---
 const portraitsData = Array.from({ length: 9 }, (_, i) => ({
     id: i + 1,
-    src: `https://sobotkiweddings.pl/wp-content/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_${i + 1}.avif`,
+    src: `/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_${i + 1}.avif`,
     title: `Portrait Session ${i + 1}`,
     client: "Guest Portrait",
     alt: 'Czarno-biały portret gościa wykonany w fotostacji Sobotki Portraits',
@@ -134,7 +134,7 @@ export const PortraitsPage: React.FC = () => {
                     {/* VIDEO INSERT */}
                     <div className="relative w-full rounded-[30px] overflow-hidden shadow-2xl bg-[#111] group border border-white/5">
                         <video
-                            src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/Na-strone-www-Fotostacja-wycinek-1.mp4"
+                            src="/uploads/2026/02/Na-strone-www-Fotostacja-wycinek-1.mp4"
                             autoPlay
                             muted
                             loop
@@ -214,7 +214,7 @@ export const PortraitsPage: React.FC = () => {
                         {/* Video Column */}
                         <div className="relative h-[500px] md:h-[700px] rounded-[30px] overflow-hidden border border-white/10 bg-[#111] shadow-2xl order-1 lg:order-1 group">
                             <video
-                                src="https://sobotkiweddings.pl/wp-content/uploads/2026/02/Na-strone-www-2.mp4"
+                                src="/uploads/2026/02/Na-strone-www-2.mp4"
                                 autoPlay
                                 muted
                                 loop
@@ -335,7 +335,7 @@ export const PortraitsPage: React.FC = () => {
                             <div className="group relative h-[500px] rounded-[30px] overflow-hidden bg-[#111] border border-white/10 cursor-pointer">
                                 {/* Background Image */}
                                 <img
-                                    src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-50-min.avif"
+                                    src="/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-50-min.avif"
                                     alt="Oferta Ślubna"
                                     loading="lazy"
                                     fetchPriority="low"
@@ -378,7 +378,7 @@ export const PortraitsPage: React.FC = () => {
                             <div className="group relative h-[500px] rounded-[30px] overflow-hidden bg-[#111] border border-white/10 cursor-pointer">
                                 {/* Background Image */}
                                 <img
-                                    src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
+                                    src="/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
                                     alt="Oferta Eventowa"
                                     loading="lazy"
                                     fetchPriority="low"
@@ -421,7 +421,7 @@ export const PortraitsPage: React.FC = () => {
                             <div className="group relative h-[500px] rounded-[30px] overflow-hidden bg-[#111] border border-white/10 cursor-pointer">
                                 {/* Background Image */}
                                 <img
-                                    src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/OlgaxFranek_Fotostacja_-51-min.avif"
+                                    src="/uploads/2025/07/OlgaxFranek_Fotostacja_-51-min.avif"
                                     alt="Studio Stacjonarne"
                                     loading="lazy"
                                     fetchPriority="low"
@@ -498,7 +498,7 @@ export const PortraitsPage: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                             <div className="relative aspect-[3/2] rounded-[20px] overflow-hidden bg-[#111] shadow-2xl group">
                                 <img
-                                    src="https://sobotkiweddings.pl/wp-content/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-1-min-1024x683.avif"
+                                    src="/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-1-min-1024x683.avif"
                                     alt="Fotostacja portretowa"
                                     loading="lazy"
                                     fetchPriority="low"

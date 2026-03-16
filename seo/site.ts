@@ -8,9 +8,9 @@ export const DEFAULT_ROBOTS = 'index,follow,max-image-preview:large';
 export const SITE_DESCRIPTION =
   'Fotografia i film ślubny oraz fotostacja premium na wesela, eventy firmowe i sesje portretowe.';
 export const SITE_LOGO =
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Sobotki_Weddings_Logo.png';
+  '/uploads/2026/03/Sobotki_Weddings_Logo.png';
 export const SITE_DEFAULT_IMAGE =
-  'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_2.jpg';
+  '/uploads/2026/03/Karuzela_homepage_2.jpg';
 
 export type SeoPageKey =
   | 'home'
@@ -38,7 +38,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Sobotki Weddings | Naturalna fotografia i film ślubny',
     description:
       'Sobotki Weddings tworzy naturalne zdjęcia ślubne, emocjonalne filmy i elegancką fotostację premium. Zobacz portfolio, filmy, portraits i skontaktuj się z nami.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_2.jpg',
+    image: '/uploads/2026/03/Karuzela_homepage_2.jpg',
     ogType: 'website',
   },
   portfolio: {
@@ -46,7 +46,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Portfolio ślubne | Zdjęcia i filmy - Sobotki Weddings',
     description:
       'Portfolio Sobotki Weddings: reportaż ślubny, kadry editorialowe i filmowe historie. Zobacz realizacje zdjęciowe i video w autorskim stylu.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_1.jpg',
+    image: '/uploads/2026/03/Karuzela_homepage_1.jpg',
     ogType: 'website',
   },
   film: {
@@ -54,7 +54,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Film ślubny | Emocjonalne filmy ślubne - Sobotki Weddings',
     description:
       'Tworzymy poruszające filmy ślubne, które zachowują emocje, rytm dnia i autentyczne relacje. Poznaj nasze podejście do video ślubnego.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/AdaxMarcin-miniaturka-www.avif',
+    image: '/uploads/2026/03/AdaxMarcin-miniaturka-www.avif',
     ogType: 'website',
   },
   portraits: {
@@ -62,7 +62,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Sobotki Portraits | Fotostacja ślubna i eventowa premium',
     description:
       'Sobotki Portraits to elegancka fotostacja premium: czarno-białe portrety na wesela, eventy firmowe i sesje stacjonarne w Gliwicach.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
+    image: '/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
     ogType: 'website',
   },
   portraitsWedding: {
@@ -70,7 +70,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Fotostacja ślubna | Czarno-białe portrety gości - Sobotki Portraits',
     description:
       'Fotostacja ślubna Sobotki Portraits to mobilne studio portretowe z natychmiastowym wydrukiem i galerią online. Elegancka atrakcja weselna premium.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_2.jpg',
+    image: '/uploads/2026/03/Portraits_Wybrane_www_2.jpg',
     ogType: 'website',
   },
   portraitsEvent: {
@@ -78,7 +78,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Fotostacja eventowa dla firm | Premium experience - Sobotki Portraits',
     description:
       'Fotostacja eventowa dla firm na gale, jubileusze, targi i konferencje. Portrety premium, branding, natychmiastowy druk i galeria online.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_3.jpg',
+    image: '/uploads/2026/03/Portraits_Wybrane_www_3.jpg',
     ogType: 'website',
   },
   portraitsStationary: {
@@ -86,7 +86,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Fotostacja stacjonarna w Gliwicach | Sesje portretowe - Sobotki Portraits',
     description:
       'Fotostacja stacjonarna w Gliwicach: krótkie sesje portretowe z eleganckimi czarno-białymi odbitkami. Umów rodzinny lub partnerski portret.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Portraits_Wybrane_www_5.jpg',
+    image: '/uploads/2026/03/Portraits_Wybrane_www_5.jpg',
     ogType: 'website',
   },
   contact: {
@@ -94,7 +94,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: 'Kontakt | Sobotki Weddings i Sobotki Portraits',
     description:
       'Skontaktuj się z Sobotki Weddings w sprawie fotografii ślubnej, filmu lub fotostacji Sobotki Portraits. Napisz do nas i zapytaj o termin.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/O-Nas_compressed_2.webp',
+    image: '/uploads/2026/03/O-Nas_compressed_2.webp',
     ogType: 'website',
   },
   notFound: {
@@ -102,7 +102,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     title: '404 | Sobotki Weddings',
     description:
       'Ta podstrona nie istnieje. Wróć do strony głównej Sobotki Weddings i przejdź do portfolio, filmu, portraits lub kontaktu.',
-    image: 'https://sobotkiweddings.pl/wp-content/uploads/2026/03/Karuzela_homepage_2.jpg',
+    image: '/uploads/2026/03/Karuzela_homepage_2.jpg',
     ogType: 'website',
     robots: 'noindex,follow',
   },

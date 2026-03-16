@@ -16,7 +16,7 @@ const generatePortfolio = () => {
     return {
       id,
       type: 'image',
-      src: `https://sobotkiweddings.pl/wp-content/uploads/2026/02/Portfolio_Sobotki_Weddings_${id}.avif`,
+      src: `/uploads/2026/02/Portfolio_Sobotki_Weddings_${id}.avif`,
       title: `Story No. ${id}`,
       category: categories[id % categories.length],
       location: locations[id % locations.length],
@@ -27,9 +27,9 @@ const generatePortfolio = () => {
   // 2. Generate Videos
   // Explicitly defining URLs to handle case sensitivity differences (e.g. 3rd video has lowercase 'd')
   const videoUrls = [
-      "https://sobotkiweddings.pl/wp-content/uploads/2026/02/Do-portfolio-1.mp4",
-      "https://sobotkiweddings.pl/wp-content/uploads/2026/02/Do-portfolio-2.mp4",
-      "https://sobotkiweddings.pl/wp-content/uploads/2026/02/do-Portfolio-3.mp4"
+      "/uploads/2026/02/Do-portfolio-1.mp4",
+      "/uploads/2026/02/Do-portfolio-2.mp4",
+      "/uploads/2026/02/do-Portfolio-3.mp4"
   ];
 
   const videos = videoUrls.map((src, i) => ({

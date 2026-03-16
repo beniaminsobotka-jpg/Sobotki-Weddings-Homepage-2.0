@@ -7,21 +7,21 @@ const reviews: Review[] = [
     name: "Adrianna",
     role: "Pani Młoda",
     date: "2023",
-    video: "https://sobotkiweddings.pl/wp-content/uploads/2026/02/Na-strone-testimonal-1-Ada-i-Marcin.mp4",
+    video: "/uploads/2026/02/Na-strone-testimonal-1-Ada-i-Marcin.mp4",
     content: "Z całego serca mogę polecić wszystkim Sobotki Weddings! Beniamin towarzyszył nam z kamerą w naszym wyjątkowym dniu. Ma niezwykłą umiejętność - był obecny, ale nie nachalnie. Potrafi wyczarować cudowne kadry."
   },
   {
     name: "Aleksandra & Patryk",
     role: "Para Młoda",
     date: "Czerwiec 2023",
-    video: "https://sobotkiweddings.pl/wp-content/uploads/2024/01/wycinek-1080.mov",
+    video: "/uploads/2024/01/wycinek-1080.mov",
     content: "Ania i Benek to strzał w dziesiątkę! Życzliwi, pomocni, wykonują swoją pracę 'po cichu', łapiąc najbardziej wzruszające momenty. Dziękujemy za wspaniałe zdjęcia i film."
   },
   {
     name: "Weronika",
     role: "Pani Młoda",
     date: "2024",
-    video: "https://sobotkiweddings.pl/wp-content/uploads/2026/02/Na-strone-testimonal-2-Weronika-x-Felix.mp4",
+    video: "/uploads/2026/02/Na-strone-testimonal-2-Weronika-x-Felix.mp4",
     content: "Zdjęcia i filmy są tak naturalne i takie nasze, lepiej nie moglibyśmy ich sobie wyobrazić. No dobra, może mają jedną wadę - oglądając je nie ma szans wyjść z tego o suchych policzkach…"
   }
 ];
