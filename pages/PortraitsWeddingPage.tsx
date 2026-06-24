@@ -767,6 +767,9 @@ export const PortraitsWeddingPage: React.FC = () => {
                       autoComplete="address-level2"
                       className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
+                    <span className="pl-2 font-sans text-[11px] leading-relaxed text-[#d42929]">
+                      Uwaga, dojeżdżamy do 300 km od Gliwic (woj.Śląskie)
+                    </span>
                   </label>
                 </div>
 
