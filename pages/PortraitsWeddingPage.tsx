@@ -758,7 +758,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                     />
                   </label>
                   <label className="grid gap-2">
-                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Miejsce ślubu</span>
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Miejsce Przyjęcia</span>
                     <input
                       name="location"
                       value={formData.location}
