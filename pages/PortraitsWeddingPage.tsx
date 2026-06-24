@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowUpRight, Camera, Check, Download, Printer, Sparkles, Star, Users, X } from 'lucide-react';
+import { ArrowUpRight, Camera, Check, ChevronDown, Download, Printer, Sparkles, Star, Users, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { subscribeToBrevo } from '../utils/brevo';
@@ -324,6 +324,7 @@ export const PortraitsWeddingPage: React.FC = () => {
     date: '',
     location: '',
     guests: '',
+    source: '',
     notes: '',
   });
 
@@ -336,7 +337,7 @@ export const PortraitsWeddingPage: React.FC = () => {
     []
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -356,6 +357,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         serviceType: 'Fotostacja ślubna',
         message: formData.notes,
         guestCount: formData.guests,
+        source: formData.source,
       });
 
       setStatus('success');
@@ -365,6 +367,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         date: '',
         location: '',
         guests: '',
+        source: '',
         notes: '',
       });
     } catch (error) {
@@ -776,6 +779,34 @@ export const PortraitsWeddingPage: React.FC = () => {
                     placeholder="Ile gości planujecie na swoim przyjęciu?"
                     className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                   />
+                </label>
+
+                <label className="grid gap-2">
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">
+                    Skąd dowiedziałeś/aś się o naszej usłudze? *
+                  </span>
+                  <div className="relative">
+                    <select
+                      required
+                      name="source"
+                      value={formData.source}
+                      onChange={handleChange}
+                      className="w-full cursor-pointer appearance-none rounded-xl border border-white/10 bg-[#1a1a1a] py-4 pl-5 pr-12 font-sans text-sm text-white transition-colors focus:border-white/30 focus:bg-[#222] focus:outline-none"
+                    >
+                      <option value="" disabled>Wybierz opcję...</option>
+                      <option value="Instagram">Instagram</option>
+                      <option value="Reklama na Instagramie">Reklama na Instagramie</option>
+                      <option value="TikTok">TikTok</option>
+                      <option value="Polecenie od znajomych">Polecenie od znajomych</option>
+                      <option value="Strona WWW">Strona WWW</option>
+                      <option value="Inne">Inne</option>
+                    </select>
+                    <ChevronDown
+                      aria-hidden="true"
+                      size={16}
+                      className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+                  </div>
                 </label>
 
                 <label className="grid gap-2">

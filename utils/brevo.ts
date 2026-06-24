@@ -14,6 +14,7 @@ type BrevoLeadInput = {
   message?: string;
   company?: string;
   guestCount?: string;
+  source?: string;
 };
 
 const buildReadableError = async (response: Response) => {

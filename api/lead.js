@@ -7,6 +7,15 @@ const FORM_TYPE_TO_LIST_ENV = {
   portraits_booth: 'BREVO_LIST_ID_PORTRAITS_BOOTH',
 };
 
+const PORTRAITS_WEDDING_SOURCES = new Set([
+  'Instagram',
+  'Reklama na Instagramie',
+  'TikTok',
+  'Polecenie od znajomych',
+  'Strona WWW',
+  'Inne',
+]);
+
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json');
   response.end(JSON.stringify(body));
@@ -110,6 +119,7 @@ const buildInternalHtml = (leadData) => `
                 ['serviceType', leadData.serviceType],
                 ['guestCount', leadData.guestCount],
                 ['company', leadData.company],
+                ['Skąd dowiedział się o nas', leadData.source],
                 ['message', leadData.message],
                 ['listId', String(leadData.listId)],
               ])}
@@ -135,6 +145,7 @@ const buildInternalText = (leadData) => [
   `serviceType: ${leadData.serviceType}`,
   `guestCount: ${leadData.guestCount || '-'}`,
   `company: ${leadData.company || '-'}`,
+  `Skąd dowiedział się o nas: ${leadData.source || '-'}`,
   `message: ${leadData.message || '-'}`,
   `listId: ${leadData.listId}`,
 ].join('\n');
@@ -171,6 +182,7 @@ export default async function handler(request, response) {
   const message = normalizeString(parsedBody.message);
   const company = normalizeString(parsedBody.company);
   const guestCount = normalizeString(parsedBody.guestCount);
+  const source = normalizeString(parsedBody.source);
 
   if (!formType) {
     return sendJson(response, 400, { error: 'formType is required' });
@@ -202,6 +214,10 @@ export default async function handler(request, response) {
     return sendJson(response, 400, { error: 'serviceType is required' });
   }
 
+  if (formType === 'portraits_wedding' && !PORTRAITS_WEDDING_SOURCES.has(source)) {
+    return sendJson(response, 400, { error: 'A valid source is required' });
+  }
+
   const { firstName, lastName } = splitName(fullName);
 
   const brevoPayload = {
@@ -214,7 +230,7 @@ export default async function handler(request, response) {
       WEDDING_DATE: weddingDate,
       VENUE: venue,
       SERVICE_TYPE: serviceType,
-      MESSAGE: message,
+      MESSAGE: source ? `[Skąd dowiedział się o nas: ${source}]\n\n${message}` : message,
       ...(company ? { COMPANY: company } : {}),
       ...(guestCount ? { GUEST_COUNT: guestCount } : {}),
     },
@@ -272,6 +288,7 @@ export default async function handler(request, response) {
         serviceType,
         guestCount,
         company,
+        source,
         message,
         listId,
       };
