@@ -95,7 +95,7 @@ const buildInternalHtml = (leadData) => `
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:720px; margin:0 auto; background:#ffffff; border:1px solid #e5e5e5; border-radius:16px; overflow:hidden;">
         <tr>
           <td style="padding:24px 28px; background:#1a1a1a;">
-            <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#bcbcbc;">Nowy lead WWW</div>
+            <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#bcbcbc;">ZAPYTANIE OFERTOWE</div>
             <div style="margin-top:8px; font-family:Arial, Helvetica, sans-serif; font-size:28px; line-height:32px; font-weight:700; color:#ffffff;">
               ${escapeHtml(leadData.serviceType)}
             </div>
@@ -132,7 +132,7 @@ const buildInternalHtml = (leadData) => `
 `;
 
 const buildInternalText = (leadData) => [
-  'Nowy lead WWW',
+  'ZAPYTANIE OFERTOWE',
   '',
   `formType: ${leadData.formType}`,
   `FULLNAME: ${leadData.fullName}`,
@@ -275,7 +275,7 @@ export default async function handler(request, response) {
     });
 
     if (notifyToEmail && notifyFromEmail && notifyFromName) {
-      const internalSubject = `[Nowy lead WWW] ${serviceType} | ${fullName} | ${normalizedEmail}`;
+      const internalSubject = `[ZAPYTANIE OFERTOWE] ${serviceType} | ${fullName} | ${normalizedEmail}`;
       const internalLeadData = {
         formType,
         fullName,
