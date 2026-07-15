@@ -115,7 +115,13 @@ async function saveLead(eventName, lead, extra = {}) {
     throw new Error(details || `Lead event failed with status ${response.status}`);
   }
 
-  return response.json().catch(() => ({ ok: true }));
+  const result = await response.json().catch(() => ({ ok: true }));
+
+  if (eventName === EVENTS.termInquiry && !result.notificationSent) {
+    throw new Error("Brevo nie potwierdziło wysyłki maila powiadamiającego.");
+  }
+
+  return result;
 }
 
 function revealOffer() {
@@ -239,12 +245,14 @@ inquiryForm.addEventListener("submit", async (event) => {
   reserveCta.textContent = "Wysyłamy zapytanie...";
 
   try {
-    await saveLead(EVENTS.termInquiry, lead, {
+    const result = await saveLead(EVENTS.termInquiry, lead, {
       interestedOffers,
       inquiryMessage,
     });
     state.termInquirySent = true;
-    ctaStatus.textContent = "Dziękujemy! Odezwiemy się mailowo, żeby potwierdzić dostępność terminu.";
+    ctaStatus.textContent = result.messageId
+      ? `Dziękujemy! Odezwiemy się mailowo, żeby potwierdzić dostępność terminu. ID wiadomości: ${result.messageId}`
+      : "Dziękujemy! Odezwiemy się mailowo, żeby potwierdzić dostępność terminu.";
     reserveCta.textContent = "Zapytanie wysłane";
     closeInquiryModal();
   } catch (error) {

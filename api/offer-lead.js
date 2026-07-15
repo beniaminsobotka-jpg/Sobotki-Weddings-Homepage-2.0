@@ -348,6 +348,7 @@ export default async function handler(request, response) {
   const apiKey = process.env.BREVO_API_KEY;
   const listId = Number(process.env.BREVO_LIST_ID_OFFER);
   const warnings = [];
+  let notificationResult = null;
 
   if (!apiKey) {
     warnings.push('BREVO_API_KEY is not configured');
@@ -392,11 +393,16 @@ export default async function handler(request, response) {
 
   if (lead.eventName === 'zapytanie_o_termin') {
     try {
-      const notificationResult = await sendInquiryNotification({ apiKey, lead });
+      notificationResult = await sendInquiryNotification({ apiKey, lead });
 
       if (notificationResult?.messageId) {
         warnings.push(`Brevo SMTP accepted messageId: ${notificationResult.messageId}`);
       }
+
+      console.info('[Offer Lead] Inquiry notification accepted', {
+        to: notificationResult?.to,
+        messageId: notificationResult?.messageId,
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown notification error';
       console.error('[Offer Lead] Inquiry notification failed', { message });
@@ -412,6 +418,9 @@ export default async function handler(request, response) {
   return sendJson(response, 200, {
     ok: true,
     eventName: lead.eventName,
+    notificationSent: Boolean(notificationResult?.ok),
+    notificationTo: notificationResult?.to || '',
+    messageId: notificationResult?.messageId || '',
     warnings,
   });
 }
