@@ -228,7 +228,7 @@ h3 {
   margin-bottom: 8px;
   font-size: 1.55rem;
   line-height: 1;
-  font-family: var(--font-serif);
+  font-family: var(--font-heading);
 }
 
 .italic-accent {
@@ -454,8 +454,8 @@ input:focus, textarea:focus, select:focus {
 .package-card:hover,
 .addons-grid article:hover,
 .faq-list details:hover {
-  background: #111;
-  border-color: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  filter: brightness(1.05);
 }
 
 .package-card {
@@ -465,17 +465,42 @@ input:focus, textarea:focus, select:focus {
   padding: 32px;
 }
 
-.packages-grid > :nth-child(1) { border-top: 2px solid var(--color-accent); }
-.packages-grid > :nth-child(2) { border-top: 2px solid #c2a578; }
-.packages-grid > :nth-child(3) { border-top: 2px solid #94a3b8; }
-.packages-grid > :nth-child(4) { border-top: 2px solid #525252; }
+.packages-grid > :nth-child(1) { background-color: #29339B; border-top: none; }
+.packages-grid > :nth-child(2) { background-color: #FF3A20; border-top: none; }
+.packages-grid > :nth-child(3) { background-color: #74A4BC; border-top: none; }
+.packages-grid > :nth-child(4) { background-color: #B6D6CC; border-top: none; color: #000; }
+
+.packages-grid > :nth-child(4) .package-topline,
+.packages-grid > :nth-child(4) .package-topline span:first-child,
+.packages-grid > :nth-child(4) > p:not(.price):not(.package-subtitle):not(.small-note),
+.packages-grid > :nth-child(4) ul li {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.packages-grid > :nth-child(4) .package-subtitle {
+  color: #000;
+}
+
+.packages-grid > :nth-child(1) .package-subtitle,
+.packages-grid > :nth-child(3) .package-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+.packages-grid > :nth-child(2) .package-subtitle {
+  color: #fff;
+}
+
+.packages-grid > :nth-child(1) ul li::before,
+.packages-grid > :nth-child(2) ul li::before,
+.packages-grid > :nth-child(3) ul li::before {
+  color: rgba(255, 255, 255, 0.6);
+}
+.packages-grid > :nth-child(4) ul li::before {
+  color: rgba(0, 0, 0, 0.5);
+}
 
 .package-featured {
-  background: #0d0d0d;
-  border-color: rgba(255, 255, 255, 0.15);
   position: relative;
   box-shadow: 0 0 40px rgba(0,0,0,0.5);
-  border-top-color: var(--color-accent);
 }
 .package-featured::before {
   content: '';
