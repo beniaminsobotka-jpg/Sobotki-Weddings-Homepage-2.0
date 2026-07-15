@@ -55,16 +55,23 @@ Endpoint aktualizuje kontakt w Brevo oraz próbuje wysłać custom event do Brev
 
 ## Mail powiadomień dla "zapytanie_o_termin"
 
-Dla dużego CTA endpoint wysyła mail przez Brevo SMTP API.
+Dla dużego CTA klient najpierw widzi popup:
+
+- "Która oferta Cię interesuje?" - można zaznaczyć kilka opcji
+- krótkie pole wiadomości: "Opowiedzcie nam w kilku słowach o Waszym ślubie"
+
+Po wysłaniu popupu endpoint wysyła mail przez Brevo SMTP API.
 
 Zmienne środowiskowe:
 
-- `BREVO_OFFER_NOTIFY_TO_EMAIL` - adres, na który mają przychodzić zapytania z tej oferty
+- `BREVO_OFFER_NOTIFY_TO_EMAIL` - adres, na który mają przychodzić zapytania z tej oferty; domyślnie kod używa `kontakt.sobotki@gmail.com`
 - `BREVO_NOTIFY_TO_EMAIL` - fallback, jeśli nie ustawisz osobnego `BREVO_OFFER_NOTIFY_TO_EMAIL`
 - `BREVO_NOTIFY_FROM_EMAIL` - zweryfikowany nadawca w Brevo
 - `BREVO_NOTIFY_FROM_NAME` - nazwa nadawcy, np. `Sobotki Weddings`
 
-Mail zawiera: imię, e-mail, datę ślubu, miejsce / salę, timestamp formularza i timestamp eventu.
+Mail zawiera: imię, e-mail, datę ślubu, miejsce / salę, zaznaczone oferty, wiadomość z popupu, timestamp formularza i timestamp eventu.
+
+W mailu `replyTo` jest ustawione na adres e-mail klienta, więc możesz odpowiadać bezpośrednio z Gmaila / skrzynki odbiorczej.
 
 ## Gdzie zobaczysz wyniki sondy odrzuceń
 

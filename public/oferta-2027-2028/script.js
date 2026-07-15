@@ -1,6 +1,6 @@
 const CONFIG = {
   brandName: "Sobotki Weddings",
-  contactEmail: "[email]",
+  contactEmail: "kontakt.sobotki@gmail.com",
   instagramUrl: "[link]",
   pdfUrl: "/oferta-sw-2027-2028.pdf",
 
@@ -32,6 +32,9 @@ const offerContent = document.querySelector("#offerContent");
 const formError = document.querySelector("#formError");
 const reserveCta = document.querySelector("#reserveCta");
 const ctaStatus = document.querySelector("#ctaStatus");
+const inquiryModal = document.querySelector("#inquiryModal");
+const inquiryForm = document.querySelector("#inquiryForm");
+const inquiryError = document.querySelector("#inquiryError");
 const showRejectSurvey = document.querySelector("#showRejectSurvey");
 const rejectForm = document.querySelector("#rejectForm");
 const rejectStatus = document.querySelector("#rejectStatus");
@@ -159,6 +162,19 @@ function ensureLeadBeforeFinalAction() {
   return lead;
 }
 
+function openInquiryModal() {
+  inquiryError.textContent = "";
+  inquiryModal.classList.remove("is-hidden");
+  inquiryModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeInquiryModal() {
+  inquiryModal.classList.add("is-hidden");
+  inquiryModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
 leadForm.addEventListener("submit", (event) => {
   event.preventDefault();
   formError.textContent = "";
@@ -179,22 +195,55 @@ leadForm.addEventListener("submit", (event) => {
   });
 });
 
-reserveCta.addEventListener("click", async () => {
+reserveCta.addEventListener("click", () => {
   const lead = ensureLeadBeforeFinalAction();
   if (!lead || state.termInquirySent) return;
 
+  openInquiryModal();
+});
+
+inquiryModal.querySelectorAll("[data-close-inquiry-modal]").forEach((element) => {
+  element.addEventListener("click", closeInquiryModal);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !inquiryModal.classList.contains("is-hidden")) {
+    closeInquiryModal();
+  }
+});
+
+inquiryForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const lead = ensureLeadBeforeFinalAction();
+  if (!lead || state.termInquirySent) return;
+
+  const formData = new FormData(inquiryForm);
+  const interestedOffers = formData.getAll("interestedOffers").map((value) => String(value));
+  const inquiryMessage = String(formData.get("inquiryMessage") || "").trim();
+
+  if (interestedOffers.length === 0) {
+    inquiryError.textContent = "Zaznaczcie proszę przynajmniej jedną ofertę.";
+    return;
+  }
+
   ctaStatus.textContent = "";
+  inquiryError.textContent = "";
   reserveCta.disabled = true;
   reserveCta.textContent = "Wysyłamy zapytanie...";
 
   try {
-    await saveLead(EVENTS.termInquiry, lead);
+    await saveLead(EVENTS.termInquiry, lead, {
+      interestedOffers,
+      inquiryMessage,
+    });
     state.termInquirySent = true;
     ctaStatus.textContent = "Dziękujemy! Odezwiemy się mailowo, żeby potwierdzić dostępność terminu.";
     reserveCta.textContent = "Zapytanie wysłane";
+    closeInquiryModal();
   } catch (error) {
     console.warn("[Sobotki Offer] Nie udało się zapisać eventu zapytanie_o_termin", error);
-    ctaStatus.textContent = "Coś poszło nie tak. Spróbuj jeszcze raz albo napisz do nas mailowo.";
+    inquiryError.textContent = "Coś poszło nie tak. Spróbuj jeszcze raz albo napisz do nas mailowo.";
     reserveCta.disabled = false;
     reserveCta.textContent = "Jestem zainteresowany — zapytaj o termin";
   }

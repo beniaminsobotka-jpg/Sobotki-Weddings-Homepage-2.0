@@ -17,6 +17,14 @@ const REJECTION_REASONS = new Set([
   'inne',
 ]);
 
+const INTERESTED_OFFERS = new Set([
+  'Foto + Video - Full pakiet 12h',
+  'Foto + Video - Przyjęcia 6h',
+  'Foto Duo - reportaż foto',
+  'Video - pakiet standardowy',
+  'Fotostacja portretowa',
+]);
+
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json');
   response.end(JSON.stringify(body));
@@ -70,6 +78,8 @@ const buildEventMessage = (lead) => [
   `Event timestamp: ${lead.eventTimestamp}`,
   `Data ślubu: ${lead.weddingDate}`,
   `Miejsce / sala: ${lead.venue}`,
+  lead.interestedOffers.length ? `Interesujące oferty: ${lead.interestedOffers.join(', ')}` : '',
+  lead.inquiryMessage ? `Wiadomość: ${lead.inquiryMessage}` : '',
   lead.rejectionReason ? `Powód odrzucenia: ${lead.rejectionReason}` : '',
   lead.rejectionNote ? `Komentarz odrzucenia: ${lead.rejectionNote}` : '',
 ]
@@ -83,6 +93,8 @@ const buildInquiryText = (lead) => [
   `E-mail: ${lead.email}`,
   `Data ślubu: ${lead.weddingDate}`,
   `Miejsce / sala: ${lead.venue}`,
+  `Interesujące oferty: ${lead.interestedOffers.join(', ')}`,
+  `Wiadomość: ${lead.inquiryMessage || '-'}`,
   `Timestamp formularza: ${lead.timestamp}`,
   `Timestamp eventu: ${lead.eventTimestamp}`,
 ].join('\n');
@@ -111,6 +123,8 @@ const buildInquiryHtml = (lead) => `
                 ['E-mail', lead.email],
                 ['Data ślubu', lead.weddingDate],
                 ['Miejsce / sala', lead.venue],
+                ['Interesujące oferty', lead.interestedOffers.join(', ')],
+                ['Wiadomość', lead.inquiryMessage],
                 ['Timestamp formularza', lead.timestamp],
                 ['Timestamp eventu', lead.eventTimestamp],
               ]
@@ -185,6 +199,8 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
       weddingDate: lead.weddingDate,
       venue: lead.venue,
       timestamp: lead.timestamp,
+      interestedOffers: lead.interestedOffers.join(', '),
+      inquiryMessage: lead.inquiryMessage || '',
       rejectionReason: lead.rejectionReason || '',
       rejectionNote: lead.rejectionNote || '',
     },
@@ -210,7 +226,9 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
 
 const sendInquiryNotification = async ({ apiKey, lead }) => {
   const notifyToEmail =
-    process.env.BREVO_OFFER_NOTIFY_TO_EMAIL || process.env.BREVO_NOTIFY_TO_EMAIL;
+    process.env.BREVO_OFFER_NOTIFY_TO_EMAIL ||
+    process.env.BREVO_NOTIFY_TO_EMAIL ||
+    'kontakt.sobotki@gmail.com';
   const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
   const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 
@@ -275,6 +293,10 @@ export default async function handler(request, response) {
     timestamp: normalizeString(parsedBody.timestamp) || new Date().toISOString(),
     eventTimestamp: normalizeString(parsedBody.eventTimestamp) || new Date().toISOString(),
     source: normalizeString(parsedBody.source) || 'hidden_offer_2027_2028',
+    interestedOffers: Array.isArray(parsedBody.interestedOffers)
+      ? parsedBody.interestedOffers.map(normalizeString).filter(Boolean)
+      : [],
+    inquiryMessage: normalizeString(parsedBody.inquiryMessage),
     rejectionReason: normalizeString(parsedBody.rejectionReason),
     rejectionNote: normalizeString(parsedBody.rejectionNote),
   };
@@ -301,6 +323,15 @@ export default async function handler(request, response) {
 
   if (lead.eventName === 'odrzucenie' && !REJECTION_REASONS.has(lead.rejectionReason)) {
     return sendJson(response, 400, { error: 'A valid rejectionReason is required' });
+  }
+
+  if (lead.eventName === 'zapytanie_o_termin') {
+    if (
+      lead.interestedOffers.length === 0 ||
+      lead.interestedOffers.some((offer) => !INTERESTED_OFFERS.has(offer))
+    ) {
+      return sendJson(response, 400, { error: 'At least one valid interested offer is required' });
+    }
   }
 
   const apiKey = process.env.BREVO_API_KEY;

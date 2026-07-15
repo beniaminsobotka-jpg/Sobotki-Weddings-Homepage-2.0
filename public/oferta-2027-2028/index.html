@@ -378,6 +378,58 @@
       </section>
     </main>
 
+    <div id="inquiryModal" class="modal is-hidden" aria-hidden="true">
+      <div class="modal-backdrop" data-close-inquiry-modal></div>
+      <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="inquiry-modal-title">
+        <button class="modal-close" type="button" data-close-inquiry-modal aria-label="Zamknij popup">×</button>
+        <p class="eyebrow">Zapytanie o termin</p>
+        <h2 id="inquiry-modal-title">Która oferta Was interesuje?</h2>
+        <p class="modal-intro">
+          Możecie zaznaczyć kilka opcji. Do maila dołączymy też datę, salę i Wasz adres e-mail,
+          żebym mógł odpisać bezpośrednio.
+        </p>
+
+        <form id="inquiryForm" class="inquiry-form">
+          <fieldset>
+            <legend>Wybierzcie interesujące usługi</legend>
+            <label class="checkbox-option">
+              <input type="checkbox" name="interestedOffers" value="Foto + Video - Full pakiet 12h" />
+              <span>Foto + Video - Full pakiet 12h</span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="interestedOffers" value="Foto + Video - Przyjęcia 6h" />
+              <span>Foto + Video - Przyjęcia 6h</span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="interestedOffers" value="Foto Duo - reportaż foto" />
+              <span>Foto Duo - reportaż foto</span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="interestedOffers" value="Video - pakiet standardowy" />
+              <span>Video - pakiet standardowy</span>
+            </label>
+            <label class="checkbox-option">
+              <input type="checkbox" name="interestedOffers" value="Fotostacja portretowa" />
+              <span>Fotostacja portretowa</span>
+            </label>
+          </fieldset>
+
+          <label class="inquiry-message-label">
+            <span>Opowiedzcie nam w kilku słowach o Waszym ślubie</span>
+            <textarea
+              id="inquiryMessage"
+              name="inquiryMessage"
+              rows="4"
+              placeholder="Np. klimat wesela, liczba gości, co jest dla Was najważniejsze..."
+            ></textarea>
+          </label>
+
+          <p id="inquiryError" class="modal-error" aria-live="polite"></p>
+          <button class="button button-primary button-large" type="submit">Wyślij zapytanie</button>
+        </form>
+      </section>
+    </div>
+
     <script src="./script.js" defer></script>
   </body>
 </html>
