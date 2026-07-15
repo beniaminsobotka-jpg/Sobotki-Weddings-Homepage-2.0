@@ -225,7 +225,7 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
 };
 
 const sendInquiryNotification = async ({ apiKey, lead }) => {
-  const notifyToEmail = 'kontakt.sobotki@gmail.com';
+  const notifyToEmail = 'kontakt@sobotkiweddings.pl';
   const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
   const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 

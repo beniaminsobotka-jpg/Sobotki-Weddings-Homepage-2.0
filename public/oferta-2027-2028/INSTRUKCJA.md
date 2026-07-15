@@ -64,7 +64,7 @@ Po wysłaniu popupu endpoint wysyła mail przez Brevo SMTP API.
 
 Odbiorca maila dla tej ukrytej oferty jest ustawiony w kodzie na:
 
-`kontakt.sobotki@gmail.com`
+`kontakt@sobotkiweddings.pl`
 
 Zmienne środowiskowe:
 

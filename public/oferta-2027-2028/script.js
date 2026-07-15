@@ -1,6 +1,6 @@
 const CONFIG = {
   brandName: "Sobotki Weddings",
-  contactEmail: "kontakt.sobotki@gmail.com",
+  contactEmail: "kontakt@sobotkiweddings.pl",
   instagramUrl: "[link]",
   pdfUrl: "/oferta-sw-2027-2028.pdf",
 
