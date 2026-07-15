@@ -226,7 +226,7 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
 
 const sendInquiryNotification = async ({ apiKey, lead }) => {
   const notifyToEmail = 'kontakt@sobotkiweddings.pl';
-  const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
+  const notifyFromEmail = 'kontakt@sobotkiweddings.pl';
   const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 
   if (!notifyToEmail) {
@@ -234,7 +234,7 @@ const sendInquiryNotification = async ({ apiKey, lead }) => {
   }
 
   if (!notifyFromEmail) {
-    throw new Error('BREVO_NOTIFY_FROM_EMAIL is not configured');
+    throw new Error('Notification sender is not configured');
   }
 
   if (!notifyFromName) {
