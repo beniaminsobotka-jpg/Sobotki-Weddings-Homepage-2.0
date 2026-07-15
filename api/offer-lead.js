@@ -225,13 +225,12 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
 };
 
 const sendInquiryNotification = async ({ apiKey, lead }) => {
-  const notifyToEmail =
-    process.env.BREVO_OFFER_NOTIFY_TO_EMAIL || 'kontakt.sobotki@gmail.com';
+  const notifyToEmail = 'kontakt.sobotki@gmail.com';
   const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
   const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 
   if (!notifyToEmail) {
-    throw new Error('BREVO_OFFER_NOTIFY_TO_EMAIL is not configured');
+    throw new Error('Notification recipient is not configured');
   }
 
   if (!notifyFromEmail) {
@@ -274,7 +273,13 @@ const sendInquiryNotification = async ({ apiKey, lead }) => {
     throw new Error(`Inquiry notification failed: ${details.slice(0, 300)}`);
   }
 
-  return { ok: true };
+  const notificationResult = await notificationResponse.json().catch(() => ({}));
+
+  return {
+    ok: true,
+    to: notifyToEmail,
+    messageId: notificationResult?.messageId || '',
+  };
 };
 
 export default async function handler(request, response) {
@@ -387,7 +392,11 @@ export default async function handler(request, response) {
 
   if (lead.eventName === 'zapytanie_o_termin') {
     try {
-      await sendInquiryNotification({ apiKey, lead });
+      const notificationResult = await sendInquiryNotification({ apiKey, lead });
+
+      if (notificationResult?.messageId) {
+        warnings.push(`Brevo SMTP accepted messageId: ${notificationResult.messageId}`);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown notification error';
       console.error('[Offer Lead] Inquiry notification failed', { message });

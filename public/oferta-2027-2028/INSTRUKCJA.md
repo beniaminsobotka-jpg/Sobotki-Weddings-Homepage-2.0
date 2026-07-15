@@ -62,9 +62,12 @@ Dla dużego CTA klient najpierw widzi popup:
 
 Po wysłaniu popupu endpoint wysyła mail przez Brevo SMTP API.
 
+Odbiorca maila dla tej ukrytej oferty jest ustawiony w kodzie na:
+
+`kontakt.sobotki@gmail.com`
+
 Zmienne środowiskowe:
 
-- `BREVO_OFFER_NOTIFY_TO_EMAIL` - opcjonalny adres, na który mają przychodzić zapytania z tej oferty; jeśli go nie ustawisz, kod używa `kontakt.sobotki@gmail.com`
 - `BREVO_NOTIFY_FROM_EMAIL` - zweryfikowany nadawca w Brevo; bez tej zmiennej mail z popupu nie zostanie wysłany
 - `BREVO_NOTIFY_FROM_NAME` - nazwa nadawcy, np. `Sobotki Weddings`
 
