@@ -139,18 +139,18 @@ a {
 }
 
 .hero-copy-inner {
-  background: rgba(10, 10, 10, 0.4);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(10, 10, 10, 0.35);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
-  padding: clamp(24px, 5vw, 48px);
+  padding: clamp(24px, 4vw, 40px);
   max-width: 100%;
 }
 
 @media (min-width: 760px) {
   .hero-copy-inner {
-    max-width: 65%;
+    max-width: 90%;
   }
 }
 
@@ -204,11 +204,11 @@ h1, h2 {
 }
 
 h1 {
-  max-width: 780px;
-  margin-bottom: 24px;
-  font-size: clamp(2.2rem, 7vw, 4.2rem);
+  max-width: 100%;
+  margin-bottom: 20px;
+  font-size: clamp(2rem, 5vw, 3.4rem);
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 h2 {
