@@ -253,7 +253,8 @@ label {
   text-transform: uppercase;
 }
 
-input {
+input,
+textarea {
   width: 100%;
   border: 1px solid var(--color-line);
   border-radius: 18px;
@@ -266,31 +267,32 @@ input {
   transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
-input:focus {
+textarea {
+  min-height: 104px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
   border-color: rgba(212, 41, 41, 0.52);
   outline: none;
   background: white;
   box-shadow: 0 0 0 4px rgba(212, 41, 41, 0.1);
 }
 
-.availability-message,
-.form-error {
+.form-error,
+.form-status {
   min-height: 22px;
   margin: 0;
   font-size: 0.9rem;
 }
 
-.availability-message.is-free {
-  color: #207443;
-}
-
-.availability-message.is-blocked,
 .form-error {
   color: var(--color-accent-dark);
 }
 
-.availability-message a {
-  font-weight: 800;
+.form-status {
+  color: rgba(255, 255, 255, 0.76);
 }
 
 .button {
@@ -313,6 +315,12 @@ input:focus {
   transform: translateY(-2px);
 }
 
+.button:disabled {
+  cursor: default;
+  opacity: 0.72;
+  transform: none;
+}
+
 .button-primary {
   background: var(--color-ink);
   color: white;
@@ -327,6 +335,11 @@ input:focus {
 .button-ghost {
   border: 1px solid rgba(255, 255, 255, 0.28);
   color: white;
+}
+
+.button-large {
+  min-height: 64px;
+  padding: 18px 30px;
 }
 
 .offer {
@@ -567,16 +580,114 @@ details p {
   color: rgba(255, 255, 255, 0.74);
 }
 
+.final-cta .button-primary {
+  background: white;
+  color: var(--color-ink);
+}
+
 .cta-actions {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 520px;
+  max-width: 620px;
   margin: 32px auto 24px;
 }
 
 .contact-line {
   font-size: 0.9rem;
+}
+
+.pdf-inline-link {
+  display: inline-flex;
+  margin: 4px auto 22px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rejection-box {
+  max-width: 620px;
+  margin: 8px auto 28px;
+}
+
+.secondary-link {
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.36);
+  padding: 0 0 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.56);
+  cursor: pointer;
+  font: 700 0.82rem var(--font-sans);
+  letter-spacing: 0.04em;
+}
+
+.secondary-link:hover {
+  color: white;
+}
+
+.reject-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+.reject-form.is-hidden {
+  display: none;
+}
+
+fieldset {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+legend,
+.reject-note-label > span {
+  margin-bottom: 4px;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.radio-option input {
+  width: auto;
+  accent-color: var(--color-accent);
+}
+
+.reject-note-label {
+  color: white;
+}
+
+.reject-form textarea {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
 }
 
 .reveal {

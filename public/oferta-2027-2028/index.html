@@ -70,7 +70,11 @@
               <input id="weddingDate" name="weddingDate" type="date" required />
             </label>
 
-            <p id="availabilityMessage" class="availability-message" aria-live="polite"></p>
+            <label>
+              <span>Miejsce / nazwa sali</span>
+              <input id="venue" name="venue" type="text" autocomplete="organization" placeholder="np. Boho Pogoria" required />
+            </label>
+
             <p id="formError" class="form-error" aria-live="polite"></p>
 
             <button class="button button-primary" type="submit">Pokaż ofertę</button>
@@ -318,11 +322,55 @@
           najlepiej opowiedzieć Wasz dzień.
         </p>
         <div class="cta-actions">
-          <a id="reserveCta" class="button button-primary" href="mailto:[email]?subject=Zapytanie%20o%20termin%20-%20Sobotki%20Weddings">
-            Zarezerwuj termin
-          </a>
-          <a class="button button-ghost" data-pdf-link href="/oferta-sw-2027-2028.pdf">Pobierz ofertę w PDF</a>
+          <button id="reserveCta" class="button button-primary button-large" type="button">
+            Jestem zainteresowany — zapytaj o termin
+          </button>
         </div>
+        <p id="ctaStatus" class="form-status" aria-live="polite"></p>
+        <a class="pdf-inline-link" data-pdf-link href="/oferta-sw-2027-2028.pdf">Pobierz ofertę w PDF</a>
+
+        <div class="rejection-box">
+          <button id="showRejectSurvey" class="secondary-link" type="button">
+            To nie dla mnie / powiedz nam dlaczego
+          </button>
+
+          <form id="rejectForm" class="reject-form is-hidden" aria-hidden="true">
+            <fieldset>
+              <legend>Co było głównym powodem?</legend>
+              <label class="radio-option">
+                <input type="radio" name="reason" value="za drogo" required />
+                <span>za drogo</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="reason" value="szukam innego stylu" required />
+                <span>szukam innego stylu</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="reason" value="mam już fotografa" required />
+                <span>mam już fotografa</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="reason" value="termin mi nie pasuje" required />
+                <span>termin mi nie pasuje</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="reason" value="tylko sprawdzam ceny" required />
+                <span>tylko sprawdzam ceny</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="reason" value="inne" required />
+                <span>inne</span>
+              </label>
+            </fieldset>
+            <label class="reject-note-label">
+              <span>Dopisz coś, jeśli chcesz</span>
+              <textarea id="rejectNote" name="note" rows="3" placeholder="Krótka informacja dla nas"></textarea>
+            </label>
+            <button class="button button-secondary" type="submit">Wyślij odpowiedź</button>
+            <p id="rejectStatus" class="form-status" aria-live="polite"></p>
+          </form>
+        </div>
+
         <p class="contact-line">
           Instagram: <a data-contact-instagram href="[link]">[link]</a>
           · E-mail: <a data-contact-email href="mailto:[email]">[email]</a>
