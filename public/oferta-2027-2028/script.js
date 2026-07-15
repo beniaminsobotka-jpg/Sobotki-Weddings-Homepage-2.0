@@ -312,9 +312,40 @@ document.addEventListener("DOMContentLoaded", () => {
       // Only apply accordion logic on mobile view
       if (window.innerWidth <= 1079) {
         if (!card.classList.contains("expanded")) {
+          // 1. First (measure)
+          const firstRects = Array.from(packageCards).map(c => c.getBoundingClientRect());
+          
+          // 2. Execute (change classes)
           packageCards.forEach(c => c.classList.remove("expanded"));
           card.classList.add("expanded");
           
+          // 3. Last (measure)
+          const lastRects = Array.from(packageCards).map(c => c.getBoundingClientRect());
+          
+          // 4. Invert (apply transforms)
+          packageCards.forEach((c, i) => {
+            const deltaY = firstRects[i].top - lastRects[i].top;
+            c.style.transition = 'none';
+            c.style.transform = `translateY(${deltaY}px)`;
+          });
+          
+          // 5. Play (animate to 0)
+          requestAnimationFrame(() => {
+            packageCards.forEach(c => {
+              c.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), max-height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+              c.style.transform = 'translateY(0)';
+            });
+            
+            // Clean up
+            setTimeout(() => {
+              packageCards.forEach(c => {
+                c.style.transition = '';
+                c.style.transform = '';
+              });
+            }, 550);
+          });
+          
+          // Scroll expanded card into view if needed
           setTimeout(() => {
             const y = card.getBoundingClientRect().top + window.scrollY - 80;
             window.scrollTo({ top: y, behavior: "smooth" });

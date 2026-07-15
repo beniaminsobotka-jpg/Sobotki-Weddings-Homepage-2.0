@@ -1029,22 +1029,19 @@ legend,
     display: flex;
     flex-direction: column;
     gap: 0;
+    padding-top: 25px;
   }
   
   .package-card {
     max-height: 135px;
     overflow: hidden;
     cursor: pointer;
-    transition: max-height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s ease;
+    transition: max-height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
     border-radius: 28px;
     box-shadow: 0 -20px 30px rgba(0,0,0,0.5);
     position: relative;
     margin-top: -25px;
-  }
-  
-  .packages-grid > :nth-child(1) {
-    margin-top: 0;
-    box-shadow: none;
+    order: 1;
   }
 
   .package-card.expanded {
@@ -1052,6 +1049,7 @@ legend,
     margin-bottom: 25px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.6);
     z-index: 10;
+    order: 2;
   }
 }
 
