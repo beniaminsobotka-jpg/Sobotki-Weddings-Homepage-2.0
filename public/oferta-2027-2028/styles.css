@@ -1038,7 +1038,42 @@ legend,
 
 @media (min-width: 1080px) {
   .packages-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+    padding: 40px 0;
+    gap: 0;
+  }
+
+  .packages-grid > article {
+    width: 310px;
+    flex-shrink: 0;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  .packages-grid > :nth-child(1) {
+    transform: rotateY(15deg) translateX(30px) translateZ(-60px);
+    z-index: 1;
+  }
+  .packages-grid > :nth-child(2) {
+    transform: rotateY(5deg) translateX(10px) translateZ(-20px);
+    z-index: 2;
+  }
+  .packages-grid > :nth-child(3) {
+    transform: rotateY(-5deg) translateX(-10px) translateZ(-20px);
+    z-index: 2;
+  }
+  .packages-grid > :nth-child(4) {
+    transform: rotateY(-15deg) translateX(-30px) translateZ(-60px);
+    z-index: 1;
+  }
+
+  .packages-grid > article:hover {
+    transform: rotateY(0deg) translateX(0) translateZ(80px);
+    z-index: 10;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.8);
   }
 }
 
