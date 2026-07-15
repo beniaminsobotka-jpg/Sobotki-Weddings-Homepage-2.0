@@ -105,7 +105,13 @@ async function saveLead(eventName, lead, extra = {}) {
   });
 
   if (!response.ok) {
-    const details = await response.text().catch(() => "");
+    let details = "";
+    try {
+      const data = await response.json();
+      details = data?.details || data?.error || "";
+    } catch {
+      details = await response.text().catch(() => "");
+    }
     throw new Error(details || `Lead event failed with status ${response.status}`);
   }
 
@@ -243,7 +249,10 @@ inquiryForm.addEventListener("submit", async (event) => {
     closeInquiryModal();
   } catch (error) {
     console.warn("[Sobotki Offer] Nie udało się zapisać eventu zapytanie_o_termin", error);
-    inquiryError.textContent = "Coś poszło nie tak. Spróbuj jeszcze raz albo napisz do nas mailowo.";
+    inquiryError.textContent =
+      error instanceof Error
+        ? `Nie udało się wysłać zapytania: ${error.message}`
+        : "Coś poszło nie tak. Spróbuj jeszcze raz albo napisz do nas mailowo.";
     reserveCta.disabled = false;
     reserveCta.textContent = "Jestem zainteresowany — zapytaj o termin";
   }

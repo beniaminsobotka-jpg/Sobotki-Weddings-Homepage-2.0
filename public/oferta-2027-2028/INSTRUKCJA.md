@@ -64,8 +64,7 @@ Po wysłaniu popupu endpoint wysyła mail przez Brevo SMTP API.
 
 Zmienne środowiskowe:
 
-- `BREVO_OFFER_NOTIFY_TO_EMAIL` - adres, na który mają przychodzić zapytania z tej oferty; domyślnie kod używa `kontakt.sobotki@gmail.com`
-- `BREVO_NOTIFY_TO_EMAIL` - fallback, jeśli nie ustawisz osobnego `BREVO_OFFER_NOTIFY_TO_EMAIL`
+- `BREVO_OFFER_NOTIFY_TO_EMAIL` - opcjonalny adres, na który mają przychodzić zapytania z tej oferty; jeśli go nie ustawisz, kod używa `kontakt.sobotki@gmail.com`
 - `BREVO_NOTIFY_FROM_EMAIL` - zweryfikowany nadawca w Brevo; bez tej zmiennej mail z popupu nie zostanie wysłany
 - `BREVO_NOTIFY_FROM_NAME` - nazwa nadawcy, np. `Sobotki Weddings`
 

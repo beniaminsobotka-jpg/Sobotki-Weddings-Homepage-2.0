@@ -226,14 +226,12 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
 
 const sendInquiryNotification = async ({ apiKey, lead }) => {
   const notifyToEmail =
-    process.env.BREVO_OFFER_NOTIFY_TO_EMAIL ||
-    process.env.BREVO_NOTIFY_TO_EMAIL ||
-    'kontakt.sobotki@gmail.com';
+    process.env.BREVO_OFFER_NOTIFY_TO_EMAIL || 'kontakt.sobotki@gmail.com';
   const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
   const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 
   if (!notifyToEmail) {
-    throw new Error('BREVO_OFFER_NOTIFY_TO_EMAIL or BREVO_NOTIFY_TO_EMAIL is not configured');
+    throw new Error('BREVO_OFFER_NOTIFY_TO_EMAIL is not configured');
   }
 
   if (!notifyFromEmail) {
