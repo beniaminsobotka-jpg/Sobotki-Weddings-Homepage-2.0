@@ -232,8 +232,16 @@ const sendInquiryNotification = async ({ apiKey, lead }) => {
   const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
   const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 
-  if (!notifyToEmail || !notifyFromEmail || !notifyFromName) {
-    return { skipped: true, reason: 'Notification env vars are not configured' };
+  if (!notifyToEmail) {
+    throw new Error('BREVO_OFFER_NOTIFY_TO_EMAIL or BREVO_NOTIFY_TO_EMAIL is not configured');
+  }
+
+  if (!notifyFromEmail) {
+    throw new Error('BREVO_NOTIFY_FROM_EMAIL is not configured');
+  }
+
+  if (!notifyFromName) {
+    throw new Error('BREVO_NOTIFY_FROM_NAME is not configured');
   }
 
   const notificationResponse = await fetch(BREVO_SMTP_API_URL, {
@@ -340,6 +348,14 @@ export default async function handler(request, response) {
 
   if (!apiKey) {
     warnings.push('BREVO_API_KEY is not configured');
+    if (lead.eventName === 'zapytanie_o_termin') {
+      return sendJson(response, 500, {
+        error: 'Inquiry notification failed',
+        details: 'BREVO_API_KEY is not configured',
+        warnings,
+      });
+    }
+
     return sendJson(response, 200, { ok: true, skipped: true, warnings });
   }
 
@@ -373,11 +389,7 @@ export default async function handler(request, response) {
 
   if (lead.eventName === 'zapytanie_o_termin') {
     try {
-      const notificationResult = await sendInquiryNotification({ apiKey, lead });
-
-      if (notificationResult.skipped) {
-        warnings.push(notificationResult.reason);
-      }
+      await sendInquiryNotification({ apiKey, lead });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown notification error';
       console.error('[Offer Lead] Inquiry notification failed', { message });

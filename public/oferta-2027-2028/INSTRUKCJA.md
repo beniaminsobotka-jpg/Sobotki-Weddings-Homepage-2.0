@@ -66,12 +66,20 @@ Zmienne środowiskowe:
 
 - `BREVO_OFFER_NOTIFY_TO_EMAIL` - adres, na który mają przychodzić zapytania z tej oferty; domyślnie kod używa `kontakt.sobotki@gmail.com`
 - `BREVO_NOTIFY_TO_EMAIL` - fallback, jeśli nie ustawisz osobnego `BREVO_OFFER_NOTIFY_TO_EMAIL`
-- `BREVO_NOTIFY_FROM_EMAIL` - zweryfikowany nadawca w Brevo
+- `BREVO_NOTIFY_FROM_EMAIL` - zweryfikowany nadawca w Brevo; bez tej zmiennej mail z popupu nie zostanie wysłany
 - `BREVO_NOTIFY_FROM_NAME` - nazwa nadawcy, np. `Sobotki Weddings`
 
 Mail zawiera: imię, e-mail, datę ślubu, miejsce / salę, zaznaczone oferty, wiadomość z popupu, timestamp formularza i timestamp eventu.
 
 W mailu `replyTo` jest ustawione na adres e-mail klienta, więc możesz odpowiadać bezpośrednio z Gmaila / skrzynki odbiorczej.
+
+Jeśli klient widzi błąd przy wysyłce popupu, najpierw sprawdź w Vercelu, czy są ustawione:
+
+- `BREVO_API_KEY`
+- `BREVO_NOTIFY_FROM_EMAIL`
+- `BREVO_NOTIFY_FROM_NAME`
+
+Adres z `BREVO_NOTIFY_FROM_EMAIL` musi być zaakceptowany / zweryfikowany jako sender w Brevo.
 
 ## Gdzie zobaczysz wyniki sondy odrzuceń
 
