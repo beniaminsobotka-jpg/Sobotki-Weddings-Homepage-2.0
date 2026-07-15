@@ -303,3 +303,24 @@ rejectForm.addEventListener("submit", async (event) => {
 });
 
 setContactLinks();
+
+// Mobile Apple Wallet Accordion Logic
+document.addEventListener("DOMContentLoaded", () => {
+  const packageCards = document.querySelectorAll(".package-card");
+  packageCards.forEach(card => {
+    card.addEventListener("click", () => {
+      // Only apply accordion logic on mobile view
+      if (window.innerWidth <= 1079) {
+        if (!card.classList.contains("expanded")) {
+          packageCards.forEach(c => c.classList.remove("expanded"));
+          card.classList.add("expanded");
+          
+          setTimeout(() => {
+            const y = card.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top: y, behavior: "smooth" });
+          }, 350);
+        }
+      }
+    });
+  });
+});
