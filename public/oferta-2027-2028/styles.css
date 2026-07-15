@@ -463,53 +463,28 @@ input:focus, textarea:focus, select:focus {
   min-height: 100%;
   flex-direction: column;
   padding: 32px;
+  position: relative;
 }
 
-.packages-grid > :nth-child(1) { background-color: #29339B; border-top: none; }
-.packages-grid > :nth-child(2) { background-color: #FF3A20; border-top: none; }
-.packages-grid > :nth-child(3) { background-color: #74A4BC; border-top: none; }
-.packages-grid > :nth-child(4) { background-color: #B6D6CC; border-top: none; color: #000; }
-
-.packages-grid > :nth-child(4) .package-topline,
-.packages-grid > :nth-child(4) .package-topline span:first-child,
-.packages-grid > :nth-child(4) > p,
-.packages-grid > :nth-child(4) ul li,
-.packages-grid > :nth-child(4) .small-note {
-  color: rgba(0, 0, 0, 0.85);
+.package-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 40px var(--card-glow, transparent);
+  pointer-events: none;
+  transition: box-shadow 300ms ease;
+  z-index: 0;
 }
 
-.packages-grid > :nth-child(1) > p,
-.packages-grid > :nth-child(1) ul li,
-.packages-grid > :nth-child(1) .small-note,
-.packages-grid > :nth-child(2) > p,
-.packages-grid > :nth-child(2) ul li,
-.packages-grid > :nth-child(2) .small-note,
-.packages-grid > :nth-child(3) > p,
-.packages-grid > :nth-child(3) ul li,
-.packages-grid > :nth-child(3) .small-note {
-  color: rgba(255, 255, 255, 0.9);
+.package-card:hover::after {
+  box-shadow: inset 0 0 70px var(--card-glow, transparent);
 }
 
-.packages-grid > :nth-child(4) .package-subtitle {
-  color: #000;
-}
-
-.packages-grid > :nth-child(1) .package-subtitle,
-.packages-grid > :nth-child(3) .package-subtitle {
-  color: rgba(255, 255, 255, 0.9);
-}
-.packages-grid > :nth-child(2) .package-subtitle {
-  color: #fff;
-}
-
-.packages-grid > :nth-child(1) ul li::before,
-.packages-grid > :nth-child(2) ul li::before,
-.packages-grid > :nth-child(3) ul li::before {
-  color: rgba(255, 255, 255, 0.6);
-}
-.packages-grid > :nth-child(4) ul li::before {
-  color: rgba(0, 0, 0, 0.5);
-}
+.packages-grid > :nth-child(1) { border-color: #29339B; --card-glow: rgba(41, 51, 155, 0.15); }
+.packages-grid > :nth-child(2) { border-color: #FF3A20; --card-glow: rgba(255, 58, 32, 0.15); }
+.packages-grid > :nth-child(3) { border-color: #74A4BC; --card-glow: rgba(116, 164, 188, 0.15); }
+.packages-grid > :nth-child(4) { border-color: #B6D6CC; --card-glow: rgba(182, 214, 204, 0.15); }
 
 .package-featured {
   position: relative;
