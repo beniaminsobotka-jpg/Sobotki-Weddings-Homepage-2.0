@@ -632,6 +632,31 @@ li::before {
   color: var(--color-ink-soft);
 }
 
+/* Protect package cards from light-section general text rules */
+.light-section .package-card h3 {
+  color: white;
+}
+
+.light-section .package-card p:not(.price):not(.package-subtitle):not(.small-note),
+.light-section .package-card ul li {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.light-section .package-card .package-topline,
+.light-section .package-card .small-note {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.light-section .package-card .package-topline span:first-child {
+  color: white;
+}
+
+/* Set price color to match border */
+.packages-grid > :nth-child(1) .price { color: #29339B; }
+.packages-grid > :nth-child(2) .price { color: #FF3A20; }
+.packages-grid > :nth-child(3) .price { color: #74A4BC; }
+.packages-grid > :nth-child(4) .price { color: #B6D6CC; }
+
 .feature-grid {
   display: grid;
   gap: 16px;
