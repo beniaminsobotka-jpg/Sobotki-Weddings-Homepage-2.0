@@ -614,6 +614,31 @@ li::before {
   margin-top: 12px;
 }
 
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .addons-grid {
   display: grid;
   gap: 16px;
@@ -987,6 +1012,10 @@ legend,
 
   .feature-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .portfolio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .addons-grid {
