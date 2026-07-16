@@ -606,6 +606,32 @@ li::before {
   color: white;
 }
 
+.light-section {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  box-shadow: 0 0 0 100vmax var(--color-ink);
+  clip-path: inset(0 -100vmax);
+}
+
+.light-section .eyebrow {
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--color-paper);
+}
+
+.light-section .section-heading p:not(.eyebrow) {
+  color: rgba(5, 5, 5, 0.7);
+}
+
+.light-section .faq-list details,
+.light-section .addons-grid article {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.light-section .faq-list details p {
+  color: var(--color-ink-soft);
+}
+
 .feature-grid {
   display: grid;
   gap: 16px;
