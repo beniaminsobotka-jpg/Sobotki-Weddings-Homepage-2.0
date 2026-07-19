@@ -12,6 +12,7 @@ const REJECTION_REASONS = new Set([
   'za drogo',
   'szukam innego stylu',
   'mam już fotografa',
+  'mam już inną atrakcję',
   'termin mi nie pasuje',
   'tylko sprawdzam ceny',
   'inne',
@@ -23,6 +24,11 @@ const INTERESTED_OFFERS = new Set([
   'Foto Duo - reportaż foto',
   'Video - pakiet standardowy',
   'Fotostacja portretowa',
+  'Fotostacja Essential - 2900 zł',
+  'Fotostacja Exclusive - 3600 zł',
+  'Filmowe kółko - dodatek',
+  'Drukowana księga gości - dodatek',
+  'Dodatkowa godzina pracy',
 ]);
 
 const sendJson = (response, status, body) => {
@@ -71,6 +77,13 @@ const parseJsonBody = (body) => {
   return body ?? {};
 };
 
+const isPortraitsOffer = (lead) => lead.source === 'hidden_offer_portraits_2026_2027';
+
+const getOfferLabel = (lead) =>
+  isPortraitsOffer(lead)
+    ? 'Sobotki Portraits - oferta Fotostacji 2026/2027'
+    : 'Sobotki Weddings - ukryta oferta 2027/2028';
+
 const buildEventMessage = (lead) => [
   `Event: ${lead.eventName}`,
   `Source: ${lead.source || 'hidden_offer_2027_2028'}`,
@@ -87,7 +100,7 @@ const buildEventMessage = (lead) => [
   .join('\n');
 
 const buildInquiryText = (lead) => [
-  'ZAPYTANIE O TERMIN - ukryta oferta 2027/2028',
+  `ZAPYTANIE O TERMIN - ${getOfferLabel(lead)}`,
   '',
   `Imię: ${lead.name}`,
   `E-mail: ${lead.email}`,
@@ -108,7 +121,7 @@ const buildInquiryHtml = (lead) => `
           <td style="padding:24px 28px; background:#1a1a1a;">
             <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#bcbcbc;">ZAPYTANIE O TERMIN</div>
             <div style="margin-top:8px; font-family:Arial, Helvetica, sans-serif; font-size:28px; line-height:32px; font-weight:700; color:#ffffff;">
-              Ukryta oferta 2027/2028
+              ${escapeHtml(getOfferLabel(lead))}
             </div>
             <div style="margin-top:6px; font-family:Georgia, serif; font-size:20px; line-height:26px; font-style:italic; color:#d42929;">
               ${escapeHtml(lead.name)}
@@ -227,7 +240,12 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
 const sendInquiryNotification = async ({ apiKey, lead }) => {
   const notifyToEmail = 'kontakt@sobotkiweddings.pl';
   const notifyFromEmail = 'kontakt@sobotkiweddings.pl';
-  const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
+  const notifyFromName =
+    process.env.BREVO_NOTIFY_FROM_NAME ||
+    (isPortraitsOffer(lead) ? 'Sobotki Portraits' : 'Sobotki Weddings');
+  const subjectPrefix = isPortraitsOffer(lead)
+    ? '[ZAPYTANIE O TERMIN - FOTOSTACJA]'
+    : '[ZAPYTANIE O TERMIN]';
 
   if (!notifyToEmail) {
     throw new Error('Notification recipient is not configured');
@@ -262,7 +280,7 @@ const sendInquiryNotification = async ({ apiKey, lead }) => {
         email: lead.email,
         name: lead.name,
       },
-      subject: `[ZAPYTANIE O TERMIN] ${lead.name} | ${lead.weddingDate} | ${lead.venue}`,
+      subject: `${subjectPrefix} ${lead.name} | ${lead.weddingDate} | ${lead.venue}`,
       htmlContent: buildInquiryHtml(lead),
       textContent: buildInquiryText(lead),
     }),
