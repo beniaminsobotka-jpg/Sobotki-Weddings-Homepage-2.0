@@ -816,6 +816,33 @@ li::before {
   object-fit: cover;
 }
 
+.alert-section {
+  padding-top: 0;
+}
+
+.alert-box {
+  background: var(--color-red);
+  color: white;
+  padding: clamp(32px, 6vw, 54px) clamp(24px, 5vw, 42px);
+  border-radius: var(--radius-lg);
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.alert-box h2 {
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  margin-bottom: 20px;
+  color: white;
+}
+
+.alert-box p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  line-height: 1.65;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.95);
+}
+
 .faq-list {
   display: grid;
   gap: 10px;
