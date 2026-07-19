@@ -199,6 +199,61 @@ const generatePortfolio = () => {
     },
   ];
 
+  const latestImages: PortfolioItem[] = [
+    {
+      id: 2013,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-13-natalia-maciej-palace.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-13-natalia-maciej-palace-preview.avif',
+      title: 'W stronę słońca',
+      category: 'Editorial',
+      location: 'Plener',
+      alt: 'Para młoda biegnąca przed pałacem podczas sesji ślubnej',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2014,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-14-natalia-maciej-veil.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-14-natalia-maciej-veil-preview.avif',
+      title: 'Pod welonem',
+      category: 'Editorial',
+      location: 'Plener',
+      alt: 'Intymny portret pary młodej skrytej pod welonem',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2015,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-15-alicja-norbert-chairs.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-15-alicja-norbert-chairs-preview.avif',
+      title: 'Po ceremonii',
+      category: 'Black & White',
+      location: 'Plener',
+      alt: 'Czarno-biały portret pary młodej pośród krzeseł po ceremonii',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2016,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-16-alicja-norbert-guests.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-16-alicja-norbert-guests-preview.avif',
+      title: 'Wśród najbliższych',
+      category: 'Black & White',
+      location: 'Ceremonia',
+      alt: 'Czarno-biała fotografia pocałunku pary młodej wśród gości',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+  ];
+
   // 2. Generate Videos
   // Explicitly defining URLs to handle case sensitivity differences (e.g. 3rd video has lowercase 'd')
   const videoUrls = [
@@ -231,6 +286,11 @@ const generatePortfolio = () => {
   const insertPositions = [2, 7, 11, 16, 20, 25, 29, 34, 38, 42, 46, 49];
   recentImages.forEach((image, index) => {
     combined.splice(insertPositions[index], 0, image);
+  });
+
+  const latestInsertPositions = [5, 18, 35, 47];
+  latestImages.forEach((image, index) => {
+    combined.splice(latestInsertPositions[index], 0, image);
   });
 
   return combined;

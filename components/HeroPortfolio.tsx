@@ -16,6 +16,10 @@ const images = [
     alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
   },
   {
+    src: '/uploads/2026/07/homepage-highlights/highlight-alicja-norbert-chairs.avif',
+    alt: 'Czarno-biały portret Alicji i Norberta po ceremonii',
+  },
+  {
     src: '/uploads/2026/03/Karuzela_homepage_6.jpg',
     alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
   },
@@ -26,6 +30,10 @@ const images = [
   {
     src: '/uploads/2026/03/Karuzela_homepage_3.jpg',
     alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/07/homepage-highlights/highlight-natalia-maciej-veil.avif',
+    alt: 'Natalia i Maciej w świetle pod welonem',
   },
   {
     src: '/uploads/2026/07/homepage-highlights/highlight-karolina-mathew-hotel.avif',
