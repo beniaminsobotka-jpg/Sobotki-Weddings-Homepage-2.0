@@ -8,11 +8,14 @@ type PortfolioItem = {
   id: number;
   type: 'image' | 'video';
   src: string;
+  previewSrc?: string;
   title: string;
   category: string;
   location: string;
   alt: string;
   aspectRatio: string;
+  width: number;
+  height: number;
 };
 
 // --- DATA GENERATION ---
@@ -32,8 +35,169 @@ const generatePortfolio = () => {
       location: locations[id % locations.length],
       alt: `Fotografia ślubna Sobotki Weddings - ${categories[id % categories.length]} w ${locations[id % locations.length]}`,
       aspectRatio: '2 / 3',
+      width: 1365,
+      height: 2048,
     };
   });
+
+  const recentImages: PortfolioItem[] = [
+    {
+      id: 2001,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-01-ceremony-motion.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-01-ceremony-motion-preview.avif',
+      title: 'Światło i ruch',
+      category: 'Black & White',
+      location: 'Ceremonia',
+      alt: 'Artystyczna czarno-biała fotografia wnętrza kościoła w ruchu',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2002,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-02-couple-flash.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-02-couple-flash-preview.avif',
+      title: 'Tuż po ceremonii',
+      category: 'Wedding',
+      location: 'Polska',
+      alt: 'Roześmiana para młoda sfotografowana z reporterskim błyskiem',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2003,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-03-wedding-rings.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-03-wedding-rings-preview.avif',
+      title: 'Obrączki',
+      category: 'Black & White',
+      location: 'Polska',
+      alt: 'Czarno-białe zbliżenie dłoni nowożeńców i obrączek',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2004,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-04-wedding-car.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-04-wedding-car-preview.avif',
+      title: 'W drodze',
+      category: 'Wedding',
+      location: 'Polska',
+      alt: 'Uśmiechnięta para młoda w samochodzie uchwycona w ruchu',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2005,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-05-champagne.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-05-champagne-preview.avif',
+      title: 'Toast',
+      category: 'Wedding',
+      location: 'Przyjęcie',
+      alt: 'Panna młoda nalewająca szampana podczas przyjęcia weselnego',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2006,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-06-couple-motion.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-06-couple-motion-preview.avif',
+      title: 'Bez pozowania',
+      category: 'Black & White',
+      location: 'Plener',
+      alt: 'Dynamiczny czarno-biały portret bawiącej się pary młodej',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2007,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-07-couple-portrait.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-07-couple-portrait-preview.avif',
+      title: 'Blisko',
+      category: 'Editorial',
+      location: 'Plener',
+      alt: 'Bliski portret pary młodej pod welonem',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2008,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-08-groom-preparations.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-08-groom-preparations-preview.avif',
+      title: 'Przygotowania',
+      category: 'Black & White',
+      location: 'Polska',
+      alt: 'Czarno-biały reportaż z przygotowań pana młodego z rodziną',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2009,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-09-first-dance.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-09-first-dance-preview.avif',
+      title: 'Tylko wy',
+      category: 'Black & White',
+      location: 'Przyjęcie',
+      alt: 'Czarno-biały, emocjonalny kadr obejmującej się pary młodej',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2010,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-10-wedding-dance.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-10-wedding-dance-preview.avif',
+      title: 'Pierwszy taniec',
+      category: 'Wedding',
+      location: 'Przyjęcie',
+      alt: 'Para młoda podczas tańca w ciepłym świetle sali weselnej',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2011,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-11-wedding-guest.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-11-wedding-guest-preview.avif',
+      title: 'Mali goście',
+      category: 'Black & White',
+      location: 'Przyjęcie',
+      alt: 'Czarno-biały reporterski kadr dziecka w okularach przeciwsłonecznych',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2012,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-12-golden-hour.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-12-golden-hour-preview.avif',
+      title: 'Złota godzina',
+      category: 'Editorial',
+      location: 'Plener',
+      alt: 'Roześmiana para młoda podczas sesji o zachodzie słońca',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+  ];
 
   // 2. Generate Videos
   // Explicitly defining URLs to handle case sensitivity differences (e.g. 3rd video has lowercase 'd')
@@ -52,6 +216,8 @@ const generatePortfolio = () => {
     location: 'Film',
     alt: `Film ślubny Sobotki Weddings - realizacja ${i + 1}`,
     aspectRatio: '4 / 5',
+    width: 1080,
+    height: 1350,
   }));
 
   // 3. Weave them together (Insert videos at specific indices for visual balance)
@@ -59,6 +225,13 @@ const generatePortfolio = () => {
   combined.splice(4, 0, videos[0]);  // Insert near top
   combined.splice(14, 0, videos[1]); // Insert middle
   combined.splice(24, 0, videos[2]); // Insert lower
+
+  // 4. Distribute the newest photographs through the full story instead of
+  // grouping them at the end. This keeps colour and black-and-white frames balanced.
+  const insertPositions = [2, 7, 11, 16, 20, 25, 29, 34, 38, 42, 46, 49];
+  recentImages.forEach((image, index) => {
+    combined.splice(insertPositions[index], 0, image);
+  });
 
   return combined;
 };
@@ -180,13 +353,13 @@ export const PortfolioPage: React.FC = () => {
                                 ) : (
                                     !failedImages.has(item.id) ? (
                                         <img 
-                                            src={item.src} 
+                                            src={item.previewSrc ?? item.src}
                                             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                                             alt={item.alt}
                                             loading="lazy"
                                             decoding="async"
-                                            width={1365}
-                                            height={2048}
+                                            width={item.width}
+                                            height={item.height}
                                             onLoad={() => markItemAsLoaded(item.id)}
                                             onError={() => handleImageError(item.id)}
                                             className={`absolute inset-0 h-full w-full object-cover transition-[transform,opacity] duration-[0.8s] ease-out group-hover:scale-105 ${
