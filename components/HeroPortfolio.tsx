@@ -2,15 +2,63 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-const mixedIds = [2, 1, 6, 3, 8, 5, 4, 7];
-
-const images = mixedIds.map((imageId, i) => ({
-  id: i,
-  src: `/uploads/2026/03/Karuzela_homepage_${imageId}.jpg`
-}));
+const images = [
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_2.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/07/homepage-highlights/highlight-dorota-mateusz-guests.avif',
+    alt: 'Para młoda świętująca z gośćmi po ceremonii',
+  },
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_1.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_6.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/07/homepage-highlights/highlight-emilia-wojciech-guests.avif',
+    alt: 'Czarno-biały reporterski kadr gości weselnych',
+  },
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_3.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/07/homepage-highlights/highlight-karolina-mathew-hotel.avif',
+    alt: 'Para młoda przed Hotelem Monopol',
+  },
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_8.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/07/homepage-highlights/highlight-karolina-mathew-portrait.avif',
+    alt: 'Naturalny portret pary młodej',
+  },
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_5.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_4.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/07/homepage-highlights/highlight-karolina-mathew-city.avif',
+    alt: 'Czarno-biały portret pary młodej w centrum miasta',
+  },
+  {
+    src: '/uploads/2026/03/Karuzela_homepage_7.jpg',
+    alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+].map((image, id) => ({ ...image, id }));
 
 export const HeroPortfolio: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState(3); // Start w środku (3 to optymalny środek dla 8 elementów)
+  const [activeIndex, setActiveIndex] = useState(() => Math.floor(images.length / 2));
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -164,9 +212,8 @@ export const HeroPortfolio: React.FC = () => {
                             
                             <img 
                                 src={item.src} 
-                                alt="Wybrany kadr ślubny z portfolio Sobotki Weddings"
+                                alt={item.alt}
                                 loading={Math.abs(index - activeIndex) <= 1 ? 'eager' : 'lazy'}
-                                fetchPriority={isActive ? 'high' : 'low'}
                                 decoding="async"
                                 sizes="(min-width: 768px) 380px, 220px"
                                 width={380}
