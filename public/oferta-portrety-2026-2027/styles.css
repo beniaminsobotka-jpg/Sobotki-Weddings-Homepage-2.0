@@ -1169,15 +1169,7 @@ legend,
   }
 }
 
-@media (min-width: 1200px) {
-  .portrait-gallery {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
 
-  .portrait-gallery img {
-    aspect-ratio: 0.78 / 1;
-  }
-}
 
 @media (max-width: 520px) {
   .brand span:last-child,
