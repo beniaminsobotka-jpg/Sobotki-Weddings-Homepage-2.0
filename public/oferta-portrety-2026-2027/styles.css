@@ -799,9 +799,10 @@ li::before {
 
 .addons-list strong {
   color: var(--color-red);
-  font-family: var(--font-serif);
+  font-family: var(--font-heading);
   font-size: 1.35rem;
-  font-style: italic;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .addons-photo {
