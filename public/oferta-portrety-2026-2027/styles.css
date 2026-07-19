@@ -544,24 +544,22 @@ textarea:focus {
 }
 
 .strike {
-  position: relative;
-  color: #777;
-}
-
-.strike::after {
-  position: absolute;
-  right: 0;
-  bottom: 0.2em;
-  left: 0;
-  height: 0.13em;
-  background: var(--color-red);
-  content: "";
+  color: #888;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 0.85em;
+  text-decoration: line-through;
+  text-decoration-color: var(--color-red);
+  text-decoration-thickness: 0.1em;
 }
 
 .comparison-table {
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.14);
   border-radius: var(--radius-md);
+  max-width: 900px;
 }
 
 .comparison-row {
