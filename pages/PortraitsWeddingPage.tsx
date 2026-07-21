@@ -361,15 +361,17 @@ export const PortraitsWeddingPage: React.FC = () => {
       });
 
       setStatus('success');
-      setFormData({
-        fullname: '',
-        email: '',
-        date: '',
-        location: '',
-        guests: '',
-        source: '',
-        notes: '',
-      });
+      
+      localStorage.setItem('sobotki_lead_portraits', JSON.stringify({
+        name: formData.fullname,
+        email: formData.email,
+        weddingDate: formData.date,
+        venue: formData.location,
+        guestsCount: formData.guests,
+        howDidYouHear: formData.source
+      }));
+
+      window.location.href = '/oferta-portrety/';
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message);

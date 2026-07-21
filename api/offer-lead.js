@@ -77,11 +77,11 @@ const parseJsonBody = (body) => {
   return body ?? {};
 };
 
-const isPortraitsOffer = (lead) => lead.source === 'hidden_offer_portraits_2026_2027';
+const isPortraitsOffer = (lead) => lead.source === 'hidden_offer_portraits';
 
 const getOfferLabel = (lead) =>
   isPortraitsOffer(lead)
-    ? 'Sobotki Portraits - oferta Fotostacji 2026/2027'
+    ? 'Sobotki Portraits - oferta Fotostacji Ślubnej'
     : 'Sobotki Weddings - ukryta oferta 2027/2028';
 
 const buildEventMessage = (lead) => [
@@ -106,6 +106,8 @@ const buildInquiryText = (lead) => [
   `E-mail: ${lead.email}`,
   `Data ślubu: ${lead.weddingDate}`,
   `Miejsce / sala: ${lead.venue}`,
+  `Szacunkowa liczba gości: ${lead.guestsCount || '-'}`,
+  `Skąd dowiedzieliście się o nas: ${lead.howDidYouHear || '-'}`,
   `Interesujące oferty: ${lead.interestedOffers.join(', ')}`,
   `Wiadomość: ${lead.inquiryMessage || '-'}`,
   `Timestamp formularza: ${lead.timestamp}`,
@@ -136,6 +138,8 @@ const buildInquiryHtml = (lead) => `
                 ['E-mail', lead.email],
                 ['Data ślubu', lead.weddingDate],
                 ['Miejsce / sala', lead.venue],
+                ['Szacunkowa liczba gości', lead.guestsCount],
+                ['Skąd dowiedzieliście się o nas', lead.howDidYouHear],
                 ['Interesujące oferty', lead.interestedOffers.join(', ')],
                 ['Wiadomość', lead.inquiryMessage],
                 ['Timestamp formularza', lead.timestamp],
