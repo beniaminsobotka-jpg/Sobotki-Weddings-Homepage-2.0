@@ -368,7 +368,8 @@ export const PortraitsWeddingPage: React.FC = () => {
         weddingDate: formData.date,
         venue: formData.location,
         guestsCount: formData.guests,
-        howDidYouHear: formData.source
+        howDidYouHear: formData.source,
+        notes: formData.notes
       }));
 
       window.location.href = '/oferta-portrety/';

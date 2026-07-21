@@ -297,6 +297,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (document.querySelector("#venue")) document.querySelector("#venue").value = parsed.venue || "";
       if (document.querySelector("#guestsCount")) document.querySelector("#guestsCount").value = parsed.guestsCount || "";
       if (document.querySelector("#howDidYouHear")) document.querySelector("#howDidYouHear").value = parsed.howDidYouHear || "";
+      if (document.querySelector("textarea[name='inquiryMessage']")) {
+        document.querySelector("textarea[name='inquiryMessage']").value = parsed.notes || "";
+      }
       
       state.lastLead = getLeadData();
       
