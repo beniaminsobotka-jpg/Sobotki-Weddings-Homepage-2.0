@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowUpRight, Camera, Check, ChevronDown, Download, Printer, Sparkles, Star, Users, X } from 'lucide-react';
+import { ArrowUpRight, Camera, Check, ChevronDown, Download, Loader2, Printer, Sparkles, Star, Users, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { subscribeToBrevo } from '../utils/brevo';
@@ -832,9 +832,16 @@ export const PortraitsWeddingPage: React.FC = () => {
 
                 <button
                   disabled={status === 'loading'}
-                  className="mt-4 rounded-full bg-white px-8 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-gray-200 disabled:opacity-50"
+                  className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-full bg-white px-8 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black transition-colors hover:bg-gray-200 disabled:opacity-80 disabled:cursor-not-allowed sm:w-auto"
                 >
-                  {status === 'loading' ? 'Wysyłanie...' : 'Wyślij zapytanie'}
+                  {status === 'loading' ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 size={14} className="animate-spin" />
+                      Odblokowuję ofertę...
+                    </span>
+                  ) : (
+                    'Pokaż ofertę'
+                  )}
                 </button>
               </form>
             )}
