@@ -526,6 +526,32 @@ textarea:focus {
   clip-path: inset(0 -100vmax);
 }
 
+.comparison-inner {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+
+.comparison-photo {
+  display: block;
+  margin-top: 2rem;
+}
+
+.comparison-photo img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+@media (min-width: 780px) {
+  .comparison-inner {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  }
+  .comparison-photo {
+    margin-top: 0;
+  }
+}
+
 .comparison-heading {
   max-width: 850px;
   margin-bottom: 44px;
