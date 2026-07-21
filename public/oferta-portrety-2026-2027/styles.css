@@ -1230,6 +1230,14 @@ legend,
     order: 1;
   }
 
+  .addons-copy {
+    order: 2;
+  }
+
+  .addons-photo {
+    order: 1;
+  }
+
   .feature-split-reverse .guestbook-gallery {
     order: 2;
   }
