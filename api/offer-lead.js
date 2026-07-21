@@ -323,6 +323,8 @@ export default async function handler(request, response) {
     email: normalizeString(parsedBody.email).toLowerCase(),
     weddingDate: normalizeString(parsedBody.weddingDate),
     venue: normalizeString(parsedBody.venue),
+    guestsCount: normalizeString(parsedBody.guestsCount),
+    howDidYouHear: normalizeString(parsedBody.howDidYouHear),
     timestamp: normalizeString(parsedBody.timestamp) || new Date().toISOString(),
     eventTimestamp: normalizeString(parsedBody.eventTimestamp) || new Date().toISOString(),
     source: normalizeString(parsedBody.source) || 'hidden_offer_2027_2028',
