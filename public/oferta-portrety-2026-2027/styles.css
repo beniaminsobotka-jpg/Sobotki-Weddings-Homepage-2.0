@@ -1251,8 +1251,9 @@ legend,
   }
 
   .final-cta {
-    margin-right: 28px;
-    margin-left: 28px;
+    width: calc(100% - 56px);
+    margin-left: auto;
+    margin-right: auto;
     grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
   }
 
