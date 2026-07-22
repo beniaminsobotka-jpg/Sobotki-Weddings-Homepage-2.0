@@ -99,8 +99,10 @@ const buildEventMessage = (lead) => [
   .filter(Boolean)
   .join('\n');
 
+const getNotificationTitle = (lead) => lead.eventName === 'oferta_obejrzana' ? 'ZAPYTANIE O OFERTĘ' : 'ZAPYTANIE O TERMIN';
+
 const buildInquiryText = (lead) => [
-  `ZAPYTANIE O TERMIN - ${getOfferLabel(lead)}`,
+  `${getNotificationTitle(lead)} - ${getOfferLabel(lead)}`,
   '',
   `Imię: ${lead.name}`,
   `E-mail: ${lead.email}`,
@@ -121,7 +123,7 @@ const buildInquiryHtml = (lead) => `
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:720px; margin:0 auto; background:#ffffff; border:1px solid #e5e5e5; border-radius:16px; overflow:hidden;">
         <tr>
           <td style="padding:24px 28px; background:#1a1a1a;">
-            <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#bcbcbc;">ZAPYTANIE O TERMIN</div>
+            <div style="font-family:Arial, Helvetica, sans-serif; font-size:12px; letter-spacing:0.24em; text-transform:uppercase; color:#bcbcbc;">${escapeHtml(getNotificationTitle(lead))}</div>
             <div style="margin-top:8px; font-family:Arial, Helvetica, sans-serif; font-size:28px; line-height:32px; font-weight:700; color:#ffffff;">
               ${escapeHtml(getOfferLabel(lead))}
             </div>
@@ -247,9 +249,16 @@ const sendInquiryNotification = async ({ apiKey, lead }) => {
   const notifyFromName =
     process.env.BREVO_NOTIFY_FROM_NAME ||
     (isPortraitsOffer(lead) ? 'Sobotki Portraits' : 'Sobotki Weddings');
-  const subjectPrefix = isPortraitsOffer(lead)
-    ? '[ZAPYTANIE O TERMIN - FOTOSTACJA]'
-    : '[ZAPYTANIE O TERMIN]';
+  const getSubjectPrefix = (lead) => {
+    if (lead.eventName === 'oferta_obejrzana') {
+      return isPortraitsOffer(lead) ? '🔴 Zapytanie o ofertę - FOTOSTACJA' : '🔴 Zapytanie o ofertę';
+    }
+    if (lead.eventName === 'zapytanie_o_termin') {
+      return isPortraitsOffer(lead) ? '🟢 Zapytanie o termin - FOTOSTACJA' : '🟢 Zapytanie o termin';
+    }
+    return '[ZAPYTANIE]';
+  };
+  const subjectPrefix = getSubjectPrefix(lead);
 
   if (!notifyToEmail) {
     throw new Error('Notification recipient is not configured');
@@ -415,7 +424,7 @@ export default async function handler(request, response) {
     warnings.push(message);
   }
 
-  if (lead.eventName === 'zapytanie_o_termin') {
+  if (lead.eventName === 'zapytanie_o_termin' || lead.eventName === 'oferta_obejrzana') {
     try {
       notificationResult = await sendInquiryNotification({ apiKey, lead });
 

@@ -275,7 +275,7 @@ export default async function handler(request, response) {
     });
 
     if (notifyToEmail && notifyFromEmail && notifyFromName) {
-      const internalSubject = `[ZAPYTANIE OFERTOWE] ${serviceType} | ${fullName} | ${normalizedEmail}`;
+      const internalSubject = `🔴 Zapytanie o ofertę | ${serviceType} | ${fullName} | ${normalizedEmail}`;
       const internalLeadData = {
         formType,
         fullName,
