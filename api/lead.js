@@ -383,8 +383,8 @@ export default async function handler(request, response) {
           </html>
         `;
 
-        const buildAutoresponderText = (firstName) => \`
-Cześć \${firstName || '!'}
+        const buildAutoresponderText = (firstName) => `
+Cześć ${firstName || '!'}
 
 Bardzo dziękujemy za zainteresowanie Fotostacją Ślubną! Abyście mogli na spokojnie przejrzeć wszystkie pakiety i opcje, przygotowaliśmy dla Was dedykowaną, odblokowaną stronę z ofertą. Zapiszcie ten e-mail, aby móc łatwo wrócić do wyceny w dowolnym momencie.
 
@@ -395,7 +395,7 @@ W ofercie, na samym dole znajdziecie również formularz kontaktowy. Gdy już wy
 Do usłyszenia,
 Kacper i Marysia
 Zespół Sobotki Portraits
-        \`.trim();
+        `.trim();
 
         try {
           const autoResponse = await fetch(BREVO_SMTP_API_URL, {
