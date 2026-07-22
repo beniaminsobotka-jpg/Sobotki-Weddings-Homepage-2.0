@@ -347,6 +347,88 @@ export default async function handler(request, response) {
           message: error instanceof Error ? error.message : 'Unknown internal notify error',
         });
       }
+
+      if (formType === 'portraits_wedding') {
+        const buildAutoresponderHtml = (firstName) => `
+          <!doctype html>
+          <html>
+            <body style="margin:0; padding:24px; background:#f3f2ed;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px; margin:0 auto; background:#ffffff; border:1px solid #e5e5e5; border-radius:16px; overflow:hidden;">
+                <tr>
+                  <td style="padding:32px; background:#1a1a1a; text-align:center;">
+                    <div style="font-family:Arial, Helvetica, sans-serif; font-size:24px; font-weight:700; color:#ffffff;">
+                      Sobotki Portraits
+                    </div>
+                    <div style="margin-top:8px; font-family:Georgia, serif; font-size:16px; font-style:italic; color:#bcbcbc;">
+                      Dziękujemy za zapytanie!
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:32px; font-family:Arial, Helvetica, sans-serif; font-size:16px; line-height:24px; color:#333333;">
+                    <p style="margin-top:0;">Cześć ${escapeHtml(firstName || '!')}</p>
+                    <p>Bardzo dziękujemy za zainteresowanie Fotostacją Ślubną! Abyście mogli na spokojnie przejrzeć wszystkie pakiety i opcje, przygotowaliśmy dla Was dedykowaną, odblokowaną stronę z ofertą.</p>
+                    <p>Zapiszcie ten e-mail, aby móc łatwo wrócić do wyceny w dowolnym momencie.</p>
+                    
+                    <div style="text-align:center; margin:32px 0;">
+                      <a href="https://www.sobotkiweddings.pl/oferta-portrety/" style="display:inline-block; padding:16px 32px; background-color:#1a1a1a; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:30px; font-size:14px; text-transform:uppercase; letter-spacing:1px;">Przejdź do oferty</a>
+                    </div>
+                    
+                    <p>W ofercie, na samym dole znajdziecie również formularz kontaktowy. Gdy już wybierzecie interesujące Was opcje, dajcie nam znać przez ten formularz - sprawdzimy dostępność terminu i odezwiemy się najszybciej jak to możliwe.</p>
+                    <p style="margin-bottom:0;">Do usłyszenia,<br>Kacper i Marysia<br>Zespół Sobotki Portraits</p>
+                  </td>
+                </tr>
+              </table>
+            </body>
+          </html>
+        `;
+
+        const buildAutoresponderText = (firstName) => \`
+Cześć \${firstName || '!'}
+
+Bardzo dziękujemy za zainteresowanie Fotostacją Ślubną! Abyście mogli na spokojnie przejrzeć wszystkie pakiety i opcje, przygotowaliśmy dla Was dedykowaną, odblokowaną stronę z ofertą. Zapiszcie ten e-mail, aby móc łatwo wrócić do wyceny w dowolnym momencie.
+
+Twój link do oferty: https://www.sobotkiweddings.pl/oferta-portrety/
+
+W ofercie, na samym dole znajdziecie również formularz kontaktowy. Gdy już wybierzecie interesujące Was opcje, dajcie nam znać przez ten formularz - sprawdzimy dostępność terminu i odezwiemy się najszybciej jak to możliwe.
+
+Do usłyszenia,
+Kacper i Marysia
+Zespół Sobotki Portraits
+        \`.trim();
+
+        try {
+          const autoResponse = await fetch(BREVO_SMTP_API_URL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'api-key': apiKey,
+            },
+            body: JSON.stringify({
+              sender: {
+                email: notifyFromEmail,
+                name: 'Sobotki Portraits',
+              },
+              to: [
+                {
+                  email: normalizedEmail,
+                  name: fullName,
+                },
+              ],
+              subject: 'Wasza oferta Fotostacji Ślubnej - Sobotki Portraits',
+              htmlContent: buildAutoresponderHtml(firstName),
+              textContent: buildAutoresponderText(firstName),
+            }),
+          });
+          
+          if (!autoResponse.ok) {
+            console.error('[Brevo] Autoresponder failed', await autoResponse.text());
+          }
+        } catch (error) {
+          console.error('[Brevo] Autoresponder error', error);
+        }
+      }
     } else {
       console.warn('[Brevo] Internal notify skipped', {
         reason: 'Missing notify env configuration',
