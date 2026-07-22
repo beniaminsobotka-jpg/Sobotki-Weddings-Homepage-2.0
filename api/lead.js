@@ -371,11 +371,11 @@ export default async function handler(request, response) {
                     <p>Zapiszcie ten e-mail, aby móc łatwo wrócić do wyceny w dowolnym momencie.</p>
                     
                     <div style="text-align:center; margin:32px 0;">
-                      <a href="https://www.sobotkiweddings.pl/oferta-portrety/" style="display:inline-block; padding:16px 32px; background-color:#1a1a1a; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:30px; font-size:14px; text-transform:uppercase; letter-spacing:1px;">Przejdź do oferty</a>
+                      <a href="https://www.sobotkiweddings.pl/oferta-portrety/" style="display:inline-block; padding:16px 32px; background-color:#d42929; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:30px; font-size:14px; text-transform:uppercase; letter-spacing:1px;">Przejdź do oferty</a>
                     </div>
                     
                     <p>W ofercie, na samym dole znajdziecie również formularz kontaktowy. Gdy już wybierzecie interesujące Was opcje, dajcie nam znać przez ten formularz - sprawdzimy dostępność terminu i odezwiemy się najszybciej jak to możliwe.</p>
-                    <p style="margin-bottom:0;">Do usłyszenia,<br>Kacper i Marysia<br>Zespół Sobotki Portraits</p>
+                    <p style="margin-bottom:0;">Do usłyszenia,<br>Ania i Beniamin<br>Zespół Sobotki Portraits</p>
                   </td>
                 </tr>
               </table>
@@ -393,7 +393,7 @@ Twój link do oferty: https://www.sobotkiweddings.pl/oferta-portrety/
 W ofercie, na samym dole znajdziecie również formularz kontaktowy. Gdy już wybierzecie interesujące Was opcje, dajcie nam znać przez ten formularz - sprawdzimy dostępność terminu i odezwiemy się najszybciej jak to możliwe.
 
 Do usłyszenia,
-Kacper i Marysia
+Ania i Beniamin
 Zespół Sobotki Portraits
         `.trim();
 
