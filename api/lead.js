@@ -156,8 +156,8 @@ export default async function handler(request, response) {
   }
 
   const apiKey = process.env.BREVO_API_KEY;
-  const notifyToEmail = process.env.BREVO_NOTIFY_TO_EMAIL || 'kontakt@sobotkiweddings.pl';
-  const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL || 'kontakt@sobotkiweddings.pl';
+  const notifyToEmail = 'kontakt@sobotkiweddings.pl';
+  const notifyFromEmail = 'kontakt@sobotkiweddings.pl';
   const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 
   if (!apiKey) {
