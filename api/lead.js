@@ -156,9 +156,9 @@ export default async function handler(request, response) {
   }
 
   const apiKey = process.env.BREVO_API_KEY;
-  const notifyToEmail = process.env.BREVO_NOTIFY_TO_EMAIL;
-  const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL;
-  const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME;
+  const notifyToEmail = process.env.BREVO_NOTIFY_TO_EMAIL || 'kontakt@sobotkiweddings.pl';
+  const notifyFromEmail = process.env.BREVO_NOTIFY_FROM_EMAIL || 'kontakt@sobotkiweddings.pl';
+  const notifyFromName = process.env.BREVO_NOTIFY_FROM_NAME || 'Sobotki Weddings';
 
   if (!apiKey) {
     return sendJson(response, 500, { error: 'Brevo API key is not configured' });
