@@ -19,6 +19,7 @@ const PortraitsWeddingPage = lazy(async () => ({ default: (await import('./pages
 const PortraitsStationaryPage = lazy(async () => ({ default: (await import('./pages/PortraitsStationaryPage')).PortraitsStationaryPage }));
 const FilmPage = lazy(async () => ({ default: (await import('./pages/FilmPage')).FilmPage }));
 const ContactPage = lazy(async () => ({ default: (await import('./pages/ContactPage')).ContactPage }));
+const EditorialHomepage = lazy(async () => ({ default: (await import('./pages/EditorialHomepage')).EditorialHomepage }));
 
 // ScrollToTop component to reset scroll on route change
 const ScrollToTop = () => {
@@ -58,7 +59,7 @@ const AppShell: React.FC<{
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ isLoading, setIsLoading }) => {
   const location = useLocation();
-  const showLiquidBackground = ['/', '/film', '/kontakt'].includes(location.pathname);
+  const showLiquidBackground = ['/', '/film', '/kontakt'].includes(location.pathname) && location.pathname !== '/editorial-home';
 
   useEffect(() => {
     if (isLoading || typeof window === 'undefined') {
@@ -129,6 +130,7 @@ const AppShell: React.FC<{
                 <Route path="/portraits/event" element={<PortraitsEventPage />} />
                 <Route path="/portraits/wedding" element={<PortraitsWeddingPage />} />
                 <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
+                <Route path="/editorial-home" element={<EditorialHomepage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>
