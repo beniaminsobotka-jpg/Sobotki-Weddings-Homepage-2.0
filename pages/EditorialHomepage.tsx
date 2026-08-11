@@ -32,25 +32,25 @@ const editorialImages = [
     id: 2008,
     src: '/uploads/2026/07/portfolio/portfolio-2026-08-groom-preparations.avif',
     title: 'Przygotowania',
-    aspectRatio: '2/3',
+    aspectRatio: '3/2',
   },
   {
     id: 2012,
     src: '/uploads/2026/07/portfolio/portfolio-2026-12-golden-hour.avif',
     title: 'Golden Hour',
-    aspectRatio: '3/2',
+    aspectRatio: '2/3',
   },
   {
     id: 2013,
     src: '/uploads/2026/07/portfolio/portfolio-2026-13-natalia-maciej-palace.avif',
     title: 'Pałac',
-    aspectRatio: '2/3',
+    aspectRatio: '3/2',
   },
   {
     id: 2014,
     src: '/uploads/2026/07/portfolio/portfolio-2026-14-natalia-maciej-veil.avif',
     title: 'Welon',
-    aspectRatio: '3/2',
+    aspectRatio: '2/3',
   },
   {
     id: 2015,
@@ -62,7 +62,7 @@ const editorialImages = [
     id: 2018,
     src: '/uploads/2026/07/portfolio/portfolio-2026-18-luiza-steffen-guest.avif',
     title: 'Goście',
-    aspectRatio: '3/2',
+    aspectRatio: '2/3',
   }
 ];
 
