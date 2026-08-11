@@ -97,7 +97,7 @@ export const EditorialHomepage: React.FC = () => {
         </section>
 
         {/* PORTFOLIO GRID - MASONRY/EDITORIAL STYLE */}
-        <section className="px-4 md:px-8 pb-32">
+        <section className="px-4 md:px-8 py-20 md:py-32">
           <div className="max-w-7xl mx-auto">
             <div className="columns-1 md:columns-2 gap-4 md:gap-8 space-y-4 md:space-y-8">
               {editorialImages.map((img, idx) => (
