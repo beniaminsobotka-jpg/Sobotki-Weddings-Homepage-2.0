@@ -16,10 +16,6 @@ const images = [
     alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
   },
   {
-    src: '/uploads/2026/07/homepage-highlights/highlight-alicja-norbert-chairs-color.avif',
-    alt: 'Alicja i Norbert pośród krzeseł po ceremonii',
-  },
-  {
     src: '/uploads/2026/07/homepage-highlights/highlight-alicja-norbert-chairs.avif',
     alt: 'Czarno-biały portret Alicji i Norberta po ceremonii',
   },
