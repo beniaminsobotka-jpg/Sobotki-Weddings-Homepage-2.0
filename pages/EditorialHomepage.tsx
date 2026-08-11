@@ -85,9 +85,9 @@ export const EditorialHomepage: React.FC = () => {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="text-center z-10 w-full max-w-7xl mx-auto flex flex-col items-center mt-12 md:mt-0"
           >
-            <h1 className="font-serif uppercase font-bold text-[13vw] sm:text-[11vw] md:text-[9vw] lg:text-[8vw] leading-[0.85] tracking-tighter mix-blend-normal z-20 text-white mb-4 drop-shadow-lg">
+            <h1 className="font-serif uppercase font-bold text-[11vw] sm:text-[9vw] md:text-[8vw] lg:text-[7vw] leading-[0.85] tracking-tighter mix-blend-normal z-20 text-white mb-4 drop-shadow-lg">
               Sobotki<br />
-              <span className="font-playfair italic normal-case font-normal text-[15vw] sm:text-[13vw] md:text-[11vw] lg:text-[10vw] -mt-[4vw] block text-white">Weddings</span>
+              <span className="font-playfair italic normal-case font-normal text-[13vw] sm:text-[11vw] md:text-[10vw] lg:text-[9vw] -mt-[2vw] block text-white">Weddings</span>
             </h1>
             
             <p className="mt-8 md:mt-16 text-xs md:text-sm tracking-[0.3em] uppercase text-white/90 max-w-md mx-auto font-semibold drop-shadow-md">
