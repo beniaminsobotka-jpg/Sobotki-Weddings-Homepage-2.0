@@ -23,46 +23,46 @@ const editorialImages = [
     aspectRatio: '2/3',
   },
   {
-    id: 2009,
-    src: '/uploads/2026/07/portfolio/portfolio-2026-09-couple-sunset.avif',
-    title: 'Zachód Słońca',
+    id: 2006,
+    src: '/uploads/2026/07/portfolio/portfolio-2026-06-couple-motion.avif',
+    title: 'W Ruchu',
     aspectRatio: '3/2',
   },
   {
-    id: 2011,
-    src: '/uploads/2026/07/portfolio/portfolio-2026-11-bride-portrait.avif',
-    title: 'Portret',
+    id: 2008,
+    src: '/uploads/2026/07/portfolio/portfolio-2026-08-groom-preparations.avif',
+    title: 'Przygotowania',
     aspectRatio: '2/3',
+  },
+  {
+    id: 2012,
+    src: '/uploads/2026/07/portfolio/portfolio-2026-12-golden-hour.avif',
+    title: 'Golden Hour',
+    aspectRatio: '3/2',
   },
   {
     id: 2013,
-    src: '/uploads/2026/07/portfolio/portfolio-2026-13-first-dance.avif',
-    title: 'Pierwszy Taniec',
+    src: '/uploads/2026/07/portfolio/portfolio-2026-13-natalia-maciej-palace.avif',
+    title: 'Pałac',
+    aspectRatio: '2/3',
+  },
+  {
+    id: 2014,
+    src: '/uploads/2026/07/portfolio/portfolio-2026-14-natalia-maciej-veil.avif',
+    title: 'Welon',
     aspectRatio: '3/2',
   },
   {
-    id: 1,
-    src: `/uploads/2026/02/Portfolio_Sobotki_Weddings_1.avif`,
-    title: `Historia No. 1`,
+    id: 2015,
+    src: '/uploads/2026/07/portfolio/portfolio-2026-15-alicja-norbert-chairs.avif',
+    title: 'Detale',
     aspectRatio: '2/3',
   },
   {
-    id: 2,
-    src: `/uploads/2026/02/Portfolio_Sobotki_Weddings_2.avif`,
-    title: `Historia No. 2`,
+    id: 2018,
+    src: '/uploads/2026/07/portfolio/portfolio-2026-18-luiza-steffen-guest.avif',
+    title: 'Goście',
     aspectRatio: '3/2',
-  },
-  {
-    id: 3,
-    src: `/uploads/2026/02/Portfolio_Sobotki_Weddings_3.avif`,
-    title: `Historia No. 3`,
-    aspectRatio: '2/3',
-  },
-  {
-    id: 4,
-    src: `/uploads/2026/02/Portfolio_Sobotki_Weddings_4.avif`,
-    title: `Historia No. 4`,
-    aspectRatio: '2/3',
   }
 ];
 
@@ -74,19 +74,23 @@ export const EditorialHomepage: React.FC = () => {
       <div className="min-h-screen bg-[#FAFAFA] text-[#1A1A1A] font-sans selection:bg-[#1A1A1A] selection:text-[#FAFAFA]">
         
         {/* HERO SECTION */}
-        <section className="relative w-full min-h-[90vh] flex flex-col justify-center items-center px-4 md:px-8 py-20">
+        <section 
+          className="relative w-full min-h-[90vh] md:min-h-screen flex flex-col justify-center items-center px-4 md:px-8 py-20 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/uploads/2026/07/portfolio/portfolio-2026-07-couple-portrait.avif')" }}
+        >
+          <div className="absolute inset-0 bg-black/40"></div> {/* Subtle dark overlay for text readability */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-center z-10 w-full max-w-7xl mx-auto flex flex-col items-center"
+            className="text-center z-10 w-full max-w-7xl mx-auto flex flex-col items-center mt-12 md:mt-0"
           >
-            <h1 className="font-serif uppercase font-bold text-[13vw] sm:text-[11vw] md:text-[9vw] lg:text-[8vw] leading-[0.85] tracking-tighter mix-blend-difference z-20 text-[#1A1A1A] mb-4">
+            <h1 className="font-serif uppercase font-bold text-[13vw] sm:text-[11vw] md:text-[9vw] lg:text-[8vw] leading-[0.85] tracking-tighter mix-blend-normal z-20 text-white mb-4 drop-shadow-lg">
               Sobotki<br />
-              <span className="font-playfair italic normal-case font-normal text-[15vw] sm:text-[13vw] md:text-[11vw] lg:text-[10vw] -mt-[4vw] block">Weddings</span>
+              <span className="font-playfair italic normal-case font-normal text-[15vw] sm:text-[13vw] md:text-[11vw] lg:text-[10vw] -mt-[4vw] block text-white">Weddings</span>
             </h1>
             
-            <p className="mt-8 md:mt-16 text-xs md:text-sm tracking-[0.3em] uppercase text-[#1A1A1A]/70 max-w-md mx-auto font-semibold">
+            <p className="mt-8 md:mt-16 text-xs md:text-sm tracking-[0.3em] uppercase text-white/90 max-w-md mx-auto font-semibold drop-shadow-md">
               Fotografia Ślubna • Editorial • Ponadczasowa Elegancja
             </p>
           </motion.div>
