@@ -16,6 +16,10 @@ const images = [
     alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
   },
   {
+    src: '/uploads/2026/07/homepage-highlights/highlight-alicja-norbert-chairs-color.avif',
+    alt: 'Alicja i Norbert pośród krzeseł po ceremonii',
+  },
+  {
     src: '/uploads/2026/07/homepage-highlights/highlight-alicja-norbert-chairs.avif',
     alt: 'Czarno-biały portret Alicji i Norberta po ceremonii',
   },
@@ -36,6 +40,10 @@ const images = [
     alt: 'Natalia i Maciej w świetle pod welonem',
   },
   {
+    src: '/uploads/2026/07/homepage-highlights/highlight-luiza-steffen-laughter.avif',
+    alt: 'Roześmiana panna młoda podczas przyjęcia weselnego',
+  },
+  {
     src: '/uploads/2026/07/homepage-highlights/highlight-karolina-mathew-hotel.avif',
     alt: 'Para młoda przed Hotelem Monopol',
   },
@@ -54,6 +62,10 @@ const images = [
   {
     src: '/uploads/2026/03/Karuzela_homepage_4.jpg',
     alt: 'Wybrany kadr ślubny z portfolio Sobotki Weddings',
+  },
+  {
+    src: '/uploads/2026/07/homepage-highlights/highlight-luiza-steffen-guest.avif',
+    alt: 'Czarno-biały reporterski portret gościa weselnego',
   },
   {
     src: '/uploads/2026/07/homepage-highlights/highlight-karolina-mathew-city.avif',

@@ -254,6 +254,74 @@ const generatePortfolio = () => {
     },
   ];
 
+  const newestImages: PortfolioItem[] = [
+    {
+      id: 2017,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-17-luiza-steffen-manor.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-17-luiza-steffen-manor-preview.avif',
+      title: 'Pałacowe kadry',
+      category: 'Editorial',
+      location: 'Plener',
+      alt: 'Para młoda przed pałacem podczas sesji ślubnej',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2018,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-18-luiza-steffen-guest.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-18-luiza-steffen-guest-preview.avif',
+      title: 'Wzruszenie',
+      category: 'Black & White',
+      location: 'Przyjęcie',
+      alt: 'Czarno-biały reporterski portret wzruszonego gościa weselnego',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2019,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-19-luiza-steffen-laughter.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-19-luiza-steffen-laughter-preview.avif',
+      title: 'Szczery śmiech',
+      category: 'Black & White',
+      location: 'Przyjęcie',
+      alt: 'Czarno-biała fotografia roześmianej panny młodej przy weselnym stole',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2020,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-20-luiza-steffen-party.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-20-luiza-steffen-party-preview.avif',
+      title: 'Pełna energia',
+      category: 'Wedding',
+      location: 'Przyjęcie',
+      alt: 'Energetyczny reporterski kadr gości podczas przyjęcia weselnego',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2021,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-21-alicja-norbert-chairs-color.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-21-alicja-norbert-chairs-color-preview.avif',
+      title: 'Po ceremonii',
+      category: 'Editorial',
+      location: 'Plener',
+      alt: 'Portret Alicji i Norberta pośród krzeseł po ceremonii',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+  ];
+
   // 2. Generate Videos
   // Explicitly defining URLs to handle case sensitivity differences (e.g. 3rd video has lowercase 'd')
   const videoUrls = [
@@ -291,6 +359,11 @@ const generatePortfolio = () => {
   const latestInsertPositions = [5, 18, 35, 47];
   latestImages.forEach((image, index) => {
     combined.splice(latestInsertPositions[index], 0, image);
+  });
+
+  const newestInsertPositions = [8, 20, 32, 43, 52];
+  newestImages.forEach((image, index) => {
+    combined.splice(newestInsertPositions[index], 0, image);
   });
 
   return combined;
