@@ -68,3 +68,10 @@ How to test:
 2. Confirm that the contact appears in Brevo on the expected list with populated attributes.
 3. Confirm that the internal notification email arrives at `BREVO_NOTIFY_TO_EMAIL`.
 4. Confirm that the email contains the submitted fields and the correct `listId`.
+
+## Dropbox event galleries
+
+Mobile event galleries are available at `/galeria/:slug` and are backed by a
+private Dropbox folder through Vercel Functions. Setup, environment variables,
+event naming and the on-site workflow are documented in
+[`docs/GALERIA-DROPBOX.md`](docs/GALERIA-DROPBOX.md).
