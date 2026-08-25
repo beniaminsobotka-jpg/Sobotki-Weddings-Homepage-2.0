@@ -262,6 +262,11 @@ export const GalleryAdminPage: React.FC = () => {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [slugTouched, setSlugTouched] = useState(false);
   const [copiedSlug, setCopiedSlug] = useState('');
+  const [oauthCode, setOauthCode] = useState('');
+  const [oauthError, setOauthError] = useState('');
+  const [oauthRefreshToken, setOauthRefreshToken] = useState('');
+  const [isOauthLoading, setIsOauthLoading] = useState(false);
+  const [oauthTokenCopied, setOauthTokenCopied] = useState(false);
   const suffixRef = useRef('');
 
   const loadAdminData = async () => {
@@ -350,6 +355,75 @@ export const GalleryAdminPage: React.FC = () => {
     setShowForm(true);
     setError('');
     setNotice('');
+  };
+
+  const startDropboxAuthorization = async () => {
+    setIsOauthLoading(true);
+    setOauthError('');
+
+    try {
+      const response = await fetchWithTimeout('/api/admin-dropbox-oauth');
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Nie udało się otworzyć Dropboxa.'));
+      }
+
+      const payload = await response.json();
+
+      if (!payload.authorizeUrl) {
+        throw new Error('Dropbox nie zwrócił adresu autoryzacji.');
+      }
+
+      window.open(payload.authorizeUrl, '_blank', 'noopener,noreferrer');
+    } catch (authorizationError) {
+      setOauthError(
+        getRequestErrorMessage(authorizationError, 'Nie udało się otworzyć Dropboxa.')
+      );
+    } finally {
+      setIsOauthLoading(false);
+    }
+  };
+
+  const exchangeDropboxCode = async (event: FormEvent) => {
+    event.preventDefault();
+    setIsOauthLoading(true);
+    setOauthError('');
+    setOauthRefreshToken('');
+
+    try {
+      const response = await fetchWithTimeout('/api/admin-dropbox-oauth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: oauthCode }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          await getErrorMessage(response, 'Nie udało się wygenerować refresh tokenu.')
+        );
+      }
+
+      const payload = await response.json();
+
+      if (!payload.refreshToken) {
+        throw new Error('Dropbox nie zwrócił refresh tokenu.');
+      }
+
+      setOauthRefreshToken(payload.refreshToken);
+      setOauthCode('');
+    } catch (exchangeError) {
+      setOauthError(
+        getRequestErrorMessage(exchangeError, 'Nie udało się wygenerować refresh tokenu.')
+      );
+    } finally {
+      setIsOauthLoading(false);
+    }
+  };
+
+  const copyRefreshToken = async () => {
+    await navigator.clipboard.writeText(oauthRefreshToken);
+    setOauthTokenCopied(true);
+    window.setTimeout(() => setOauthTokenCopied(false), 1800);
   };
 
   const openEditForm = (gallery: GalleryRecord) => {
@@ -540,6 +614,99 @@ export const GalleryAdminPage: React.FC = () => {
             <Check size={15} aria-hidden="true" />
             {notice}
           </div>
+        )}
+
+        {!data && (
+          <section className="mt-7 rounded-2xl border border-black/10 bg-white/60 p-5 sm:p-7">
+            <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-black/40">
+              Trwałe połączenie
+            </p>
+            <h3 className="mt-2 font-serif text-2xl font-black uppercase tracking-[-0.035em]">
+              Połącz Dropbox przez OAuth
+            </h3>
+            <p className="mt-3 max-w-2xl font-sans text-sm leading-6 text-black/55">
+              Panel poprosi Dropbox o właściwe uprawnienia i wygeneruje refresh token, który nie
+              wygasa po kilku godzinach.
+            </p>
+
+            <div className="mt-6 grid gap-5 lg:grid-cols-2">
+              <div className="rounded-xl border border-black/[0.08] p-4">
+                <p className="font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-black/65">
+                  1. Autoryzuj konto
+                </p>
+                <p className="mt-2 font-sans text-xs leading-5 text-black/48">
+                  Dropbox otworzy się w nowej karcie. Zatwierdź dostęp, a następnie skopiuj
+                  wyświetlony kod.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void startDropboxAuthorization()}
+                  disabled={isOauthLoading}
+                  className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-black px-5 font-sans text-[9px] font-bold uppercase tracking-[0.16em] text-white disabled:opacity-40"
+                >
+                  <ExternalLink size={15} aria-hidden="true" />
+                  Otwórz autoryzację Dropbox
+                </button>
+              </div>
+
+              <form onSubmit={exchangeDropboxCode} className="rounded-xl border border-black/[0.08] p-4">
+                <label className="block font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-black/65">
+                  2. Wklej kod Dropbox
+                  <input
+                    type="text"
+                    value={oauthCode}
+                    onChange={(event) => setOauthCode(event.target.value)}
+                    autoComplete="off"
+                    className="mt-3 min-h-12 w-full rounded-xl border border-black/10 bg-white px-3 font-mono text-xs outline-none focus:border-black/35"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={isOauthLoading || !oauthCode.trim()}
+                  className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-black/15 px-5 font-sans text-[9px] font-bold uppercase tracking-[0.16em] disabled:opacity-35"
+                >
+                  {isOauthLoading && <Loader2 size={15} className="animate-spin" aria-hidden="true" />}
+                  Wygeneruj refresh token
+                </button>
+              </form>
+            </div>
+
+            {oauthError && (
+              <p className="mt-4 font-sans text-xs leading-5 text-[#a62020]" role="alert">
+                {oauthError}
+              </p>
+            )}
+
+            {oauthRefreshToken && (
+              <div className="mt-5 rounded-xl border border-emerald-800/15 bg-emerald-700/[0.06] p-4">
+                <p className="font-sans text-xs font-bold text-emerald-950">
+                  Refresh token został wygenerowany.
+                </p>
+                <p className="mt-2 font-sans text-xs leading-5 text-emerald-950/65">
+                  Skopiuj go teraz i dodaj w Vercelu jako <code>DROPBOX_REFRESH_TOKEN</code> dla
+                  Production. Usuń wtedy <code>DROPBOX_ACCESS_TOKEN</code>. Token zniknie po
+                  odświeżeniu tej strony.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <input
+                    type="password"
+                    readOnly
+                    value={oauthRefreshToken}
+                    aria-label="Wygenerowany refresh token"
+                    className="min-h-11 min-w-0 flex-1 rounded-xl border border-emerald-900/10 bg-white px-3 font-mono text-xs"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void copyRefreshToken()}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-950 px-4 font-sans text-[9px] font-bold uppercase tracking-[0.14em] text-white"
+                  >
+                    {oauthTokenCopied ? <Check size={14} /> : <Copy size={14} />}
+                    {oauthTokenCopied ? 'Skopiowano' : 'Kopiuj'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
         )}
 
         {data?.folders.length === 0 && (
