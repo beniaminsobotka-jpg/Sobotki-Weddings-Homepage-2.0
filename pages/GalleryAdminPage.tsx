@@ -134,9 +134,11 @@ const GalleryQrPreview = ({ url }: { url: string }) => {
 
 const LoginView = ({
   configured,
+  loadError,
   onAuthenticated,
 }: {
   configured: boolean;
+  loadError: string;
   onAuthenticated: () => Promise<void>;
 }) => {
   const [password, setPassword] = useState('');
@@ -207,9 +209,9 @@ const LoginView = ({
                 className="mt-3 min-h-14 w-full rounded-xl border border-white/15 bg-white/[0.06] px-4 font-sans text-base text-white outline-none transition-colors focus:border-white/45"
               />
             </label>
-            {error && (
+            {(error || loadError) && (
               <p className="mt-3 font-sans text-xs leading-5 text-[#ff8b8b]" role="alert">
-                {error}
+                {error || loadError}
               </p>
             )}
             <button
@@ -428,7 +430,13 @@ export const GalleryAdminPage: React.FC = () => {
   }
 
   if (authState === 'login') {
-    return <LoginView configured={configured} onAuthenticated={loadAdminData} />;
+    return (
+      <LoginView
+        configured={configured}
+        loadError={error}
+        onAuthenticated={loadAdminData}
+      />
+    );
   }
 
   return (
