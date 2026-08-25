@@ -155,10 +155,24 @@ export const resolveGallery = async (rawSlug) => {
 export const getGalleryRoot = () =>
   normalizeDropboxPath(process.env.DROPBOX_GALLERY_ROOT || '/Galerie');
 
+const readSecret = (value) => {
+  const trimmed = String(value || '').trim();
+  const unquoted =
+    trimmed.length >= 2 &&
+    ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'")))
+      ? trimmed.slice(1, -1).trim()
+      : trimmed;
+
+  return unquoted;
+};
+
+const readAccessToken = (value) => readSecret(value).replace(/^Bearer\s+/i, '').trim();
+
 const getAccessToken = async () => {
-  const refreshToken = process.env.DROPBOX_REFRESH_TOKEN;
-  const appKey = process.env.DROPBOX_APP_KEY;
-  const appSecret = process.env.DROPBOX_APP_SECRET;
+  const refreshToken = readSecret(process.env.DROPBOX_REFRESH_TOKEN);
+  const appKey = readSecret(process.env.DROPBOX_APP_KEY);
+  const appSecret = readSecret(process.env.DROPBOX_APP_SECRET);
 
   if (refreshToken && appKey && appSecret) {
     const now = Date.now();
@@ -204,8 +218,10 @@ const getAccessToken = async () => {
     return cachedAccessToken;
   }
 
-  if (process.env.DROPBOX_ACCESS_TOKEN) {
-    return process.env.DROPBOX_ACCESS_TOKEN;
+  const accessToken = readAccessToken(process.env.DROPBOX_ACCESS_TOKEN);
+
+  if (accessToken) {
+    return accessToken;
   }
 
   throw new GalleryError(
