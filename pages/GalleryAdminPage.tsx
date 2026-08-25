@@ -25,6 +25,7 @@ type GalleryRecord = {
   date: string;
   folder: string;
   coverPhoto: string;
+  photoCount: number | null;
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -74,6 +75,25 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 70);
+
+const formatPhotoCount = (count: number | null) => {
+  if (count === null) {
+    return 'Liczba zdjęć niedostępna';
+  }
+
+  if (count === 1) {
+    return '1 zdjęcie';
+  }
+
+  const modulo100 = count % 100;
+  const modulo10 = count % 10;
+
+  if ((modulo100 < 12 || modulo100 > 14) && modulo10 >= 2 && modulo10 <= 4) {
+    return `${count} zdjęcia`;
+  }
+
+  return `${count} zdjęć`;
+};
 
 const createSuffix = () => {
   const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -837,11 +857,17 @@ export const GalleryAdminPage: React.FC = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <span className={`inline-flex rounded-full px-2.5 py-1 font-sans text-[8px] font-bold uppercase tracking-[0.17em] ${
-                            gallery.active ? 'bg-emerald-700/10 text-emerald-800' : 'bg-black/[0.07] text-black/[0.45]'
-                          }`}>
-                            {gallery.active ? 'Aktywna' : 'Archiwum'}
-                          </span>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`inline-flex rounded-full px-2.5 py-1 font-sans text-[8px] font-bold uppercase tracking-[0.17em] ${
+                              gallery.active ? 'bg-emerald-700/10 text-emerald-800' : 'bg-black/[0.07] text-black/[0.45]'
+                            }`}>
+                              {gallery.active ? 'Aktywna' : 'Archiwum'}
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.055] px-2.5 py-1 font-sans text-[8px] font-bold uppercase tracking-[0.13em] text-black/55">
+                              <Image size={11} aria-hidden="true" />
+                              {formatPhotoCount(gallery.photoCount)}
+                            </span>
+                          </div>
                           <h3 className="mt-3 truncate font-serif text-2xl font-black uppercase tracking-[-0.035em]">
                             {gallery.title}
                           </h3>

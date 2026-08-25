@@ -30,9 +30,19 @@ const getAdminData = async () => {
     getGalleryRegistry({ fresh: true }),
     listGalleryFolders(),
   ]);
+  const galleries = await Promise.all(
+    (registry?.galleries || []).map(async (gallery) => {
+      try {
+        const photos = await listGalleryPhotos(gallery);
+        return { ...gallery, photoCount: photos.length };
+      } catch {
+        return { ...gallery, photoCount: null };
+      }
+    })
+  );
 
   return {
-    galleries: [...(registry?.galleries || [])].sort(
+    galleries: galleries.sort(
       (first, second) =>
         Number(second.active) - Number(first.active) ||
         second.createdAt.localeCompare(first.createdAt)
