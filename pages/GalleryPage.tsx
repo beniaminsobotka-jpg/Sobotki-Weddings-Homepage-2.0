@@ -38,8 +38,8 @@ const DEFAULT_REFRESH_INTERVAL = 10_000;
 
 const GalleryBrand = ({ light = true }: { light?: boolean }) => (
   <Link
-    to="/"
-    aria-label="Sobotki Weddings — strona główna"
+    to="/portraits"
+    aria-label="Sobotki Portraits"
     className={`inline-flex flex-col items-center leading-none transition-opacity hover:opacity-75 ${
       light ? 'text-white' : 'text-brand-black'
     }`}
