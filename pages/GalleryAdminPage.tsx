@@ -80,6 +80,28 @@ const getErrorMessage = async (response: Response, fallback: string) => {
   return payload?.error || fallback;
 };
 
+const fetchWithTimeout = async (
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  timeoutMs = 15_000
+) => {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+};
+
+const getRequestErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof DOMException && error.name === 'AbortError'
+    ? 'Dropbox nie odpowiedział w ciągu 15 sekund. Sprawdź token i uprawnienia aplikacji.'
+    : error instanceof Error
+      ? error.message
+      : fallback;
+
 const setNoIndex = () => {
   const robotsMeta = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
   const previousRobots = robotsMeta?.content;
@@ -151,7 +173,7 @@ const LoginView = ({
     setError('');
 
     try {
-      const response = await fetch('/api/admin-gallery-auth', {
+      const response = await fetchWithTimeout('/api/admin-gallery-auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -164,7 +186,7 @@ const LoginView = ({
       setPassword('');
       await onAuthenticated();
     } catch (loginError) {
-      setError(loginError instanceof Error ? loginError.message : 'Nie udało się zalogować.');
+      setError(getRequestErrorMessage(loginError, 'Nie udało się zalogować.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -247,7 +269,7 @@ export const GalleryAdminPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/admin-galleries', {
+      const response = await fetchWithTimeout('/api/admin-galleries', {
         headers: { Accept: 'application/json' },
       });
 
@@ -264,7 +286,8 @@ export const GalleryAdminPage: React.FC = () => {
       setData((await response.json()) as AdminData);
       setAuthState('ready');
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'Nie udało się wczytać panelu.');
+      setError(getRequestErrorMessage(loadError, 'Nie udało się wczytać panelu.'));
+      setAuthState('ready');
     } finally {
       setIsLoading(false);
     }
@@ -277,7 +300,7 @@ export const GalleryAdminPage: React.FC = () => {
 
     const checkSession = async () => {
       try {
-        const response = await fetch('/api/admin-gallery-auth');
+        const response = await fetchWithTimeout('/api/admin-gallery-auth');
         const status = await response.json();
         setConfigured(status.configured === true);
 

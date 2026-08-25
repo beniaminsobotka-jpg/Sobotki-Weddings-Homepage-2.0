@@ -224,6 +224,26 @@ const readDropboxError = async (response) => {
   }
 };
 
+const throwDropboxAuthError = (response, errorSummary) => {
+  if (response.status === 401 && errorSummary.includes('missing_scope')) {
+    throw new GalleryError(
+      'Aplikacja Dropbox nie ma wymaganych uprawnień. Zapisz uprawnienia i wygeneruj nowy token.',
+      502,
+      'dropbox_missing_scope'
+    );
+  }
+
+  if (response.status === 401) {
+    cachedAccessToken = null;
+    cachedAccessTokenExpiresAt = 0;
+    throw new GalleryError(
+      'Token Dropbox jest nieprawidłowy albo wygasł. Wygeneruj nowy token.',
+      502,
+      'dropbox_invalid_token'
+    );
+  }
+};
+
 const dropboxRpc = async (endpoint, payload) => {
   const accessToken = await getAccessToken();
   const dropboxResponse = await fetch(`${DROPBOX_API_URL}/${endpoint}`, {
@@ -238,13 +258,10 @@ const dropboxRpc = async (endpoint, payload) => {
   if (!dropboxResponse.ok) {
     const errorSummary = await readDropboxError(dropboxResponse);
 
+    throwDropboxAuthError(dropboxResponse, errorSummary);
+
     if (dropboxResponse.status === 409 && errorSummary.includes('not_found')) {
       throw new GalleryError('Nie znaleziono takiej galerii.', 404, 'gallery_not_found');
-    }
-
-    if (dropboxResponse.status === 401) {
-      cachedAccessToken = null;
-      cachedAccessTokenExpiresAt = 0;
     }
 
     throw new GalleryError(
@@ -306,6 +323,8 @@ export const getGalleryRegistry = async ({ fresh = false } = {}) => {
 
   if (!dropboxResponse.ok) {
     const errorSummary = await readDropboxError(dropboxResponse);
+
+    throwDropboxAuthError(dropboxResponse, errorSummary);
 
     if (dropboxResponse.status === 409 && errorSummary.includes('not_found')) {
       cachedRegistry = null;
