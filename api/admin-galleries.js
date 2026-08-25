@@ -111,6 +111,23 @@ export default async function handler(request, response) {
       galleries: [],
     };
 
+    if (action === 'delete') {
+      const slug = normalizeText(body.slug, 96).toLowerCase();
+      const galleryIndex = registry.galleries.findIndex((gallery) => gallery.slug === slug);
+
+      if (galleryIndex < 0) {
+        return sendJson(response, 404, { error: 'Nie znaleziono galerii.' });
+      }
+
+      if (registry.galleries[galleryIndex].active) {
+        return sendJson(response, 409, { error: 'Najpierw przenieś galerię do archiwum.' });
+      }
+
+      registry.galleries.splice(galleryIndex, 1);
+      await saveGalleryRegistry(registry);
+      return sendJson(response, 200, await getAdminData());
+    }
+
     if (action === 'set_cover') {
       const slug = normalizeText(body.slug, 96).toLowerCase();
       const photoName = normalizeText(body.photoName, 255);

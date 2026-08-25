@@ -16,6 +16,7 @@ import {
   QrCode,
   RefreshCw,
   RotateCcw,
+  Trash2,
   X,
 } from 'lucide-react';
 
@@ -672,6 +673,46 @@ export const GalleryAdminPage: React.FC = () => {
     }
   };
 
+  const deleteGallery = async (gallery: GalleryRecord) => {
+    if (gallery.active) {
+      setError('Najpierw przenieś galerię do archiwum.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Usunąć galerię „${gallery.title}”? Jej publiczny adres przestanie działać. Folder i zdjęcia na Dropboxie pozostaną bez zmian.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+    setNotice('');
+
+    try {
+      const response = await fetchWithTimeout('/api/admin-galleries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', slug: gallery.slug }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Nie udało się usunąć galerii.'));
+      }
+
+      setData((await response.json()) as AdminData);
+      setNotice('Galeria została usunięta. Zdjęcia na Dropboxie pozostały bez zmian.');
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error ? deleteError.message : 'Nie udało się usunąć galerii.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const copyGalleryUrl = async (gallery: GalleryRecord) => {
     const url = `${origin}/galeria/${gallery.slug}`;
     await navigator.clipboard.writeText(url);
@@ -711,7 +752,10 @@ export const GalleryAdminPage: React.FC = () => {
         color: { dark: '#000000', light: '#FFFFFF' },
         errorCorrectionLevel: 'H',
       });
-      const qrImage = await loadCanvasImage(qrDataUrl);
+      const [qrImage, logoImage] = await Promise.all([
+        loadCanvasImage(qrDataUrl),
+        loadCanvasImage('/sobotki-portraits-logo.png'),
+      ]);
       const canvas = document.createElement('canvas');
       canvas.width = 2480;
       canvas.height = 3508;
@@ -746,30 +790,46 @@ export const GalleryAdminPage: React.FC = () => {
       };
 
       drawFittedText(
-        'POBIERZ ZDJĘCIA NA TELEFON',
-        560,
+        'POBIERZ ZDJĘCIA',
+        470,
         2110,
-        210,
+        270,
         (size) => `800 ${size}px "podium-sharp-variable", "Arial Narrow", sans-serif`
       );
       drawFittedText(
-        'Zeskanuj kod QR, aby otworzyć galerię zdjęć z dzisiejszej imprezy',
-        760,
+        'NA TELEFON',
+        720,
+        1700,
+        270,
+        (size) => `800 ${size}px "podium-sharp-variable", "Arial Narrow", sans-serif`
+      );
+      drawFittedText(
+        'Zeskanuj kod, aby otworzyć galerię zdjęć z dzisiejszej imprezy',
+        930,
         2050,
         60,
         (size) => `italic ${size}px "Playfair Display", serif`
       );
 
-      const qrSize = 1600;
-      context.drawImage(qrImage, (canvas.width - qrSize) / 2, 930, qrSize, qrSize);
+      const qrSize = 1500;
+      context.drawImage(qrImage, (canvas.width - qrSize) / 2, 1070, qrSize, qrSize);
 
-      drawFittedText(
-        'SOBOTKI PORTRAITS',
-        3070,
-        1200,
-        125,
-        (size) => `600 ${size}px "podium-sharp-variable", "Arial Narrow", sans-serif`
-      );
+      const blackLogo = document.createElement('canvas');
+      blackLogo.width = logoImage.naturalWidth;
+      blackLogo.height = logoImage.naturalHeight;
+      const logoContext = blackLogo.getContext('2d');
+
+      if (!logoContext) {
+        throw new Error('Nie udało się przygotować logo na karcie.');
+      }
+
+      logoContext.drawImage(logoImage, 0, 0);
+      logoContext.globalCompositeOperation = 'source-in';
+      logoContext.fillStyle = '#000000';
+      logoContext.fillRect(0, 0, blackLogo.width, blackLogo.height);
+      const logoWidth = 1000;
+      const logoHeight = logoWidth * (blackLogo.height / blackLogo.width);
+      context.drawImage(blackLogo, (canvas.width - logoWidth) / 2, 2920, logoWidth, logoHeight);
 
       context.strokeStyle = '#D8D8D8';
       context.lineWidth = 2;
@@ -1131,6 +1191,17 @@ export const GalleryAdminPage: React.FC = () => {
                       {gallery.active ? <Archive size={14} /> : <RotateCcw size={14} />}
                       {gallery.active ? 'Archiwizuj' : 'Przywróć'}
                     </button>
+                    {!gallery.active && (
+                      <button
+                        type="button"
+                        onClick={() => void deleteGallery(gallery)}
+                        disabled={isLoading}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-red-800/20 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] text-red-800 transition-colors hover:bg-red-800 hover:text-white disabled:opacity-40"
+                      >
+                        <Trash2 size={14} aria-hidden="true" />
+                        Usuń
+                      </button>
+                    )}
                   </div>
                 </article>
               );
