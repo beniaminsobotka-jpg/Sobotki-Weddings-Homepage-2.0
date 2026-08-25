@@ -95,6 +95,78 @@ const formatPhotoCount = (count: number | null) => {
   return `${count} zdjęć`;
 };
 
+const loadCanvasImage = (source: string) =>
+  new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new window.Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Nie udało się przygotować kodu QR.'));
+    image.src = source;
+  });
+
+const canvasToA4Pdf = async (canvas: HTMLCanvasElement) => {
+  const jpegBlob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error('Nie udało się utworzyć pliku PDF.'))),
+      'image/jpeg',
+      0.98
+    );
+  });
+  const jpegBytes = new Uint8Array(await jpegBlob.arrayBuffer());
+  const encoder = new TextEncoder();
+  const chunks: Uint8Array[] = [];
+  const offsets = Array<number>(6).fill(0);
+  let byteLength = 0;
+
+  const append = (value: string | Uint8Array) => {
+    const bytes = typeof value === 'string' ? encoder.encode(value) : value;
+    chunks.push(bytes);
+    byteLength += bytes.byteLength;
+  };
+  const beginObject = (id: number) => {
+    offsets[id] = byteLength;
+    append(`${id} 0 obj\n`);
+  };
+
+  append('%PDF-1.4\n%Sobotki Portraits\n');
+  beginObject(1);
+  append('<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+  beginObject(2);
+  append('<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n');
+  beginObject(3);
+  append(
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>\nendobj\n'
+  );
+  beginObject(4);
+  append(
+    `<< /Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.byteLength} >>\nstream\n`
+  );
+  append(jpegBytes);
+  append('\nendstream\nendobj\n');
+
+  const pageContent = encoder.encode('q\n595.28 0 0 841.89 0 0 cm\n/Im0 Do\nQ\n');
+  beginObject(5);
+  append(`<< /Length ${pageContent.byteLength} >>\nstream\n`);
+  append(pageContent);
+  append('endstream\nendobj\n');
+
+  const xrefOffset = byteLength;
+  append('xref\n0 6\n0000000000 65535 f \n');
+  for (let id = 1; id <= 5; id += 1) {
+    append(`${String(offsets[id]).padStart(10, '0')} 00000 n \n`);
+  }
+  append(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+
+  const pdfBytes = new Uint8Array(byteLength);
+  let writeOffset = 0;
+
+  chunks.forEach((chunk) => {
+    pdfBytes.set(chunk, writeOffset);
+    writeOffset += chunk.byteLength;
+  });
+
+  return new Blob([pdfBytes.buffer], { type: 'application/pdf' });
+};
+
 const createSuffix = () => {
   const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
   const bytes = new Uint8Array(5);
@@ -299,6 +371,7 @@ export const GalleryAdminPage: React.FC = () => {
   const [selectedCoverPhoto, setSelectedCoverPhoto] = useState('');
   const [coverError, setCoverError] = useState('');
   const [isCoverLoading, setIsCoverLoading] = useState(false);
+  const [cardGeneratingSlug, setCardGeneratingSlug] = useState('');
   const suffixRef = useRef('');
 
   useEffect(() => {
@@ -619,6 +692,117 @@ export const GalleryAdminPage: React.FC = () => {
     link.click();
   };
 
+  const downloadGalleryCard = async (gallery: GalleryRecord) => {
+    setCardGeneratingSlug(gallery.slug);
+    setError('');
+
+    try {
+      await document.fonts.ready;
+      await Promise.all([
+        document.fonts.load('800 180px "podium-sharp-variable"'),
+        document.fonts.load('italic 58px "Playfair Display"'),
+        document.fonts.load('700 32px "DM Sans"'),
+      ]);
+
+      const galleryUrl = `${origin}/galeria/${gallery.slug}`;
+      const qrDataUrl = await QRCode.toDataURL(galleryUrl, {
+        width: 1600,
+        margin: 2,
+        color: { dark: '#000000', light: '#FFFFFF' },
+        errorCorrectionLevel: 'H',
+      });
+      const qrImage = await loadCanvasImage(qrDataUrl);
+      const canvas = document.createElement('canvas');
+      canvas.width = 2480;
+      canvas.height = 3508;
+      const context = canvas.getContext('2d');
+
+      if (!context) {
+        throw new Error('Nie udało się przygotować karty A4.');
+      }
+
+      context.fillStyle = '#FFFFFF';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = '#000000';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+
+      const drawFittedText = (
+        text: string,
+        y: number,
+        maxWidth: number,
+        initialSize: number,
+        font: (size: number) => string
+      ) => {
+        let size = initialSize;
+        context.font = font(size);
+
+        while (context.measureText(text).width > maxWidth && size > 24) {
+          size -= 2;
+          context.font = font(size);
+        }
+
+        context.fillText(text, canvas.width / 2, y);
+      };
+
+      drawFittedText(
+        'POBIERZ ZDJĘCIA NA TELEFON',
+        560,
+        2110,
+        210,
+        (size) => `800 ${size}px "podium-sharp-variable", "Arial Narrow", sans-serif`
+      );
+      drawFittedText(
+        'Zeskanuj kod QR, aby otworzyć galerię zdjęć z dzisiejszej imprezy',
+        760,
+        2050,
+        60,
+        (size) => `italic ${size}px "Playfair Display", serif`
+      );
+
+      const qrSize = 1600;
+      context.drawImage(qrImage, (canvas.width - qrSize) / 2, 930, qrSize, qrSize);
+
+      drawFittedText(
+        'SOBOTKI PORTRAITS',
+        3070,
+        1200,
+        125,
+        (size) => `600 ${size}px "podium-sharp-variable", "Arial Narrow", sans-serif`
+      );
+
+      context.strokeStyle = '#D8D8D8';
+      context.lineWidth = 2;
+      context.beginPath();
+      context.moveTo(620, 3270);
+      context.lineTo(1860, 3270);
+      context.stroke();
+
+      const galleryLabel = [gallery.title, gallery.date].filter(Boolean).join(' · ');
+      drawFittedText(
+        `KARTA DO GALERII: ${galleryLabel}`.toUpperCase(),
+        3340,
+        1900,
+        30,
+        (size) => `700 ${size}px "DM Sans", sans-serif`
+      );
+
+      const pdf = await canvasToA4Pdf(canvas);
+      const pdfUrl = URL.createObjectURL(pdf);
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `karta-a4-${gallery.slug}.pdf`;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+    } catch (cardError) {
+      setError(
+        cardError instanceof Error ? cardError.message : 'Nie udało się przygotować karty A4.'
+      );
+    } finally {
+      setCardGeneratingSlug('');
+    }
+  };
+
   const logout = async () => {
     await fetch('/api/admin-gallery-auth', { method: 'DELETE' });
     setData(null);
@@ -904,6 +1088,19 @@ export const GalleryAdminPage: React.FC = () => {
                     >
                       <QrCode size={14} aria-hidden="true" />
                       Pobierz QR
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void downloadGalleryCard(gallery)}
+                      disabled={cardGeneratingSlug === gallery.slug}
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-40"
+                    >
+                      {cardGeneratingSlug === gallery.slug ? (
+                        <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Download size={14} aria-hidden="true" />
+                      )}
+                      Pobierz kartę A4
                     </button>
                     {gallery.active && (
                       <a
