@@ -21,6 +21,7 @@ const FilmPage = lazy(async () => ({ default: (await import('./pages/FilmPage'))
 const ContactPage = lazy(async () => ({ default: (await import('./pages/ContactPage')).ContactPage }));
 const EditorialHomepage = lazy(async () => ({ default: (await import('./pages/EditorialHomepage')).EditorialHomepage }));
 const GalleryPage = lazy(async () => ({ default: (await import('./pages/GalleryPage')).GalleryPage }));
+const GalleryAdminPage = lazy(async () => ({ default: (await import('./pages/GalleryAdminPage')).GalleryAdminPage }));
 
 // ScrollToTop component to reset scroll on route change
 const ScrollToTop = () => {
@@ -61,8 +62,10 @@ const AppShell: React.FC<{
 }> = ({ isLoading, setIsLoading }) => {
   const location = useLocation();
   const isGalleryRoute = location.pathname.startsWith('/galeria/');
+  const isGalleryAdminRoute = location.pathname.startsWith('/panel/');
+  const isStandaloneRoute = isGalleryRoute || isGalleryAdminRoute;
   const showLiquidBackground =
-    !isGalleryRoute &&
+    !isStandaloneRoute &&
     ['/', '/film', '/kontakt'].includes(location.pathname) &&
     location.pathname !== '/editorial-home';
 
@@ -115,7 +118,7 @@ const AppShell: React.FC<{
 
       {!isLoading && (
         <>
-          {!isGalleryRoute && <Navbar />}
+          {!isStandaloneRoute && <Navbar />}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[120] focus:rounded-full focus:bg-brand-black focus:px-5 focus:py-3 focus:font-sans focus:text-xs focus:font-bold focus:uppercase focus:tracking-[0.2em] focus:text-white"
@@ -137,11 +140,12 @@ const AppShell: React.FC<{
                 <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
                 <Route path="/editorial-home" element={<EditorialHomepage />} />
                 <Route path="/galeria/:slug" element={<GalleryPage />} />
+                <Route path="/panel/galerie" element={<GalleryAdminPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>
           </main>
-          {!isGalleryRoute && <Footer />}
+          {!isStandaloneRoute && <Footer />}
         </>
       )}
     </>
@@ -154,7 +158,10 @@ const App: React.FC = () => {
       return true;
     }
 
-    if (window.location.pathname.startsWith('/galeria/')) {
+    if (
+      window.location.pathname.startsWith('/galeria/') ||
+      window.location.pathname.startsWith('/panel/')
+    ) {
       return false;
     }
 

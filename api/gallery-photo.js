@@ -18,7 +18,7 @@ export default async function handler(request, response) {
   }
 
   try {
-    const gallery = resolveGallery(request.query?.slug);
+    const gallery = await resolveGallery(request.query?.slug);
     const photoPath = buildPhotoPath(gallery, request.query?.name);
     const requestedSize = request.query?.size === 'large' ? 'large' : 'small';
     const thumbnail = await getPhotoThumbnail(photoPath, requestedSize);

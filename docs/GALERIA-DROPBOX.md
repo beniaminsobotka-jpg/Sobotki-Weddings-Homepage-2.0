@@ -13,6 +13,7 @@ W Dropbox App Console utwórz aplikację API. Najmniejszy potrzebny zakres to:
 
 - `files.metadata.read` — lista zdjęć w folderze,
 - `files.content.read` — miniatury i pobieranie oryginałów.
+- `files.content.write` — zapis prywatnego rejestru galerii przez panel.
 
 Możesz wybrać dostęp typu **App folder**. Wtedy folder `/Galerie` widziany przez
 API znajduje się fizycznie w katalogu aplikacji wewnątrz `Apps` na Dropboxie.
@@ -29,40 +30,44 @@ Ustaw dla środowiska Production:
 - `DROPBOX_APP_SECRET`
 - `DROPBOX_REFRESH_TOKEN`
 - `DROPBOX_GALLERY_ROOT` — domyślnie `/Galerie`
+- `GALLERY_ADMIN_PASSWORD` — długie, losowe hasło do panelu
 
-Opcjonalnie ustaw `DROPBOX_GALLERY_EVENTS`. To mapa publicznego, trudnego do
-odgadnięcia sluga na nazwę i folder wydarzenia, na przykład (jako jedna linia):
+Opcjonalnie możesz ustawić osobny `GALLERY_ADMIN_SESSION_SECRET`. Jeżeli go nie
+ustawisz, sesje panelu będą podpisywane przez `DROPBOX_APP_SECRET`.
 
-```json
-{
-  "ania-marek-x7k2": {
-    "title": "Ania & Marek",
-    "date": "24 sierpnia 2026",
-    "folder": "/Galerie/ania-i-marek"
-  }
-}
-```
+## 3. Panel galerii
 
-Jeśli `DROPBOX_GALLERY_EVENTS` jest ustawione, działa jako lista dozwolonych
-galerii. Nieznane slugi zwracają stronę błędu bez ujawniania zawartości Dropboxa.
+Panel znajduje się pod adresem:
 
-Jeżeli zmienna nie jest ustawiona, działa prosty tryb konwencji:
+`https://www.sobotkiweddings.pl/panel/galerie`
 
-- URL `/galeria/ania-i-marek`
-- folder Dropbox `/Galerie/ania-i-marek`
-- tytuł galerii `Ania i Marek`
+Panel automatycznie listuje podfoldery z `/Galerie`. Utworzone galerie zapisuje
+w prywatnym pliku `/Galerie/_sobotki-galleries.json`. Plik jest dostępny tylko
+dla serwera i nie jest wystawiany gościom.
 
-Tryb konwencji jest wygodny na start, ale na prawdziwych imprezach lepiej używać
-allowlisty i losowego fragmentu w slugu.
+Panel pozwala:
 
-## 3. Workflow podczas imprezy
+- utworzyć lub edytować galerię,
+- przypisać folder Dropboxa,
+- skopiować publiczny adres,
+- pobrać kod QR w PNG,
+- zarchiwizować lub przywrócić galerię.
+
+## 4. Workflow podczas imprezy
 
 1. Utwórz folder wydarzenia na Dropboxie.
-2. Dodaj wydarzenie do `DROPBOX_GALLERY_EVENTS` albo nazwij folder tak jak slug.
-3. Wygeneruj QR prowadzący bezpośrednio do adresu galerii.
+2. Otwórz panel i kliknij **Nowa galeria**.
+3. Wybierz folder, wpisz nazwę i pobierz wygenerowany QR.
 4. Eksportuj zdjęcia do folderu wydarzenia jak dotychczas.
 5. Galeria gości odświeża listę co 10 sekund. Miniatury są cache'owane na CDN
    Vercela, a przycisk pobierania prowadzi do krótkotrwałego linku oryginału.
+
+## 5. Darmowe statystyki
+
+Projekt zawiera Vercel Web Analytics. Po włączeniu Analytics w dashboardzie
+projektu Vercel zobaczysz odsłony i anonimowych odwiedzających galerii. Panel
+administracyjny jest wyłączony z pomiaru. Płatne zdarzenia, takie jak kliknięcia
+pobierania, nie są wymagane w wersji pilotażowej.
 
 Obsługiwane formaty to JPG/JPEG, PNG, WebP, GIF, TIFF i BMP. Dla najlepszego
 czasu pojawiania się zdjęć rekomendowany jest JPG w przestrzeni sRGB.

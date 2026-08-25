@@ -13,6 +13,8 @@ const IMAGE_EXTENSIONS = new Set([
 
 let cachedAccessToken = null;
 let cachedAccessTokenExpiresAt = 0;
+let cachedRegistry = undefined;
+let cachedRegistryExpiresAt = 0;
 
 export class GalleryError extends Error {
   constructor(message, statusCode = 500, code = 'gallery_error') {
@@ -41,7 +43,7 @@ const normalizeDropboxPath = (value) => {
   return normalized;
 };
 
-const validateSlug = (slug) => {
+export const validateGallerySlug = (slug) => {
   const normalized = String(slug || '').trim().toLowerCase();
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalized) || normalized.length > 96) {
@@ -87,10 +89,28 @@ const parseEventsConfig = () => {
   }
 };
 
-export const resolveGallery = (rawSlug) => {
-  const slug = validateSlug(rawSlug);
+export const resolveGallery = async (rawSlug) => {
+  const slug = validateGallerySlug(rawSlug);
   const events = parseEventsConfig();
-  const galleryRoot = normalizeDropboxPath(process.env.DROPBOX_GALLERY_ROOT || '/Galerie');
+  const galleryRoot = getGalleryRoot();
+  const registry = await getGalleryRegistry();
+
+  if (registry) {
+    const registeredGallery = registry.galleries.find(
+      (gallery) => gallery.slug === slug && gallery.active !== false
+    );
+
+    if (!registeredGallery) {
+      throw new GalleryError('Nie znaleziono takiej galerii.', 404, 'gallery_not_found');
+    }
+
+    return {
+      slug,
+      title: registeredGallery.title,
+      date: registeredGallery.date || '',
+      folder: normalizeDropboxPath(registeredGallery.folder),
+    };
+  }
 
   if (events) {
     const configuredEvent = events[slug];
@@ -120,6 +140,10 @@ export const resolveGallery = (rawSlug) => {
     };
   }
 
+  if (process.env.GALLERY_ADMIN_PASSWORD) {
+    throw new GalleryError('Nie znaleziono takiej galerii.', 404, 'gallery_not_found');
+  }
+
   return {
     slug,
     title: titleFromSlug(slug),
@@ -127,6 +151,9 @@ export const resolveGallery = (rawSlug) => {
     folder: normalizeDropboxPath(`${galleryRoot}/${slug}`),
   };
 };
+
+export const getGalleryRoot = () =>
+  normalizeDropboxPath(process.env.DROPBOX_GALLERY_ROOT || '/Galerie');
 
 const getAccessToken = async () => {
   const refreshToken = process.env.DROPBOX_REFRESH_TOKEN;
@@ -228,6 +255,168 @@ const dropboxRpc = async (endpoint, payload) => {
   }
 
   return dropboxResponse.json();
+};
+
+const normalizeRegistry = (payload) => {
+  if (!payload || !Array.isArray(payload.galleries)) {
+    throw new GalleryError(
+      'Plik konfiguracji galerii jest nieprawidłowy.',
+      500,
+      'invalid_gallery_registry'
+    );
+  }
+
+  const galleries = payload.galleries
+    .filter((gallery) => gallery && typeof gallery === 'object')
+    .map((gallery) => ({
+      slug: validateGallerySlug(gallery.slug),
+      title: String(gallery.title || '').trim(),
+      date: String(gallery.date || '').trim(),
+      folder: normalizeDropboxPath(gallery.folder),
+      active: gallery.active !== false,
+      createdAt: String(gallery.createdAt || ''),
+      updatedAt: String(gallery.updatedAt || ''),
+    }))
+    .filter((gallery) => gallery.title && gallery.folder);
+
+  return {
+    version: 1,
+    updatedAt: String(payload.updatedAt || ''),
+    galleries,
+  };
+};
+
+const getRegistryPath = () => `${getGalleryRoot()}/_sobotki-galleries.json`;
+
+export const getGalleryRegistry = async ({ fresh = false } = {}) => {
+  const now = Date.now();
+
+  if (!fresh && cachedRegistryExpiresAt > now) {
+    return cachedRegistry;
+  }
+
+  const accessToken = await getAccessToken();
+  const dropboxResponse = await fetch(`${DROPBOX_CONTENT_URL}/files/download`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Dropbox-API-Arg': JSON.stringify({ path: getRegistryPath() }),
+    },
+  });
+
+  if (!dropboxResponse.ok) {
+    const errorSummary = await readDropboxError(dropboxResponse);
+
+    if (dropboxResponse.status === 409 && errorSummary.includes('not_found')) {
+      cachedRegistry = null;
+      cachedRegistryExpiresAt = now + 5_000;
+      return null;
+    }
+
+    throw new GalleryError(
+      'Nie udało się odczytać konfiguracji galerii.',
+      502,
+      'gallery_registry_read_failed'
+    );
+  }
+
+  try {
+    cachedRegistry = normalizeRegistry(await dropboxResponse.json());
+    cachedRegistryExpiresAt = now + 5_000;
+    return cachedRegistry;
+  } catch (error) {
+    if (error instanceof GalleryError) {
+      throw error;
+    }
+
+    throw new GalleryError(
+      'Plik konfiguracji galerii jest nieprawidłowy.',
+      500,
+      'invalid_gallery_registry'
+    );
+  }
+};
+
+const ensureGalleryRoot = async () => {
+  try {
+    await dropboxRpc('files/get_metadata', {
+      path: getGalleryRoot(),
+      include_deleted: false,
+    });
+  } catch (error) {
+    if (!(error instanceof GalleryError) || error.code !== 'gallery_not_found') {
+      throw error;
+    }
+
+    await dropboxRpc('files/create_folder_v2', {
+      path: getGalleryRoot(),
+      autorename: false,
+    });
+  }
+};
+
+export const saveGalleryRegistry = async (registry) => {
+  await ensureGalleryRoot();
+  const normalized = normalizeRegistry({
+    ...registry,
+    version: 1,
+    updatedAt: new Date().toISOString(),
+  });
+  const accessToken = await getAccessToken();
+  const dropboxResponse = await fetch(`${DROPBOX_CONTENT_URL}/files/upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/octet-stream',
+      'Dropbox-API-Arg': JSON.stringify({
+        path: getRegistryPath(),
+        mode: 'overwrite',
+        autorename: false,
+        mute: true,
+        strict_conflict: false,
+      }),
+    },
+    body: JSON.stringify(normalized, null, 2),
+  });
+
+  if (!dropboxResponse.ok) {
+    throw new GalleryError(
+      'Nie udało się zapisać konfiguracji galerii.',
+      502,
+      'gallery_registry_write_failed'
+    );
+  }
+
+  cachedRegistry = normalized;
+  cachedRegistryExpiresAt = Date.now() + 5_000;
+  return normalized;
+};
+
+export const listGalleryFolders = async () => {
+  await ensureGalleryRoot();
+  let result = await dropboxRpc('files/list_folder', {
+    path: getGalleryRoot(),
+    recursive: false,
+    include_deleted: false,
+    include_non_downloadable_files: false,
+    limit: 2000,
+  });
+  const entries = [...result.entries];
+
+  while (result.has_more) {
+    result = await dropboxRpc('files/list_folder/continue', {
+      cursor: result.cursor,
+    });
+    entries.push(...result.entries);
+  }
+
+  return entries
+    .filter((entry) => entry?.['.tag'] === 'folder')
+    .map((entry) => ({
+      name: entry.name,
+      path: normalizeDropboxPath(entry.path_display || entry.path_lower),
+    }))
+    .sort((first, second) => first.name.localeCompare(second.name, 'pl'));
 };
 
 const getFileExtension = (name) => {

@@ -4,6 +4,10 @@
     {
       "source": "/galeria/:path*",
       "destination": "/index.html"
+    },
+    {
+      "source": "/panel/:path*",
+      "destination": "/index.html"
     }
   ]
 }
