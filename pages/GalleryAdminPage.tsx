@@ -281,6 +281,22 @@ export const GalleryAdminPage: React.FC = () => {
   const [isCoverLoading, setIsCoverLoading] = useState(false);
   const suffixRef = useRef('');
 
+  useEffect(() => {
+    if (!coverGallery && !showForm) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const lenis = (window as any).lenis;
+    document.body.style.overflow = 'hidden';
+    lenis?.stop?.();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      lenis?.start?.();
+    };
+  }, [coverGallery, showForm]);
+
   const loadAdminData = async () => {
     setIsLoading(true);
     setError('');
@@ -908,7 +924,7 @@ export const GalleryAdminPage: React.FC = () => {
           aria-label={`Ustaw okładkę galerii ${coverGallery.title}`}
         >
           <div className="flex max-h-[95dvh] w-full max-w-5xl flex-col rounded-t-3xl bg-[#f3f2ed] sm:rounded-3xl">
-            <div className="flex items-center justify-between gap-4 border-b border-black/[0.08] p-5 sm:p-7">
+            <div className="flex shrink-0 items-center justify-between gap-4 border-b border-black/[0.08] p-5 sm:p-7">
               <div>
                 <p className="font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-black/38">
                   {coverGallery.title}
@@ -927,7 +943,10 @@ export const GalleryAdminPage: React.FC = () => {
               </button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-7">
+            <div
+              data-lenis-prevent
+              className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain p-4 sm:p-7"
+            >
               {isCoverLoading && coverPhotos.length === 0 && (
                 <div className="flex min-h-56 items-center justify-center" role="status">
                   <Loader2 size={26} className="animate-spin text-black/35" aria-hidden="true" />
@@ -984,7 +1003,7 @@ export const GalleryAdminPage: React.FC = () => {
               )}
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.08] p-4 sm:p-6">
+            <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-black/[0.08] p-4 sm:p-6">
               <button
                 type="button"
                 onClick={() => void saveCoverPhoto('')}
