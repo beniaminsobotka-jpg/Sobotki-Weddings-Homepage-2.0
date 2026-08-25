@@ -109,6 +109,7 @@ export const resolveGallery = async (rawSlug) => {
       title: registeredGallery.title,
       date: registeredGallery.date || '',
       folder: normalizeDropboxPath(registeredGallery.folder),
+      coverPhoto: String(registeredGallery.coverPhoto || '').trim(),
     };
   }
 
@@ -137,6 +138,7 @@ export const resolveGallery = async (rawSlug) => {
       title: String(event.title || titleFromSlug(slug)).trim(),
       date: String(event.date || '').trim(),
       folder: normalizeDropboxPath(event.folder || `${galleryRoot}/${slug}`),
+      coverPhoto: String(event.coverPhoto || '').trim(),
     };
   }
 
@@ -149,6 +151,7 @@ export const resolveGallery = async (rawSlug) => {
     title: titleFromSlug(slug),
     date: '',
     folder: normalizeDropboxPath(`${galleryRoot}/${slug}`),
+    coverPhoto: '',
   };
 };
 
@@ -306,6 +309,7 @@ const normalizeRegistry = (payload) => {
       title: String(gallery.title || '').trim(),
       date: String(gallery.date || '').trim(),
       folder: normalizeDropboxPath(gallery.folder),
+      coverPhoto: String(gallery.coverPhoto || '').trim(),
       active: gallery.active !== false,
       createdAt: String(gallery.createdAt || ''),
       updatedAt: String(gallery.updatedAt || ''),

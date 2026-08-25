@@ -27,6 +27,7 @@ type GalleryData = {
     slug: string;
     title: string;
     date: string;
+    coverUrl: string;
   };
   photos: GalleryPhoto[];
   refreshAfterMs: number;
@@ -237,9 +238,31 @@ export const GalleryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#f3f2ed] text-brand-black">
-      <header className="relative overflow-hidden bg-[#111111] px-5 pb-16 pt-7 text-white sm:px-8 sm:pb-20 sm:pt-9">
+      <header
+        className={`relative flex flex-col overflow-hidden bg-[#111111] px-5 pt-7 text-white sm:px-8 sm:pt-9 ${
+          data?.gallery.coverUrl
+            ? 'min-h-[72svh] pb-10 sm:min-h-[78svh] sm:pb-14'
+            : 'pb-16 sm:pb-20'
+        }`}
+      >
+        {data?.gallery.coverUrl && (
+          <>
+            <img
+              src={data.gallery.coverUrl}
+              alt=""
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              aria-hidden="true"
+            />
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-[#111111]"
+              aria-hidden="true"
+            />
+          </>
+        )}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.035]"
+          className={`pointer-events-none absolute inset-0 ${
+            data?.gallery.coverUrl ? 'opacity-[0.07]' : 'opacity-[0.035]'
+          }`}
           style={{ backgroundImage: 'url(/noise.svg)' }}
           aria-hidden="true"
         />
@@ -247,7 +270,11 @@ export const GalleryPage: React.FC = () => {
           <GalleryBrand />
         </div>
 
-        <div className="relative mx-auto mt-16 max-w-3xl text-center sm:mt-20">
+        <div
+          className={`relative mx-auto max-w-3xl text-center ${
+            data?.gallery.coverUrl ? 'mt-auto pt-32' : 'mt-16 sm:mt-20'
+          }`}
+        >
           <p className="font-sans text-[10px] font-bold uppercase tracking-[0.32em] text-white/45 sm:text-xs">
             Wasza galeria
           </p>

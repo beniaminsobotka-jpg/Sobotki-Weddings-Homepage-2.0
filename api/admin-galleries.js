@@ -4,6 +4,7 @@ import {
   getGalleryRegistry,
   getGalleryRoot,
   listGalleryFolders,
+  listGalleryPhotos,
   saveGalleryRegistry,
   validateGallerySlug,
 } from '../server/dropbox-gallery.js';
@@ -48,6 +49,35 @@ export default async function handler(request, response) {
 
   try {
     if (request.method === 'GET') {
+      if (request.query?.photosFor) {
+        const slug = validateGallerySlug(request.query.photosFor);
+        const registry = await getGalleryRegistry({ fresh: true });
+        const gallery = registry?.galleries.find((item) => item.slug === slug);
+
+        if (!gallery) {
+          return sendJson(response, 404, { error: 'Nie znaleziono galerii.' });
+        }
+
+        const photos = await listGalleryPhotos(gallery);
+
+        return sendJson(response, 200, {
+          coverPhoto: gallery.coverPhoto || '',
+          photos: photos.map((photo) => {
+            const query = new URLSearchParams({
+              slug,
+              name: photo.name,
+              rev: photo.rev,
+            });
+
+            return {
+              id: photo.id,
+              name: photo.name,
+              thumbnailUrl: `/api/admin-gallery-photo?${query.toString()}`,
+            };
+          }),
+        });
+      }
+
       return sendJson(response, 200, await getAdminData());
     }
 
@@ -70,6 +100,32 @@ export default async function handler(request, response) {
       updatedAt: '',
       galleries: [],
     };
+
+    if (action === 'set_cover') {
+      const slug = normalizeText(body.slug, 96).toLowerCase();
+      const photoName = normalizeText(body.photoName, 255);
+      const galleryIndex = registry.galleries.findIndex((gallery) => gallery.slug === slug);
+
+      if (galleryIndex < 0) {
+        return sendJson(response, 404, { error: 'Nie znaleziono galerii.' });
+      }
+
+      if (photoName) {
+        const photos = await listGalleryPhotos(registry.galleries[galleryIndex]);
+
+        if (!photos.some((photo) => photo.name === photoName)) {
+          return sendJson(response, 400, { error: 'Nie znaleziono wybranego zdjęcia.' });
+        }
+      }
+
+      registry.galleries[galleryIndex] = {
+        ...registry.galleries[galleryIndex],
+        coverPhoto: photoName,
+        updatedAt: new Date().toISOString(),
+      };
+      await saveGalleryRegistry(registry);
+      return sendJson(response, 200, await getAdminData());
+    }
 
     if (action === 'set_active') {
       const slug = normalizeText(body.slug, 96).toLowerCase();
@@ -135,6 +191,8 @@ export default async function handler(request, response) {
       title,
       date,
       folder,
+      coverPhoto:
+        existingIndex >= 0 ? String(registry.galleries[existingIndex].coverPhoto || '') : '',
       active: body.gallery?.active !== false,
       createdAt: existingIndex >= 0 ? registry.galleries[existingIndex].createdAt : now,
       updatedAt: now,

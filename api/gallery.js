@@ -18,6 +18,15 @@ export default async function handler(request, response) {
   try {
     const gallery = await resolveGallery(request.query?.slug);
     const photos = await listGalleryPhotos(gallery);
+    const coverPhoto = photos.find((photo) => photo.name === gallery.coverPhoto);
+    const coverQuery = coverPhoto
+      ? new URLSearchParams({
+          slug: gallery.slug,
+          name: coverPhoto.name,
+          rev: coverPhoto.rev,
+          size: 'large',
+        })
+      : null;
 
     response.setHeader(
       'Cache-Control',
@@ -29,6 +38,7 @@ export default async function handler(request, response) {
         slug: gallery.slug,
         title: gallery.title,
         date: gallery.date,
+        coverUrl: coverQuery ? `/api/gallery-photo?${coverQuery.toString()}` : '',
       },
       photos: photos.map((photo) => {
         const query = new URLSearchParams({

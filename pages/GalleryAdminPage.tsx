@@ -24,9 +24,16 @@ type GalleryRecord = {
   title: string;
   date: string;
   folder: string;
+  coverPhoto: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+type AdminGalleryPhoto = {
+  id: string;
+  name: string;
+  thumbnailUrl: string;
 };
 
 type DropboxFolder = {
@@ -267,6 +274,11 @@ export const GalleryAdminPage: React.FC = () => {
   const [oauthRefreshToken, setOauthRefreshToken] = useState('');
   const [isOauthLoading, setIsOauthLoading] = useState(false);
   const [oauthTokenCopied, setOauthTokenCopied] = useState(false);
+  const [coverGallery, setCoverGallery] = useState<GalleryRecord | null>(null);
+  const [coverPhotos, setCoverPhotos] = useState<AdminGalleryPhoto[]>([]);
+  const [selectedCoverPhoto, setSelectedCoverPhoto] = useState('');
+  const [coverError, setCoverError] = useState('');
+  const [isCoverLoading, setIsCoverLoading] = useState(false);
   const suffixRef = useRef('');
 
   const loadAdminData = async () => {
@@ -424,6 +436,65 @@ export const GalleryAdminPage: React.FC = () => {
     await navigator.clipboard.writeText(oauthRefreshToken);
     setOauthTokenCopied(true);
     window.setTimeout(() => setOauthTokenCopied(false), 1800);
+  };
+
+  const openCoverPicker = async (gallery: GalleryRecord) => {
+    setCoverGallery(gallery);
+    setCoverPhotos([]);
+    setSelectedCoverPhoto(gallery.coverPhoto || '');
+    setCoverError('');
+    setIsCoverLoading(true);
+
+    try {
+      const response = await fetchWithTimeout(
+        `/api/admin-galleries?photosFor=${encodeURIComponent(gallery.slug)}`
+      );
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Nie udało się wczytać zdjęć.'));
+      }
+
+      const payload = await response.json();
+      setCoverPhotos(Array.isArray(payload.photos) ? payload.photos : []);
+      setSelectedCoverPhoto(payload.coverPhoto || '');
+    } catch (photoError) {
+      setCoverError(getRequestErrorMessage(photoError, 'Nie udało się wczytać zdjęć.'));
+    } finally {
+      setIsCoverLoading(false);
+    }
+  };
+
+  const saveCoverPhoto = async (photoName: string) => {
+    if (!coverGallery) {
+      return;
+    }
+
+    setIsCoverLoading(true);
+    setCoverError('');
+
+    try {
+      const response = await fetchWithTimeout('/api/admin-galleries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'set_cover',
+          slug: coverGallery.slug,
+          photoName,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Nie udało się ustawić okładki.'));
+      }
+
+      setData((await response.json()) as AdminData);
+      setCoverGallery(null);
+      setNotice(photoName ? 'Okładka galerii została ustawiona.' : 'Okładka została usunięta.');
+    } catch (saveError) {
+      setCoverError(getRequestErrorMessage(saveError, 'Nie udało się ustawić okładki.'));
+    } finally {
+      setIsCoverLoading(false);
+    }
   };
 
   const openEditForm = (gallery: GalleryRecord) => {
@@ -805,6 +876,15 @@ export const GalleryAdminPage: React.FC = () => {
                     )}
                     <button
                       type="button"
+                      onClick={() => void openCoverPicker(gallery)}
+                      disabled={isLoading}
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white disabled:opacity-40"
+                    >
+                      <Image size={14} aria-hidden="true" />
+                      {gallery.coverPhoto ? 'Zmień okładkę' : 'Ustaw okładkę'}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => void setGalleryActive(gallery, !gallery.active)}
                       disabled={isLoading}
                       className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white disabled:opacity-40"
@@ -819,6 +899,113 @@ export const GalleryAdminPage: React.FC = () => {
           </div>
         )}
       </main>
+
+      {coverGallery && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-5"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Ustaw okładkę galerii ${coverGallery.title}`}
+        >
+          <div className="flex max-h-[95dvh] w-full max-w-5xl flex-col rounded-t-3xl bg-[#f3f2ed] sm:rounded-3xl">
+            <div className="flex items-center justify-between gap-4 border-b border-black/[0.08] p-5 sm:p-7">
+              <div>
+                <p className="font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-black/38">
+                  {coverGallery.title}
+                </p>
+                <h2 className="mt-1 font-serif text-3xl font-black uppercase tracking-[-0.04em]">
+                  Ustaw okładkę
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCoverGallery(null)}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-black/10"
+                aria-label="Zamknij wybór okładki"
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-7">
+              {isCoverLoading && coverPhotos.length === 0 && (
+                <div className="flex min-h-56 items-center justify-center" role="status">
+                  <Loader2 size={26} className="animate-spin text-black/35" aria-hidden="true" />
+                  <span className="sr-only">Wczytuję zdjęcia</span>
+                </div>
+              )}
+
+              {!isCoverLoading && coverPhotos.length === 0 && !coverError && (
+                <div className="flex min-h-56 flex-col items-center justify-center text-center">
+                  <Image size={30} className="text-black/25" aria-hidden="true" />
+                  <p className="mt-4 font-serif text-2xl font-black uppercase">
+                    W galerii nie ma jeszcze zdjęć
+                  </p>
+                </div>
+              )}
+
+              {coverPhotos.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+                  {coverPhotos.map((photo, index) => {
+                    const selected = selectedCoverPhoto === photo.name;
+
+                    return (
+                      <button
+                        key={photo.id}
+                        type="button"
+                        onClick={() => setSelectedCoverPhoto(photo.name)}
+                        className={`group relative aspect-[4/5] overflow-hidden rounded-xl border-2 bg-black/[0.06] transition ${
+                          selected ? 'border-black' : 'border-transparent hover:border-black/30'
+                        }`}
+                        aria-label={`Wybierz zdjęcie ${index + 1} jako okładkę`}
+                        aria-pressed={selected}
+                      >
+                        <img
+                          src={photo.thumbnailUrl}
+                          alt={`Zdjęcie ${index + 1}`}
+                          loading={index < 8 ? 'eager' : 'lazy'}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                        />
+                        {selected && (
+                          <span className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
+                            <Check size={16} aria-hidden="true" />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {coverError && (
+                <p className="mt-4 font-sans text-xs text-[#a62020]" role="alert">
+                  {coverError}
+                </p>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.08] p-4 sm:p-6">
+              <button
+                type="button"
+                onClick={() => void saveCoverPhoto('')}
+                disabled={isCoverLoading || !coverGallery.coverPhoto}
+                className="min-h-11 rounded-full border border-black/10 px-5 font-sans text-[9px] font-bold uppercase tracking-[0.16em] disabled:opacity-30"
+              >
+                Usuń okładkę
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveCoverPhoto(selectedCoverPhoto)}
+                disabled={isCoverLoading || !selectedCoverPhoto}
+                className="inline-flex min-h-12 items-center gap-2 rounded-full bg-black px-6 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-white disabled:opacity-30"
+              >
+                {isCoverLoading && <Loader2 size={15} className="animate-spin" aria-hidden="true" />}
+                Ustaw wybrane zdjęcie
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <div className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/65 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-label={form.originalSlug ? 'Edytuj galerię' : 'Nowa galeria'}>
