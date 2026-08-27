@@ -714,7 +714,9 @@ export const GalleryAdminPage: React.FC = () => {
   };
 
   const copyGalleryUrl = async (gallery: GalleryRecord) => {
-    const url = `${origin}/galeria/${gallery.slug}`;
+    const updatedAt = new Date(gallery.updatedAt).getTime();
+    const version = Number.isFinite(updatedAt) ? updatedAt.toString(36) : '';
+    const url = `${origin}/galeria/${gallery.slug}${version ? `?v=${version}` : ''}`;
     await navigator.clipboard.writeText(url);
     setCopiedSlug(gallery.slug);
     window.setTimeout(() => setCopiedSlug(''), 1800);
