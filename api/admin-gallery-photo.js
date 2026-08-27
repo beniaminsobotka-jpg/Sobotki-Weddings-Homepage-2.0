@@ -41,7 +41,7 @@ export default async function handler(request, response) {
     }
 
     const imageBuffer = Buffer.from(await thumbnail.arrayBuffer());
-    response.setHeader('Content-Type', thumbnail.headers.get('content-type') || 'image/jpeg');
+    response.setHeader('Content-Type', 'image/jpeg');
     response.setHeader('Cache-Control', 'private, max-age=300');
     response.setHeader('Content-Length', String(imageBuffer.byteLength));
     return response.status(200).end(imageBuffer);

@@ -30,7 +30,7 @@ export default async function handler(request, response) {
     }
 
     const imageBuffer = Buffer.from(await thumbnail.arrayBuffer());
-    response.setHeader('Content-Type', thumbnail.headers.get('content-type') || 'image/jpeg');
+    response.setHeader('Content-Type', 'image/jpeg');
     response.setHeader(
       'Cache-Control',
       'public, max-age=31536000, s-maxage=31536000, immutable'
