@@ -15,6 +15,8 @@ type BrevoLeadInput = {
   company?: string;
   guestCount?: string;
   source?: string;
+  distanceKm?: number;
+  pricingTier?: string;
 };
 
 const buildReadableError = async (response: Response) => {

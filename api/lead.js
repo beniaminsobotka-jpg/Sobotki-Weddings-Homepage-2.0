@@ -88,6 +88,12 @@ const buildInternalRows = (entries) =>
     )
     .join('');
 
+const getPricingTierLabel = (tier) => ({
+  'up-to-150': 'Próg I — do 150 km',
+  'up-to-250': 'Próg II — do 250 km',
+  'up-to-350': 'Próg III — powyżej 250 km',
+}[tier] || tier || '-');
+
 const buildInternalHtml = (leadData) => `
   <!doctype html>
   <html>
@@ -116,6 +122,8 @@ const buildInternalHtml = (leadData) => `
                 ['phone', leadData.phone],
                 ['weddingDate', leadData.weddingDate],
                 ['venue', leadData.venue],
+                ['Odległość od Gliwic', leadData.distanceKm ? `${leadData.distanceKm} km (w jedną stronę)` : ''],
+                ['Próg cenowy oferty', getPricingTierLabel(leadData.pricingTier)],
                 ['serviceType', leadData.serviceType],
                 ['guestCount', leadData.guestCount],
                 ['company', leadData.company],
@@ -142,6 +150,8 @@ const buildInternalText = (leadData) => [
   `phone: ${leadData.phone || '-'}`,
   `weddingDate: ${leadData.weddingDate || '-'}`,
   `venue: ${leadData.venue || '-'}`,
+  `Odległość od Gliwic: ${leadData.distanceKm ? `${leadData.distanceKm} km (w jedną stronę)` : '-'}`,
+  `Próg cenowy oferty: ${getPricingTierLabel(leadData.pricingTier)}`,
   `serviceType: ${leadData.serviceType}`,
   `guestCount: ${leadData.guestCount || '-'}`,
   `company: ${leadData.company || '-'}`,
@@ -183,6 +193,8 @@ export default async function handler(request, response) {
   const company = normalizeString(parsedBody.company);
   const guestCount = normalizeString(parsedBody.guestCount);
   const source = normalizeString(parsedBody.source);
+  const distanceKm = Number.isFinite(Number(parsedBody.distanceKm)) ? Number(parsedBody.distanceKm) : 0;
+  const pricingTier = normalizeString(parsedBody.pricingTier);
 
   if (!formType) {
     return sendJson(response, 400, { error: 'formType is required' });
@@ -285,6 +297,8 @@ export default async function handler(request, response) {
         phone,
         weddingDate,
         venue,
+        distanceKm,
+        pricingTier,
         serviceType,
         guestCount,
         company,

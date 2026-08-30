@@ -88,6 +88,12 @@ const getOfferLabel = (lead) =>
     ? 'Sobotki Portraits - oferta Fotostacji Ślubnej'
     : 'Sobotki Weddings - ukryta oferta 2027/2028';
 
+const getPricingTierLabel = (tier) => ({
+  'up-to-150': 'Próg I — do 150 km',
+  'up-to-250': 'Próg II — do 250 km',
+  'up-to-350': 'Próg III — powyżej 250 km',
+}[tier] || tier || '-');
+
 const buildEventMessage = (lead) => [
   `Event: ${lead.eventName}`,
   `Source: ${lead.source || 'hidden_offer_2027_2028'}`,
@@ -96,7 +102,7 @@ const buildEventMessage = (lead) => [
   `Data ślubu: ${lead.weddingDate}`,
   `Miejsce / sala: ${lead.venue}`,
   lead.distanceKm ? `Odległość drogowa od Gliwic: ${lead.distanceKm} km (w jedną stronę)` : '',
-  lead.pricingTier ? `Próg cenowy: ${lead.pricingTier}` : '',
+  lead.pricingTier ? `Próg cenowy oferty: ${getPricingTierLabel(lead.pricingTier)}` : '',
   lead.resolvedLocation ? `Rozpoznana lokalizacja: ${lead.resolvedLocation}` : '',
   lead.interestedOffers.length ? `Interesujące oferty: ${lead.interestedOffers.join(', ')}` : '',
   lead.inquiryMessage ? `Wiadomość: ${lead.inquiryMessage}` : '',
@@ -116,7 +122,7 @@ const buildInquiryText = (lead) => [
   `Data ślubu: ${lead.weddingDate}`,
   `Miejsce / sala: ${lead.venue}`,
   `Odległość drogowa od Gliwic: ${lead.distanceKm ? `${lead.distanceKm} km (w jedną stronę)` : '-'}`,
-  `Próg cenowy: ${lead.pricingTier || '-'}`,
+  `Próg cenowy oferty: ${getPricingTierLabel(lead.pricingTier)}`,
   `Rozpoznana lokalizacja: ${lead.resolvedLocation || '-'}`,
   `Szacunkowa liczba gości: ${lead.guestsCount || '-'}`,
   `Skąd dowiedzieliście się o nas: ${lead.howDidYouHear || '-'}`,
@@ -151,7 +157,7 @@ const buildInquiryHtml = (lead) => `
                 ['Data ślubu', lead.weddingDate],
                 ['Miejsce / sala', lead.venue],
                 ['Odległość drogowa od Gliwic', lead.distanceKm ? `${lead.distanceKm} km (w jedną stronę)` : ''],
-                ['Próg cenowy', lead.pricingTier],
+                ['Próg cenowy oferty', getPricingTierLabel(lead.pricingTier)],
                 ['Rozpoznana lokalizacja', lead.resolvedLocation],
                 ['Szacunkowa liczba gości', lead.guestsCount],
                 ['Skąd dowiedzieliście się o nas', lead.howDidYouHear],
@@ -231,7 +237,7 @@ const trackBrevoEvent = async ({ apiKey, lead, firstName, lastName }) => {
       weddingDate: lead.weddingDate,
       venue: lead.venue,
       distanceKm: lead.distanceKm || '',
-      pricingTier: lead.pricingTier || '',
+      pricingTier: getPricingTierLabel(lead.pricingTier),
       resolvedLocation: lead.resolvedLocation || '',
       timestamp: lead.timestamp,
       interestedOffers: lead.interestedOffers.join(', '),

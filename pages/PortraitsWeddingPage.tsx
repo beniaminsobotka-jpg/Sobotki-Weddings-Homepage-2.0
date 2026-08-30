@@ -373,6 +373,8 @@ export const PortraitsWeddingPage: React.FC = () => {
         message: formData.notes,
         guestCount: formData.guests,
         source: formData.source,
+        distanceKm: distanceData.distanceKm,
+        pricingTier: distanceData.tier,
       });
 
       setStatus('success');
