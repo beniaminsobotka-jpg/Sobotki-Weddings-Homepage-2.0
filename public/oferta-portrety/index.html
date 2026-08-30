@@ -222,7 +222,7 @@
         <div class="packages-grid">
           <article class="package-card">
             <div class="package-topline"><span>Opcja Essential</span><span>3h</span></div>
-            <p class="price">2 900 zł</p>
+            <p class="price" data-package-price="essential">2 900 zł</p>
             <p class="package-intro">Najważniejsze elementy Fotostacji w kompletnej, prostej formie.</p>
             <ul>
               <li>3 godziny pracy, bez czasu przygotowania stanowiska</li>
@@ -233,7 +233,7 @@
           </article>
           <article class="package-card package-featured">
             <div class="package-topline"><span>Opcja Exclusive</span><span>3h</span></div>
-            <p class="price">3 600 zł</p>
+            <p class="price" data-package-price="exclusive">3 600 zł</p>
             <p class="package-intro">Pełne doświadczenie bez liczenia wydruków, z gotową księgą gości.</p>
             <ul>
               <li>3 godziny pracy, bez czasu przygotowania stanowiska</li>
@@ -245,6 +245,7 @@
             <span class="recommended">Najpełniejsza opcja</span>
           </article>
         </div>
+        <p id="distancePriceNote" class="internet-note" hidden></p>
         <p class="internet-note">*Jeżeli zasięg i prędkość internetu na sali pozwalają na przesyłanie plików.</p>
       </section>
 
@@ -297,7 +298,7 @@
             <article><span>Zdjęcia w filmowym kółku</span><strong>+500 zł</strong></article>
             <article><span>Drukowana księga gości 30×30 cm (tylko w pakiecie Essential)</span><strong>+600 zł</strong></article>
             <article><span>Dodatkowa godzina pracy</span><strong>+500 zł</strong></article>
-            <article><span>Transport od Gliwic</span><strong>1 zł / km</strong></article>
+            <article><span>Transport od Gliwic</span><strong>wliczony w cenę pakietu</strong></article>
           </div>
         </div>
         <figure class="addons-photo"><img src="./assets/addons.webp" alt="Para gości sfotografowana w Fotostacji" loading="lazy" /></figure>
@@ -442,8 +443,8 @@
         <form id="inquiryForm" class="inquiry-form">
           <fieldset>
             <legend>Wybierzcie interesujące elementy</legend>
-            <label class="choice-option"><input type="checkbox" name="interestedOffers" value="Fotostacja Essential - 2900 zł" /><span>Fotostacja Essential - 2900 zł</span></label>
-            <label class="choice-option"><input type="checkbox" name="interestedOffers" value="Fotostacja Exclusive - 3600 zł" /><span>Fotostacja Exclusive - 3600 zł</span></label>
+            <label class="choice-option"><input data-package-option="essential" type="checkbox" name="interestedOffers" value="Fotostacja Essential - 2900 zł" /><span>Fotostacja Essential - 2900 zł</span></label>
+            <label class="choice-option"><input data-package-option="exclusive" type="checkbox" name="interestedOffers" value="Fotostacja Exclusive - 3600 zł" /><span>Fotostacja Exclusive - 3600 zł</span></label>
             <label class="choice-option"><input type="checkbox" name="interestedOffers" value="Filmowe kółko - dodatek" /><span>Filmowe kółko - dodatek</span></label>
             <label class="choice-option"><input type="checkbox" name="interestedOffers" value="Drukowana księga gości - dodatek" /><span>Drukowana księga gości - dodatek</span></label>
             <label class="choice-option"><input type="checkbox" name="interestedOffers" value="Dodatkowa godzina pracy" /><span>Dodatkowa godzina pracy</span></label>

@@ -22,6 +22,7 @@ const state = {
   lastLead: null,
   termInquirySent: false,
   rejectionSent: false,
+  pricing: null,
 };
 
 const leadForm = document.querySelector("#leadForm");
@@ -63,7 +64,55 @@ function getLeadData() {
     howDidYouHear: String(formData.get("howDidYouHear") || "").trim(),
     timestamp: new Date().toISOString(),
     source: "hidden_offer_portraits",
+    distanceKm: state.pricing?.distanceKm || "",
+    pricingTier: state.pricing?.tier || "",
+    resolvedLocation: state.pricing?.resolvedLocation || "",
   };
+}
+
+function formatPrice(value) {
+  return `${String(value).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} zł`;
+}
+
+function applyPricing(pricing) {
+  if (!pricing?.prices?.essential || !pricing?.prices?.exclusive) return;
+  state.pricing = pricing;
+
+  document.querySelectorAll("[data-package-price]").forEach((element) => {
+    const packageName = element.dataset.packagePrice;
+    element.textContent = formatPrice(pricing.prices[packageName]);
+  });
+
+  document.querySelectorAll("[data-package-option]").forEach((input) => {
+    const packageName = input.dataset.packageOption;
+    const label = packageName === "essential" ? "Fotostacja Essential" : "Fotostacja Exclusive";
+    const price = pricing.prices[packageName];
+    input.value = `${label} - ${price} zł`;
+    const text = input.closest("label")?.querySelector("span");
+    if (text) text.textContent = `${label} - ${formatPrice(price)}`;
+  });
+
+  const note = document.querySelector("#distancePriceNote");
+  if (note) {
+    note.hidden = false;
+    note.textContent = `Cena dopasowana do lokalizacji: ${pricing.distanceKm} km drogą od Gliwic (w jedną stronę). Transport jest wliczony w cenę pakietu. Dane tras: OpenStreetMap.`;
+  }
+
+  document.querySelectorAll("[data-pdf-link]").forEach((link) => {
+    link.hidden = true;
+    link.style.display = "none";
+  });
+}
+
+async function getTravelPricing(venue) {
+  const response = await fetch(`/api/travel-distance?venue=${encodeURIComponent(venue)}`, {
+    headers: { Accept: "application/json" },
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(result.error || "Nie udało się sprawdzić odległości do miejsca przyjęcia.");
+  }
+  return result;
 }
 
 function validateLead(lead) {
@@ -177,7 +226,7 @@ function closeInquiryModal() {
   reserveCta.focus();
 }
 
-leadForm.addEventListener("submit", (event) => {
+leadForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   formError.textContent = "";
 
@@ -188,12 +237,31 @@ leadForm.addEventListener("submit", (event) => {
     return;
   }
 
-  state.lastLead = lead;
-  revealOffer();
+  const submitButton = leadForm.querySelector("button[type='submit']");
+  submitButton.disabled = true;
+  submitButton.textContent = "Sprawdzamy lokalizację...";
 
-  saveLead(EVENTS.offerViewed, lead).catch((saveError) => {
-    console.warn("[Sobotki Portraits Offer] Nie udało się zapisać eventu oferta_obejrzana", saveError);
-  });
+  try {
+    const pricing = await getTravelPricing(lead.venue);
+    if (pricing.overLimit) {
+      formError.textContent = pricing.message;
+      return;
+    }
+
+    applyPricing(pricing);
+    state.lastLead = { ...lead, distanceKm: pricing.distanceKm, pricingTier: pricing.tier, resolvedLocation: pricing.resolvedLocation };
+    localStorage.setItem("sobotki_lead_portraits", JSON.stringify({ ...state.lastLead, packagePrices: pricing.prices }));
+    revealOffer();
+
+    saveLead(EVENTS.offerViewed, state.lastLead).catch((saveError) => {
+      console.warn("[Sobotki Portraits Offer] Nie udało się zapisać eventu oferta_obejrzana", saveError);
+    });
+  } catch (error) {
+    formError.textContent = error instanceof Error ? error.message : "Nie udało się sprawdzić odległości.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Pokaż ofertę";
+  }
 });
 
 reserveCta.addEventListener("click", () => {
@@ -300,7 +368,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (document.querySelector("textarea[name='inquiryMessage']")) {
         document.querySelector("textarea[name='inquiryMessage']").value = parsed.notes || "";
       }
-      
+
+      if (!parsed.pricingTier || !parsed.packagePrices || !parsed.distanceKm) return;
+
+      applyPricing({
+        tier: parsed.pricingTier,
+        prices: parsed.packagePrices,
+        distanceKm: parsed.distanceKm,
+        resolvedLocation: parsed.resolvedLocation || "",
+      });
       state.lastLead = getLeadData();
       
       const headerEl = document.querySelector("header");

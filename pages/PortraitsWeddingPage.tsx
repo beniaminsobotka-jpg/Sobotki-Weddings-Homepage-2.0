@@ -347,6 +347,21 @@ export const PortraitsWeddingPage: React.FC = () => {
     setErrorMessage('Coś poszło nie tak. Spróbuj ponownie.');
 
     try {
+      const distanceResponse = await fetch(`/api/travel-distance?venue=${encodeURIComponent(formData.location)}`, {
+        headers: { Accept: 'application/json' },
+      });
+      const distanceData = await distanceResponse.json().catch(() => ({}));
+
+      if (!distanceResponse.ok) {
+        throw new Error(distanceData.error || 'Nie udało się sprawdzić odległości do miejsca przyjęcia.');
+      }
+
+      if (distanceData.overLimit) {
+        setErrorMessage(distanceData.message || 'Przepraszamy, ta lokalizacja jest poza naszym zasięgiem.');
+        setStatus('error');
+        return;
+      }
+
       await subscribeToBrevo({
         formType: 'portraits_wedding',
         email: formData.email,
@@ -369,7 +384,11 @@ export const PortraitsWeddingPage: React.FC = () => {
         venue: formData.location,
         guestsCount: formData.guests,
         howDidYouHear: formData.source,
-        notes: formData.notes
+        notes: formData.notes,
+        distanceKm: distanceData.distanceKm,
+        pricingTier: distanceData.tier,
+        packagePrices: distanceData.prices,
+        resolvedLocation: distanceData.resolvedLocation,
       }));
 
       window.location.href = '/oferta-portrety/';
@@ -763,6 +782,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                   <label className="grid gap-2">
                     <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Miejsce Przyjęcia</span>
                     <input
+                      required
                       name="location"
                       value={formData.location}
                       onChange={handleChange}
@@ -771,7 +791,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                       className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
                     <span className="pl-2 font-sans text-[11px] leading-relaxed text-[#d42929]">
-                      Uwaga, dojeżdżamy do 300 km od Gliwic (woj.Śląskie)
+                      Uwaga, standardowo dojeżdżamy do 300 km od Gliwic (woj. śląskie)
                     </span>
                   </label>
                 </div>
