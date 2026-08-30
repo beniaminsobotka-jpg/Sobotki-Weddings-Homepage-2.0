@@ -15,6 +15,9 @@
   --radius-md: 22px;
   --shadow: 0 28px 70px rgba(0, 0, 0, 0.4);
   --hero-image: url("./assets/hero.webp");
+  --content-max: 1360px;
+  --page-gutter: clamp(20px, 5.25vw, 96px);
+  --section-space: clamp(88px, 10vw, 144px);
 }
 
 * {
@@ -75,7 +78,7 @@ figure {
 
 .hero {
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px var(--page-gutter) 32px;
 }
 
 .topbar {
@@ -85,7 +88,7 @@ figure {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  max-width: 1500px;
+  max-width: var(--content-max);
   margin: 0 auto 20px;
 }
 
@@ -122,9 +125,9 @@ figure {
 .hero-grid {
   display: grid;
   min-height: calc(100vh - 92px);
-  max-width: 1500px;
+  max-width: var(--content-max);
   margin: 0 auto;
-  gap: 20px;
+  gap: clamp(22px, 2.4vw, 38px);
 }
 
 .hero-copy,
@@ -399,14 +402,14 @@ textarea:focus {
 }
 
 .section {
-  max-width: 1500px;
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--content-max));
   margin: 0 auto;
-  padding: clamp(72px, 11vw, 150px) 20px;
+  padding: var(--section-space) 0;
 }
 
 .intro-section {
   display: grid;
-  gap: 36px;
+  gap: clamp(42px, 6vw, 88px);
   align-items: center;
 }
 
@@ -456,16 +459,16 @@ textarea:focus {
 
 .portrait-gallery {
   display: grid;
-  max-width: 1500px;
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--content-max));
   margin: 0 auto;
-  gap: 6px;
-  padding: 0 20px clamp(72px, 10vw, 130px);
+  gap: clamp(8px, 1.15vw, 18px);
+  padding: 0 0 var(--section-space);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .portrait-gallery figure {
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: clamp(16px, 2vw, 28px);
   background: white;
 }
 
@@ -486,12 +489,12 @@ textarea:focus {
 
 .section-heading {
   max-width: 810px;
-  margin-bottom: 46px;
+  margin-bottom: clamp(42px, 5vw, 68px);
 }
 
 .process-grid {
   display: grid;
-  gap: 14px;
+  gap: clamp(16px, 2vw, 28px);
 }
 
 .process-grid article {
@@ -522,13 +525,18 @@ textarea:focus {
 .faq-section {
   background: var(--color-white);
   color: var(--color-black);
-  box-shadow: 0 0 0 100vmax var(--color-white);
-  clip-path: inset(0 -100vmax);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: clamp(30px, 4vw, 52px);
+  margin-top: clamp(24px, 3vw, 48px);
+  margin-bottom: clamp(24px, 3vw, 48px);
+  padding-right: clamp(24px, 5vw, 72px);
+  padding-left: clamp(24px, 5vw, 72px);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.32);
 }
 
 .comparison-inner {
   display: grid;
-  gap: 40px;
+  gap: clamp(44px, 6vw, 84px);
   align-items: center;
 }
 
@@ -631,7 +639,7 @@ textarea:focus {
 
 .feature-split {
   display: grid;
-  gap: 38px;
+  gap: clamp(44px, 7vw, 96px);
   align-items: center;
 }
 
@@ -687,7 +695,7 @@ textarea:focus {
 
 .packages-grid {
   display: grid;
-  gap: 16px;
+  gap: clamp(20px, 2.6vw, 36px);
 }
 
 .package-card {
@@ -698,7 +706,7 @@ textarea:focus {
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-md);
-  padding: clamp(28px, 5vw, 44px);
+  padding: clamp(32px, 4.2vw, 54px);
   background: var(--color-black-soft);
   color: white;
 }
@@ -799,7 +807,7 @@ li::before {
 
 .addons-section {
   display: grid;
-  gap: 42px;
+  gap: clamp(48px, 7vw, 96px);
   align-items: center;
 }
 
@@ -975,7 +983,7 @@ details p {
   position: relative;
   display: grid;
   min-height: 720px;
-  max-width: 1500px;
+  width: min(calc(100% - (var(--page-gutter) * 2)), var(--content-max));
   overflow: hidden;
   margin: clamp(30px, 7vw, 90px) auto 20px;
   border: 1px solid var(--color-line);
@@ -1212,10 +1220,6 @@ legend,
 }
 
 @media (min-width: 780px) {
-  .hero {
-    padding: 28px;
-  }
-
   .hero-grid {
     grid-template-columns: minmax(0, 1.25fr) minmax(390px, 0.72fr);
   }
@@ -1251,7 +1255,6 @@ legend,
   }
 
   .final-cta {
-    width: calc(100% - 56px);
     margin-left: auto;
     margin-right: auto;
     grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
@@ -1288,6 +1291,15 @@ legend,
 
 
 @media (max-width: 520px) {
+  :root {
+    --section-space: 76px;
+  }
+
+  .hero {
+    padding-top: 16px;
+    padding-bottom: 20px;
+  }
+
   .brand span:last-child,
   .topbar-note {
     display: none;
@@ -1304,8 +1316,8 @@ legend,
   }
 
   .final-cta {
-    margin-right: 12px;
-    margin-left: 12px;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .final-content > .button {
