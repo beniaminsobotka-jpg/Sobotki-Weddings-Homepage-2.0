@@ -811,6 +811,21 @@ li::before {
   align-items: center;
 }
 
+.addons-copy {
+  min-width: 0;
+}
+
+.addons-copy h2 {
+  max-width: 100%;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.addons-copy h2 .serif-accent {
+  display: inline;
+}
+
 .addons-list {
   display: grid;
   gap: 10px;

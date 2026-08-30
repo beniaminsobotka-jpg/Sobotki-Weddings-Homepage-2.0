@@ -92,12 +92,6 @@ function applyPricing(pricing) {
     if (text) text.textContent = `${label} - ${formatPrice(price)}`;
   });
 
-  const note = document.querySelector("#distancePriceNote");
-  if (note) {
-    note.hidden = false;
-    note.textContent = `Cena pakietu dopasowana do lokalizacji: ${pricing.distanceKm} km drogą od Gliwic (w jedną stronę). Koszt transportu wyceniamy i rozliczamy osobno. Dane tras: OpenStreetMap.`;
-  }
-
   document.querySelectorAll("[data-pdf-link]").forEach((link) => {
     link.hidden = true;
     link.style.display = "none";
