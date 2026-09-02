@@ -19,6 +19,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { sobotkiPortraitsLogoDataUrl } from '../assets/sobotkiPortraitsLogo';
 
 type GalleryRecord = {
   slug: string;
@@ -748,16 +749,14 @@ export const GalleryAdminPage: React.FC = () => {
       ]);
 
       const galleryUrl = `${origin}/galeria/${gallery.slug}`;
-      const qrDataUrl = await QRCode.toDataURL(galleryUrl, {
+      const qrCanvas = document.createElement('canvas');
+      await QRCode.toCanvas(qrCanvas, galleryUrl, {
         width: 1600,
         margin: 2,
         color: { dark: '#000000', light: '#FFFFFF' },
         errorCorrectionLevel: 'H',
       });
-      const [qrImage, logoImage] = await Promise.all([
-        loadCanvasImage(qrDataUrl),
-        loadCanvasImage('/sobotki-portraits-logo.png'),
-      ]);
+      const logoImage = await loadCanvasImage(sobotkiPortraitsLogoDataUrl);
       const canvas = document.createElement('canvas');
       canvas.width = 2480;
       canvas.height = 3508;
@@ -814,7 +813,7 @@ export const GalleryAdminPage: React.FC = () => {
       );
 
       const qrSize = 1500;
-      context.drawImage(qrImage, (canvas.width - qrSize) / 2, 1070, qrSize, qrSize);
+      context.drawImage(qrCanvas, (canvas.width - qrSize) / 2, 1070, qrSize, qrSize);
 
       const blackLogo = document.createElement('canvas');
       blackLogo.width = logoImage.naturalWidth;
