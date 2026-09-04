@@ -325,6 +325,11 @@ const normalizeRegistry = (payload) => {
 
 const getRegistryPath = () => `${getGalleryRoot()}/_sobotki-galleries.json`;
 
+const stringifyDropboxHeader = (payload) =>
+  JSON.stringify(payload).replace(/[\u007f-\uffff]/g, (character) =>
+    `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`
+  );
+
 export const getGalleryRegistry = async ({ fresh = false } = {}) => {
   const now = Date.now();
 
@@ -337,7 +342,7 @@ export const getGalleryRegistry = async ({ fresh = false } = {}) => {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      'Dropbox-API-Arg': JSON.stringify({ path: getRegistryPath() }),
+      'Dropbox-API-Arg': stringifyDropboxHeader({ path: getRegistryPath() }),
     },
   });
 
@@ -407,7 +412,7 @@ export const saveGalleryRegistry = async (registry) => {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/octet-stream',
-      'Dropbox-API-Arg': JSON.stringify({
+      'Dropbox-API-Arg': stringifyDropboxHeader({
         path: getRegistryPath(),
         mode: 'overwrite',
         autorename: false,
@@ -528,7 +533,7 @@ export const getPhotoThumbnail = async (path, requestedSize) => {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      'Dropbox-API-Arg': JSON.stringify({
+      'Dropbox-API-Arg': stringifyDropboxHeader({
         resource: {
           '.tag': 'path',
           path,
