@@ -10,6 +10,7 @@ const IMAGE_EXTENSIONS = new Set([
   'tiff',
   'bmp',
 ]);
+const BEST_OF_FOLDER_NAME = 'Best Of';
 
 let cachedAccessToken = null;
 let cachedAccessTokenExpiresAt = 0;
@@ -310,6 +311,10 @@ const normalizeRegistry = (payload) => {
       date: String(gallery.date || '').trim(),
       folder: normalizeDropboxPath(gallery.folder),
       coverPhoto: String(gallery.coverPhoto || '').trim(),
+      publicationConsent:
+        gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
+          ? gallery.publicationConsent
+          : 'unknown',
       active: gallery.active !== false,
       createdAt: String(gallery.createdAt || ''),
       updatedAt: String(gallery.updatedAt || ''),
@@ -398,6 +403,41 @@ const ensureGalleryRoot = async () => {
     });
   }
 };
+
+export const ensureDropboxFolder = async (path) => {
+  const normalizedPath = normalizeDropboxPath(path);
+
+  try {
+    await dropboxRpc('files/get_metadata', {
+      path: normalizedPath,
+      include_deleted: false,
+    });
+  } catch (error) {
+    if (!(error instanceof GalleryError) || error.code !== 'gallery_not_found') {
+      throw error;
+    }
+
+    await dropboxRpc('files/create_folder_v2', {
+      path: normalizedPath,
+      autorename: false,
+    });
+  }
+
+  return normalizedPath;
+};
+
+export const getBestOfGallery = () => ({
+  slug: 'best-of',
+  title: 'Best Of',
+  date: '',
+  folder: `${getGalleryRoot()}/${BEST_OF_FOLDER_NAME}`,
+  coverPhoto: '',
+  publicationConsent: 'granted',
+  active: false,
+  isBestOf: true,
+  createdAt: '',
+  updatedAt: '',
+});
 
 export const saveGalleryRegistry = async (registry) => {
   await ensureGalleryRoot();
@@ -593,4 +633,14 @@ export const getPhotoFile = async (path) => {
   }
 
   return dropboxResponse;
+};
+
+export const copyPhoto = async (sourcePath, destinationPath) => {
+  await dropboxRpc('files/copy_v2', {
+    from_path: normalizeDropboxPath(sourcePath),
+    to_path: normalizeDropboxPath(destinationPath),
+    allow_shared_folder: false,
+    autorename: false,
+    allow_ownership_transfer: false,
+  });
 };

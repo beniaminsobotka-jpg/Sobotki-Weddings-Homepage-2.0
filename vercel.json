@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
+    "api/admin-galleries.js": {
+      "maxDuration": 60
+    },
     "api/gallery-batch-download.js": {
       "maxDuration": 60
     }

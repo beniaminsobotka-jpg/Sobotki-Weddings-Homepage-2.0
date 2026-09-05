@@ -2,6 +2,7 @@ import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
 import {
   buildPhotoPath,
   GalleryError,
+  getBestOfGallery,
   getGalleryRegistry,
   getPhotoThumbnail,
   getTemporaryPhotoLink,
@@ -27,13 +28,22 @@ export default async function handler(request, response) {
   try {
     const slug = validateGallerySlug(request.query?.slug);
     const registry = await getGalleryRegistry();
-    const gallery = registry?.galleries.find((item) => item.slug === slug);
+    const gallery =
+      slug === 'best-of'
+        ? getBestOfGallery()
+        : registry?.galleries.find((item) => item.slug === slug);
 
     if (!gallery) {
       throw new GalleryError('Nie znaleziono galerii.', 404, 'gallery_not_found');
     }
 
     const photoPath = buildPhotoPath(gallery, request.query?.name);
+
+    if (request.query?.download === '1') {
+      response.setHeader('Cache-Control', 'private, no-store');
+      return response.redirect(302, await getTemporaryPhotoLink(photoPath));
+    }
+
     const thumbnail = await getPhotoThumbnail(photoPath, 'small');
 
     if (!thumbnail) {

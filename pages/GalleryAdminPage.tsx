@@ -6,6 +6,7 @@ import {
   Copy,
   Download,
   Edit3,
+  Eye,
   ExternalLink,
   Folder,
   Image,
@@ -16,6 +17,9 @@ import {
   QrCode,
   RefreshCw,
   RotateCcw,
+  ShieldCheck,
+  ShieldX,
+  Sparkles,
   Trash2,
   X,
 } from 'lucide-react';
@@ -28,7 +32,9 @@ type GalleryRecord = {
   folder: string;
   coverPhoto: string;
   photoCount: number | null;
+  publicationConsent: 'granted' | 'denied' | 'unknown';
   active: boolean;
+  isBestOf?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -37,6 +43,7 @@ type AdminGalleryPhoto = {
   id: string;
   name: string;
   thumbnailUrl: string;
+  downloadUrl: string;
 };
 
 type DropboxFolder = {
@@ -48,6 +55,7 @@ type AdminData = {
   galleries: GalleryRecord[];
   folders: DropboxFolder[];
   galleryRoot: string;
+  bestOf: GalleryRecord;
 };
 
 type FormState = {
@@ -56,6 +64,7 @@ type FormState = {
   date: string;
   folder: string;
   slug: string;
+  publicationConsent: 'granted' | 'denied' | '';
   active: boolean;
 };
 
@@ -65,6 +74,7 @@ const emptyForm = (): FormState => ({
   date: '',
   folder: '',
   slug: '',
+  publicationConsent: '',
   active: true,
 });
 
@@ -373,11 +383,18 @@ export const GalleryAdminPage: React.FC = () => {
   const [selectedCoverPhoto, setSelectedCoverPhoto] = useState('');
   const [coverError, setCoverError] = useState('');
   const [isCoverLoading, setIsCoverLoading] = useState(false);
+  const [browserGallery, setBrowserGallery] = useState<GalleryRecord | null>(null);
+  const [browserPhotos, setBrowserPhotos] = useState<AdminGalleryPhoto[]>([]);
+  const [selectedBrowserPhotos, setSelectedBrowserPhotos] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [browserError, setBrowserError] = useState('');
+  const [isBrowserLoading, setIsBrowserLoading] = useState(false);
   const [cardGeneratingSlug, setCardGeneratingSlug] = useState('');
   const suffixRef = useRef('');
 
   useEffect(() => {
-    if (!coverGallery && !showForm) {
+    if (!coverGallery && !browserGallery && !showForm) {
       return;
     }
 
@@ -390,7 +407,7 @@ export const GalleryAdminPage: React.FC = () => {
       document.body.style.overflow = previousOverflow;
       lenis?.start?.();
     };
-  }, [coverGallery, showForm]);
+  }, [browserGallery, coverGallery, showForm]);
 
   const loadAdminData = async () => {
     setIsLoading(true);
@@ -608,6 +625,104 @@ export const GalleryAdminPage: React.FC = () => {
     }
   };
 
+  const openAdminBrowser = async (gallery: GalleryRecord) => {
+    setBrowserGallery(gallery);
+    setBrowserPhotos([]);
+    setSelectedBrowserPhotos(new Set());
+    setBrowserError('');
+    setIsBrowserLoading(true);
+
+    try {
+      const response = await fetchWithTimeout(
+        `/api/admin-galleries?photosFor=${encodeURIComponent(gallery.slug)}`,
+        {},
+        30_000
+      );
+
+      if (!response.ok) {
+        throw new Error(await getErrorMessage(response, 'Nie udało się wczytać zdjęć.'));
+      }
+
+      const payload = await response.json();
+      setBrowserPhotos(Array.isArray(payload.photos) ? payload.photos : []);
+    } catch (photoError) {
+      setBrowserError(getRequestErrorMessage(photoError, 'Nie udało się wczytać zdjęć.'));
+    } finally {
+      setIsBrowserLoading(false);
+    }
+  };
+
+  const toggleBrowserPhoto = (photoName: string) => {
+    if (!browserGallery || browserGallery.isBestOf || browserGallery.publicationConsent !== 'granted') {
+      return;
+    }
+
+    setBrowserError('');
+    setSelectedBrowserPhotos((current) => {
+      const next = new Set(current);
+
+      if (next.has(photoName)) {
+        next.delete(photoName);
+      } else {
+        next.add(photoName);
+      }
+
+      return next;
+    });
+  };
+
+  const addSelectedToBestOf = async () => {
+    if (!browserGallery || !selectedBrowserPhotos.size) {
+      return;
+    }
+
+    setIsBrowserLoading(true);
+    setBrowserError('');
+
+    try {
+      const response = await fetchWithTimeout(
+        '/api/admin-galleries',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'add_to_best_of',
+            slug: browserGallery.slug,
+            photoNames: [...selectedBrowserPhotos],
+          }),
+        },
+        60_000
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          await getErrorMessage(response, 'Nie udało się dodać zdjęć do Best Of.')
+        );
+      }
+
+      const payload = await response.json();
+      const addedCount = Number(payload.addedCount || 0);
+      const skippedCount = Number(payload.skippedCount || 0);
+
+      setData(payload as AdminData);
+      setBrowserGallery(null);
+      setSelectedBrowserPhotos(new Set());
+      setNotice(
+        addedCount > 0
+          ? `Dodano ${addedCount} zdjęć do Best Of.${
+              skippedCount > 0 ? ` ${skippedCount} było już wcześniej dodanych.` : ''
+            }`
+          : 'Wszystkie wybrane zdjęcia były już w Best Of.'
+      );
+    } catch (addError) {
+      setBrowserError(
+        getRequestErrorMessage(addError, 'Nie udało się dodać zdjęć do Best Of.')
+      );
+    } finally {
+      setIsBrowserLoading(false);
+    }
+  };
+
   const openEditForm = (gallery: GalleryRecord) => {
     suffixRef.current = '';
     setSlugTouched(true);
@@ -617,6 +732,10 @@ export const GalleryAdminPage: React.FC = () => {
       date: gallery.date,
       folder: gallery.folder,
       slug: gallery.slug,
+      publicationConsent:
+        gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
+          ? gallery.publicationConsent
+          : '',
       active: gallery.active,
     });
     setShowForm(true);
@@ -968,6 +1087,42 @@ export const GalleryAdminPage: React.FC = () => {
           </div>
         )}
 
+        {data?.bestOf && (
+          <section className="relative mt-7 overflow-hidden rounded-3xl bg-[#111111] p-6 text-white sm:p-8">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-[0.06]"
+              style={{ backgroundImage: 'url(/noise.svg)' }}
+              aria-hidden="true"
+            />
+            <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+              <div className="flex items-start gap-4">
+                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.06]">
+                  <Sparkles size={20} aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-sans text-[9px] font-bold uppercase tracking-[0.24em] text-white/42">
+                    Biblioteka najlepszych kadrów
+                  </p>
+                  <h2 className="mt-2 font-serif text-4xl font-black uppercase tracking-[-0.045em]">
+                    Best Of
+                  </h2>
+                  <p className="mt-2 font-sans text-xs leading-5 text-white/52">
+                    {formatPhotoCount(data.bestOf.photoCount)} gotowych do wykorzystania w social mediach i ofercie.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => void openAdminBrowser(data.bestOf)}
+                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-black transition-opacity hover:opacity-85"
+              >
+                <Eye size={16} aria-hidden="true" />
+                Przeglądaj Best Of
+              </button>
+            </div>
+          </section>
+        )}
+
         {!data && (
           <section className="mt-7 rounded-2xl border border-black/10 bg-white/60 p-5 sm:p-7">
             <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-black/40">
@@ -1112,6 +1267,26 @@ export const GalleryAdminPage: React.FC = () => {
                               <Image size={11} aria-hidden="true" />
                               {formatPhotoCount(gallery.photoCount)}
                             </span>
+                            <span
+                              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-sans text-[8px] font-bold uppercase tracking-[0.13em] ${
+                                gallery.publicationConsent === 'granted'
+                                  ? 'bg-emerald-700/10 text-emerald-800'
+                                  : gallery.publicationConsent === 'denied'
+                                    ? 'bg-red-700/10 text-red-800'
+                                    : 'bg-amber-500/15 text-amber-800'
+                              }`}
+                            >
+                              {gallery.publicationConsent === 'granted' ? (
+                                <ShieldCheck size={11} aria-hidden="true" />
+                              ) : (
+                                <ShieldX size={11} aria-hidden="true" />
+                              )}
+                              {gallery.publicationConsent === 'granted'
+                                ? 'Zgoda na publikację'
+                                : gallery.publicationConsent === 'denied'
+                                  ? 'Brak zgody'
+                                  : 'Zgoda nieustawiona'}
+                            </span>
                           </div>
                           <h3 className="mt-3 truncate font-serif text-2xl font-black uppercase tracking-[-0.035em]">
                             {gallery.title}
@@ -1134,6 +1309,15 @@ export const GalleryAdminPage: React.FC = () => {
                   </div>
 
                   <div className="mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => void openAdminBrowser(gallery)}
+                      disabled={isLoading}
+                      className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-black px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] text-white transition-opacity hover:opacity-85 disabled:opacity-40 sm:col-span-1"
+                    >
+                      <Eye size={14} aria-hidden="true" />
+                      Przeglądaj galerię jako administrator
+                    </button>
                     <button
                       type="button"
                       onClick={() => void copyGalleryUrl(gallery)}
@@ -1210,6 +1394,207 @@ export const GalleryAdminPage: React.FC = () => {
           </div>
         )}
       </main>
+
+      {browserGallery && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-5"
+          role="dialog"
+          aria-modal="true"
+          aria-label={
+            browserGallery.isBestOf
+              ? 'Przeglądaj Best Of'
+              : `Przeglądaj galerię ${browserGallery.title} jako administrator`
+          }
+        >
+          <div className="flex max-h-[95dvh] w-full max-w-6xl flex-col rounded-t-3xl bg-[#f3f2ed] sm:rounded-3xl">
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-black/[0.08] p-5 sm:p-7">
+              <div className="min-w-0">
+                <p className="font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-black/38">
+                  {browserGallery.isBestOf ? 'Biblioteka najlepszych kadrów' : browserGallery.title}
+                </p>
+                <h2 className="mt-1 font-serif text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
+                  {browserGallery.isBestOf ? 'Best Of' : 'Przeglądaj galerię'}
+                </h2>
+                {!browserGallery.isBestOf && (
+                  <div
+                    className={`mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-sans text-[8px] font-bold uppercase tracking-[0.14em] ${
+                      browserGallery.publicationConsent === 'granted'
+                        ? 'bg-emerald-700/10 text-emerald-800'
+                        : 'bg-red-700/10 text-red-800'
+                    }`}
+                  >
+                    {browserGallery.publicationConsent === 'granted' ? (
+                      <ShieldCheck size={13} aria-hidden="true" />
+                    ) : (
+                      <ShieldX size={13} aria-hidden="true" />
+                    )}
+                    {browserGallery.publicationConsent === 'granted'
+                      ? 'Możesz dodawać zdjęcia do Best Of'
+                      : browserGallery.publicationConsent === 'denied'
+                        ? 'Brak zgody — dodawanie do Best Of zablokowane'
+                        : 'Zgoda nieustawiona — dodawanie do Best Of zablokowane'}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setBrowserGallery(null)}
+                disabled={isBrowserLoading}
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-black/10 disabled:opacity-35"
+                aria-label="Zamknij przeglądanie galerii"
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div
+              data-lenis-prevent
+              className="min-h-0 flex-1 touch-pan-y overflow-y-auto overscroll-contain p-4 sm:p-7"
+            >
+              {isBrowserLoading && browserPhotos.length === 0 && (
+                <div className="flex min-h-56 items-center justify-center" role="status">
+                  <Loader2 size={26} className="animate-spin text-black/35" aria-hidden="true" />
+                  <span className="sr-only">Wczytuję zdjęcia</span>
+                </div>
+              )}
+
+              {!isBrowserLoading && browserPhotos.length === 0 && !browserError && (
+                <div className="flex min-h-56 flex-col items-center justify-center text-center">
+                  <Image size={30} className="text-black/25" aria-hidden="true" />
+                  <p className="mt-4 font-serif text-2xl font-black uppercase">
+                    {browserGallery.isBestOf
+                      ? 'Best Of jest jeszcze puste'
+                      : 'W galerii nie ma jeszcze zdjęć'}
+                  </p>
+                </div>
+              )}
+
+              {browserPhotos.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+                  {browserPhotos.map((photo, index) => {
+                    const selected = selectedBrowserPhotos.has(photo.name);
+                    const canSelect =
+                      !browserGallery.isBestOf &&
+                      browserGallery.publicationConsent === 'granted';
+
+                    return (
+                      <div
+                        key={photo.id}
+                        className={`group relative aspect-[4/5] overflow-hidden rounded-xl border-2 bg-black/[0.06] transition ${
+                          selected ? 'border-black' : 'border-transparent'
+                        }`}
+                      >
+                        <img
+                          src={photo.thumbnailUrl}
+                          alt={`Zdjęcie ${index + 1}`}
+                          loading={index < 8 ? 'eager' : 'lazy'}
+                          className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.02] ${
+                            selected ? 'opacity-75' : ''
+                          }`}
+                        />
+                        {canSelect && (
+                          <button
+                            type="button"
+                            onClick={() => toggleBrowserPhoto(photo.name)}
+                            className="absolute inset-0 z-10"
+                            aria-label={`${selected ? 'Odznacz' : 'Zaznacz'} zdjęcie ${index + 1}`}
+                            aria-pressed={selected}
+                          />
+                        )}
+                        {canSelect && (
+                          <span
+                            className={`pointer-events-none absolute right-2 top-2 z-20 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 shadow-sm ${
+                              selected
+                                ? 'border-black bg-black text-white'
+                                : 'border-white bg-black/20 text-transparent'
+                            }`}
+                          >
+                            <Check size={16} strokeWidth={3} aria-hidden="true" />
+                          </span>
+                        )}
+                        <a
+                          href={photo.downloadUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="absolute bottom-2 right-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-md transition-transform hover:scale-105"
+                          aria-label={`Pobierz zdjęcie ${index + 1}`}
+                        >
+                          <Download size={15} aria-hidden="true" />
+                        </a>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {browserError && (
+                <p className="mt-4 rounded-xl border border-red-700/15 bg-red-700/[0.06] p-4 font-sans text-xs text-[#a62020]" role="alert">
+                  {browserError}
+                </p>
+              )}
+            </div>
+
+            <div className="shrink-0 border-t border-black/[0.08] p-4 sm:p-6">
+              {browserGallery.isBestOf ? (
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-sans text-[9px] font-bold uppercase tracking-[0.16em] text-black/45">
+                    {formatPhotoCount(browserPhotos.length)} w Best Of
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setBrowserGallery(null)}
+                    className="min-h-11 rounded-full bg-black px-6 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white"
+                  >
+                    Zamknij
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center justify-between gap-3 sm:justify-start">
+                    <p className="font-sans text-[9px] font-bold uppercase tracking-[0.16em] text-black/50">
+                      Wybrano {selectedBrowserPhotos.size}
+                    </p>
+                    {browserGallery.publicationConsent === 'granted' && browserPhotos.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedBrowserPhotos(
+                            selectedBrowserPhotos.size === browserPhotos.length
+                              ? new Set()
+                              : new Set(browserPhotos.map((photo) => photo.name))
+                          )
+                        }
+                        className="min-h-10 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.13em]"
+                      >
+                        {selectedBrowserPhotos.size === browserPhotos.length
+                          ? 'Odznacz wszystkie'
+                          : 'Zaznacz wszystkie'}
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void addSelectedToBestOf()}
+                    disabled={
+                      isBrowserLoading ||
+                      !selectedBrowserPhotos.size ||
+                      browserGallery.publicationConsent !== 'granted'
+                    }
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-black px-6 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white disabled:cursor-not-allowed disabled:opacity-30"
+                  >
+                    {isBrowserLoading ? (
+                      <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Sparkles size={15} aria-hidden="true" />
+                    )}
+                    Dodaj wybrane do Best Of
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {coverGallery && (
         <div
@@ -1369,6 +1754,71 @@ export const GalleryAdminPage: React.FC = () => {
                 />
               </label>
 
+              <fieldset>
+                <legend className="font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">
+                  Zgoda na publikację wizerunku
+                </legend>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <label
+                    className={`flex min-h-[64px] cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${
+                      form.publicationConsent === 'granted'
+                        ? 'border-emerald-700 bg-emerald-700/[0.07]'
+                        : 'border-black/12 bg-white/50 hover:border-black/30'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="publicationConsent"
+                      value="granted"
+                      checked={form.publicationConsent === 'granted'}
+                      onChange={() =>
+                        setForm((current) => ({
+                          ...current,
+                          publicationConsent: 'granted',
+                        }))
+                      }
+                      required
+                      className="sr-only"
+                    />
+                    <ShieldCheck size={20} className="shrink-0 text-emerald-800" aria-hidden="true" />
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-black/70">
+                      Zgoda na publikację
+                    </span>
+                  </label>
+                  <label
+                    className={`flex min-h-[64px] cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors ${
+                      form.publicationConsent === 'denied'
+                        ? 'border-red-700 bg-red-700/[0.06]'
+                        : 'border-black/12 bg-white/50 hover:border-black/30'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="publicationConsent"
+                      value="denied"
+                      checked={form.publicationConsent === 'denied'}
+                      onChange={() =>
+                        setForm((current) => ({
+                          ...current,
+                          publicationConsent: 'denied',
+                        }))
+                      }
+                      required
+                      className="sr-only"
+                    />
+                    <ShieldX size={20} className="shrink-0 text-red-800" aria-hidden="true" />
+                    <span className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-black/70">
+                      Brak zgody na publikację
+                    </span>
+                  </label>
+                </div>
+                {!form.publicationConsent && (
+                  <p className="mt-2 font-sans text-[10px] leading-4 text-amber-800">
+                    Wybierz jedną opcję. Bez wyraźnej zgody zdjęć nie można dodać do Best Of.
+                  </p>
+                )}
+              </fieldset>
+
               <label className="block font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">
                 Folder na Dropboxie
                 <select
@@ -1409,7 +1859,13 @@ export const GalleryAdminPage: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={isLoading || !form.title || !form.folder || !form.slug}
+                disabled={
+                  isLoading ||
+                  !form.title ||
+                  !form.folder ||
+                  !form.slug ||
+                  !form.publicationConsent
+                }
                 className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-black px-6 font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-white disabled:cursor-wait disabled:opacity-35"
               >
                 {isLoading && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
