@@ -1,7 +1,7 @@
 import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
 import {
   buildPhotoPath,
-  copyPhoto,
+  copyPhotosBatch,
   ensureDropboxFolder,
   GalleryError,
   getBestOfGallery,
@@ -58,6 +58,36 @@ const findAdminGallery = (registry, slug) =>
   slug === 'best-of'
     ? getBestOfGallery()
     : registry?.galleries.find((gallery) => gallery.slug === slug);
+
+const wait = (milliseconds) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+
+const waitForCopiedPhotos = async (gallery, expectedNames) => {
+  if (!expectedNames.length) {
+    return;
+  }
+
+  const deadline = Date.now() + 8_000;
+
+  while (Date.now() < deadline) {
+    const photos = await listGalleryPhotos(gallery);
+    const currentNames = new Set(photos.map((photo) => photo.name));
+
+    if (expectedNames.every((name) => currentNames.has(name))) {
+      return;
+    }
+
+    await wait(400);
+  }
+
+  throw new GalleryError(
+    'Dropbox nadal przetwarza część zdjęć. Odśwież panel za chwilę.',
+    504,
+    'best_of_visibility_timeout'
+  );
+};
 
 const getAdminData = async () => {
   const bestOfGallery = getBestOfGallery();
@@ -200,17 +230,16 @@ export default async function handler(request, response) {
         }))
         .filter((photo) => !existingNames.has(photo.destinationName));
 
-      for (let index = 0; index < photosToCopy.length; index += 6) {
-        const batch = photosToCopy.slice(index, index + 6);
-        await Promise.all(
-          batch.map((photo) =>
-            copyPhoto(
-              buildPhotoPath(gallery, photo.sourceName),
-              `${bestOfGallery.folder}/${photo.destinationName}`
-            )
-          )
-        );
-      }
+      await copyPhotosBatch(
+        photosToCopy.map((photo) => ({
+          sourcePath: buildPhotoPath(gallery, photo.sourceName),
+          destinationPath: `${bestOfGallery.folder}/${photo.destinationName}`,
+        }))
+      );
+      await waitForCopiedPhotos(
+        bestOfGallery,
+        photosToCopy.map((photo) => photo.destinationName)
+      );
 
       return sendJson(response, 200, {
         ...(await getAdminData()),

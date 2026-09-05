@@ -635,12 +635,94 @@ export const getPhotoFile = async (path) => {
   return dropboxResponse;
 };
 
-export const copyPhoto = async (sourcePath, destinationPath) => {
-  await dropboxRpc('files/copy_v2', {
-    from_path: normalizeDropboxPath(sourcePath),
-    to_path: normalizeDropboxPath(destinationPath),
-    allow_shared_folder: false,
-    autorename: false,
-    allow_ownership_transfer: false,
+const wait = (milliseconds) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
   });
+
+const getCompletedBatchEntries = (result) => {
+  if (result?.['.tag'] !== 'complete') {
+    return null;
+  }
+
+  if (Array.isArray(result.entries)) {
+    return result.entries;
+  }
+
+  if (Array.isArray(result.complete?.entries)) {
+    return result.complete.entries;
+  }
+
+  return Array.isArray(result.complete) ? result.complete : [];
+};
+
+const assertCopyBatchSucceeded = (entries, expectedCount) => {
+  if (
+    entries.length !== expectedCount ||
+    entries.some((entry) => entry?.['.tag'] !== 'success')
+  ) {
+    throw new GalleryError(
+      'Nie wszystkie wybrane zdjęcia udało się dodać do Best Of. Spróbuj ponownie.',
+      502,
+      'best_of_copy_failed'
+    );
+  }
+};
+
+export const copyPhotosBatch = async (photos) => {
+  if (!Array.isArray(photos) || photos.length === 0) {
+    return;
+  }
+
+  const entries = photos.map((photo) => ({
+    from_path: normalizeDropboxPath(photo.sourcePath),
+    to_path: normalizeDropboxPath(photo.destinationPath),
+  }));
+  let result = await dropboxRpc('files/copy_batch_v2', {
+    entries,
+    autorename: false,
+  });
+  let completedEntries = getCompletedBatchEntries(result);
+
+  if (completedEntries) {
+    assertCopyBatchSucceeded(completedEntries, entries.length);
+    return;
+  }
+
+  if (result?.['.tag'] !== 'async_job_id' || !result.async_job_id) {
+    throw new GalleryError(
+      'Dropbox nie potwierdził dodania zdjęć do Best Of. Spróbuj ponownie.',
+      502,
+      'best_of_copy_failed'
+    );
+  }
+
+  const deadline = Date.now() + 42_000;
+
+  while (Date.now() < deadline) {
+    await wait(500);
+    result = await dropboxRpc('files/copy_batch/check_v2', {
+      async_job_id: result.async_job_id,
+    });
+    completedEntries = getCompletedBatchEntries(result);
+
+    if (completedEntries) {
+      assertCopyBatchSucceeded(completedEntries, entries.length);
+      return;
+    }
+
+    if (result?.['.tag'] !== 'in_progress') {
+      throw new GalleryError(
+        'Nie wszystkie wybrane zdjęcia udało się dodać do Best Of. Spróbuj ponownie.',
+        502,
+        'best_of_copy_failed'
+      );
+    }
+  }
+
+  throw new GalleryError(
+    'Dodawanie zdjęć do Best Of trwa dłużej niż zwykle. Odśwież panel za chwilę.',
+    504,
+    'best_of_copy_timeout'
+  );
 };

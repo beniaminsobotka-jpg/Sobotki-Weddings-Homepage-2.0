@@ -22,6 +22,7 @@ const ContactPage = lazy(async () => ({ default: (await import('./pages/ContactP
 const EditorialHomepage = lazy(async () => ({ default: (await import('./pages/EditorialHomepage')).EditorialHomepage }));
 const GalleryPage = lazy(async () => ({ default: (await import('./pages/GalleryPage')).GalleryPage }));
 const GalleryAdminPage = lazy(async () => ({ default: (await import('./pages/GalleryAdminPage')).GalleryAdminPage }));
+const BestOfGalleryPage = lazy(async () => ({ default: (await import('./pages/BestOfGalleryPage')).BestOfGalleryPage }));
 
 // ScrollToTop component to reset scroll on route change
 const ScrollToTop = () => {
@@ -140,6 +141,7 @@ const AppShell: React.FC<{
                 <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
                 <Route path="/editorial-home" element={<EditorialHomepage />} />
                 <Route path="/galeria/:slug" element={<GalleryPage />} />
+                <Route path="/panel/galerie/best-of" element={<BestOfGalleryPage />} />
                 <Route path="/panel/galerie" element={<GalleryAdminPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

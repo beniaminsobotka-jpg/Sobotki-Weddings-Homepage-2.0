@@ -44,7 +44,10 @@ export default async function handler(request, response) {
       return response.redirect(302, await getTemporaryPhotoLink(photoPath));
     }
 
-    const thumbnail = await getPhotoThumbnail(photoPath, 'small');
+    const thumbnail = await getPhotoThumbnail(
+      photoPath,
+      request.query?.size === 'large' ? 'large' : 'small'
+    );
 
     if (!thumbnail) {
       return response.redirect(302, await getTemporaryPhotoLink(photoPath));

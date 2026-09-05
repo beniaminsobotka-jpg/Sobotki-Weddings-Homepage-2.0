@@ -373,6 +373,7 @@ export const GalleryAdminPage: React.FC = () => {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [slugTouched, setSlugTouched] = useState(false);
   const [copiedSlug, setCopiedSlug] = useState('');
+  const [bestOfLinkCopied, setBestOfLinkCopied] = useState(false);
   const [oauthCode, setOauthCode] = useState('');
   const [oauthError, setOauthError] = useState('');
   const [oauthRefreshToken, setOauthRefreshToken] = useState('');
@@ -480,6 +481,7 @@ export const GalleryAdminPage: React.FC = () => {
   }, [form.title, form.originalSlug, showForm, slugTouched]);
 
   const origin = typeof window === 'undefined' ? 'https://www.sobotkiweddings.pl' : window.location.origin;
+  const bestOfUrl = `${origin}/panel/galerie/best-of`;
   const activeGalleries = useMemo(
     () => data?.galleries.filter((gallery) => gallery.active).length || 0,
     [data]
@@ -1111,14 +1113,29 @@ export const GalleryAdminPage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => void openAdminBrowser(data.bestOf)}
-                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-black transition-opacity hover:opacity-85"
-              >
-                <Eye size={16} aria-hidden="true" />
-                Przeglądaj Best Of
-              </button>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(bestOfUrl);
+                    setBestOfLinkCopied(true);
+                    window.setTimeout(() => setBestOfLinkCopied(false), 1800);
+                  }}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-5 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white transition-colors hover:bg-white hover:text-black"
+                >
+                  {bestOfLinkCopied ? <Check size={16} /> : <Copy size={16} />}
+                  {bestOfLinkCopied ? 'Skopiowano' : 'Kopiuj link'}
+                </button>
+                <a
+                  href="/panel/galerie/best-of"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-black transition-opacity hover:opacity-85"
+                >
+                  <ExternalLink size={16} aria-hidden="true" />
+                  Otwórz galerię Best Of
+                </a>
+              </div>
             </div>
           </section>
         )}
