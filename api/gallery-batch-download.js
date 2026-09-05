@@ -6,9 +6,9 @@ import {
   resolveGallery,
 } from '../server/dropbox-gallery.js';
 
-const MAX_ARCHIVE_PHOTOS = 100;
-const MAX_ARCHIVE_BYTES = 750 * 1024 * 1024;
-const DOWNLOAD_CONCURRENCY = 4;
+const MAX_ARCHIVE_PHOTOS = 2000;
+const MAX_ARCHIVE_BYTES = 250 * 1024 * 1024;
+const DOWNLOAD_CONCURRENCY = 8;
 
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
