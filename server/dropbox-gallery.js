@@ -565,3 +565,32 @@ export const getTemporaryPhotoLink = async (path) => {
 
   return result.link;
 };
+
+export const getPhotoFile = async (path) => {
+  const accessToken = await getAccessToken();
+  const dropboxResponse = await fetch(`${DROPBOX_CONTENT_URL}/files/download`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Dropbox-API-Arg': stringifyDropboxHeader({ path }),
+    },
+  });
+
+  if (!dropboxResponse.ok) {
+    const errorSummary = await readDropboxError(dropboxResponse);
+
+    throwDropboxAuthError(dropboxResponse, errorSummary);
+
+    if (dropboxResponse.status === 409 && errorSummary.includes('not_found')) {
+      throw new GalleryError('Nie znaleziono takiego zdjęcia.', 404, 'photo_not_found');
+    }
+
+    throw new GalleryError(
+      'Nie udało się pobrać jednego ze zdjęć.',
+      502,
+      'photo_download_failed'
+    );
+  }
+
+  return dropboxResponse;
+};

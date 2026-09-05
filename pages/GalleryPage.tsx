@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Camera,
+  Check,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -64,6 +65,12 @@ export const GalleryPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(
+    () => new Set()
+  );
+  const [isDownloadingSelection, setIsDownloadingSelection] = useState(false);
+  const [selectionError, setSelectionError] = useState('');
   const touchStartX = useRef<number | null>(null);
   const requestInProgress = useRef(false);
 
@@ -169,6 +176,90 @@ export const GalleryPage: React.FC = () => {
 
   const photos = data?.photos || [];
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
+
+  useEffect(() => {
+    const availablePhotoIds = new Set(photos.map((photo) => photo.id));
+
+    setSelectedPhotoIds((current) => {
+      const next = new Set(
+        [...current].filter((photoId) => availablePhotoIds.has(photoId))
+      );
+
+      return next.size === current.size ? current : next;
+    });
+  }, [photos]);
+
+  const togglePhotoSelection = useCallback((photoId: string) => {
+    setSelectionError('');
+    setSelectedPhotoIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(photoId)) {
+        next.delete(photoId);
+      } else {
+        next.add(photoId);
+      }
+
+      return next;
+    });
+  }, []);
+
+  const closeSelectionMode = useCallback(() => {
+    setIsSelectionMode(false);
+    setSelectedPhotoIds(new Set());
+    setSelectionError('');
+  }, []);
+
+  const downloadSelectedPhotos = useCallback(async () => {
+    const names = photos
+      .filter((photo) => selectedPhotoIds.has(photo.id))
+      .map((photo) => photo.name);
+
+    if (!names.length || isDownloadingSelection) {
+      return;
+    }
+
+    setIsDownloadingSelection(true);
+    setSelectionError('');
+
+    try {
+      const response = await fetch('/api/gallery-batch-download', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/zip, application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ slug, names }),
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        throw new Error(
+          payload?.error || 'Nie udało się przygotować wybranych zdjęć.'
+        );
+      }
+
+      const archive = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(archive);
+      const downloadLink = document.createElement('a');
+
+      downloadLink.href = downloadUrl;
+      downloadLink.download = `sobotki-${slug}-${names.length}-zdjec.zip`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      window.setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 1_000);
+      closeSelectionMode();
+    } catch (downloadError) {
+      setSelectionError(
+        downloadError instanceof Error
+          ? downloadError.message
+          : 'Nie udało się przygotować wybranych zdjęć.'
+      );
+    } finally {
+      setIsDownloadingSelection(false);
+    }
+  }, [closeSelectionMode, isDownloadingSelection, photos, selectedPhotoIds, slug]);
 
   const showPrevious = useCallback(() => {
     if (!photos.length) {
@@ -293,8 +384,16 @@ export const GalleryPage: React.FC = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1500px] px-3 pb-20 pt-7 sm:px-6 sm:pb-28 sm:pt-10 lg:px-8">
-        <div className="mb-7 flex items-center justify-between gap-4 px-1 sm:mb-9">
+      <main
+        className={`mx-auto max-w-[1500px] px-3 pt-7 sm:px-6 sm:pt-10 lg:px-8 ${
+          isSelectionMode ? 'pb-36 sm:pb-40' : 'pb-20 sm:pb-28'
+        }`}
+      >
+        <div
+          className={`mb-7 flex justify-between gap-4 px-1 sm:mb-9 sm:flex-row sm:items-center ${
+            isSelectionMode ? 'flex-col items-stretch' : 'items-center'
+          }`}
+        >
           <div className="flex min-w-0 items-center gap-3">
             <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/10 bg-white/45">
               <Images size={16} strokeWidth={1.7} aria-hidden="true" />
@@ -309,19 +408,68 @@ export const GalleryPage: React.FC = () => {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => void loadGallery(true)}
-            disabled={isRefreshing}
-            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[10px] font-bold uppercase tracking-[0.16em] transition-colors hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-50"
+          <div
+            className={`flex shrink-0 items-center gap-2 ${
+              isSelectionMode ? 'justify-between sm:justify-start' : ''
+            }`}
           >
-            <RefreshCw
-              size={14}
-              className={isRefreshing ? 'animate-spin' : ''}
-              aria-hidden="true"
-            />
-            <span className="hidden sm:inline">Odśwież</span>
-          </button>
+            {isSelectionMode ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectionError('');
+                    setSelectedPhotoIds(
+                      selectedPhotoIds.size === photos.length
+                        ? new Set()
+                        : new Set(photos.map((photo) => photo.id))
+                    );
+                  }}
+                  className="inline-flex min-h-11 items-center rounded-full border border-black/10 px-3 font-sans text-[9px] font-bold uppercase tracking-[0.13em] transition-colors hover:bg-black hover:text-white sm:px-4 sm:text-[10px]"
+                >
+                  {selectedPhotoIds.size === photos.length
+                    ? 'Odznacz wszystkie'
+                    : 'Zaznacz wszystkie'}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeSelectionMode}
+                  className="inline-flex min-h-11 items-center rounded-full px-3 font-sans text-[9px] font-bold uppercase tracking-[0.13em] text-black/50 transition-colors hover:bg-black/5 hover:text-black sm:px-4 sm:text-[10px]"
+                >
+                  Anuluj
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSelectionMode(true);
+                  setSelectionError('');
+                }}
+                disabled={!photos.length}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-black/10 px-3 font-sans text-[9px] font-bold uppercase tracking-[0.13em] transition-colors hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-35 sm:px-4 sm:text-[10px] sm:tracking-[0.16em]"
+              >
+                <Check size={14} aria-hidden="true" />
+                Wybierz zdjęcia
+              </button>
+            )}
+
+            {!isSelectionMode && (
+              <button
+                type="button"
+                onClick={() => void loadGallery(true)}
+                disabled={isRefreshing}
+                className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[10px] font-bold uppercase tracking-[0.16em] transition-colors hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-50"
+              >
+                <RefreshCw
+                  size={14}
+                  className={isRefreshing ? 'animate-spin' : ''}
+                  aria-hidden="true"
+                />
+                <span className="hidden sm:inline">Odśwież</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {isLoading && !data && (
@@ -371,29 +519,64 @@ export const GalleryPage: React.FC = () => {
 
         {photos.length > 0 && (
           <div className="columns-2 gap-2 sm:columns-3 sm:gap-4 lg:columns-4">
-            {photos.map((photo, index) => (
-              <motion.button
-                type="button"
-                key={photo.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: Math.min(index * 0.025, 0.35) }}
-                onClick={() => setSelectedIndex(index)}
-                className="group relative mb-2 block w-full break-inside-avoid overflow-hidden bg-black/[0.08] text-left sm:mb-4"
-                aria-label={`Otwórz portret ${index + 1} z ${photos.length}`}
-              >
-                <img
-                  src={photo.thumbnailUrl}
-                  alt={`Portret ${index + 1}`}
-                  loading={index < 6 ? 'eager' : 'lazy'}
-                  decoding="async"
-                  className="h-auto w-full transition duration-700 ease-out group-hover:scale-[1.015] group-hover:opacity-90"
-                />
-                <span className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-black/60 to-transparent px-4 pb-3 pt-10 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-white opacity-0 transition-opacity group-hover:opacity-100 sm:block">
-                  Zobacz zdjęcie
-                </span>
-              </motion.button>
-            ))}
+            {photos.map((photo, index) => {
+              const isSelected = selectedPhotoIds.has(photo.id);
+
+              return (
+                <motion.button
+                  type="button"
+                  key={photo.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: Math.min(index * 0.025, 0.35) }}
+                  onClick={() => {
+                    if (isSelectionMode) {
+                      togglePhotoSelection(photo.id);
+                    } else {
+                      setSelectedIndex(index);
+                    }
+                  }}
+                  className={`group relative mb-2 block w-full break-inside-avoid overflow-hidden bg-black/[0.08] text-left sm:mb-4 ${
+                    isSelected ? 'ring-4 ring-black ring-offset-2 ring-offset-[#f3f2ed]' : ''
+                  }`}
+                  aria-label={
+                    isSelectionMode
+                      ? `${isSelected ? 'Odznacz' : 'Zaznacz'} portret ${index + 1}`
+                      : `Otwórz portret ${index + 1} z ${photos.length}`
+                  }
+                  aria-pressed={isSelectionMode ? isSelected : undefined}
+                >
+                  <img
+                    src={photo.thumbnailUrl}
+                    alt={`Portret ${index + 1}`}
+                    loading={index < 6 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    className={`h-auto w-full transition duration-700 ease-out group-hover:scale-[1.015] ${
+                      isSelected ? 'opacity-75' : 'group-hover:opacity-90'
+                    }`}
+                  />
+                  {isSelectionMode && (
+                    <span
+                      className={`pointer-events-none absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
+                        isSelected
+                          ? 'border-black bg-black text-white'
+                          : 'border-white bg-black/25 text-transparent backdrop-blur-sm'
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <Check size={18} strokeWidth={3} />
+                    </span>
+                  )}
+                  <span className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-black/60 to-transparent px-4 pb-3 pt-10 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-white opacity-0 transition-opacity group-hover:opacity-100 sm:block">
+                    {isSelectionMode
+                      ? isSelected
+                        ? 'Odznacz zdjęcie'
+                        : 'Zaznacz zdjęcie'
+                      : 'Zobacz zdjęcie'}
+                  </span>
+                </motion.button>
+              );
+            })}
           </div>
         )}
       </main>
@@ -404,6 +587,43 @@ export const GalleryPage: React.FC = () => {
           Portrety tworzone na żywo
         </p>
       </footer>
+
+      <AnimatePresence>
+        {isSelectionMode && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            className="fixed inset-x-3 bottom-3 z-[9000] mx-auto max-w-2xl rounded-2xl border border-white/10 bg-black px-4 py-3 text-white shadow-2xl sm:bottom-5 sm:flex sm:items-center sm:justify-between sm:gap-5 sm:rounded-full sm:px-5"
+          >
+            <div className="min-w-0">
+              <p className="font-sans text-[10px] font-bold uppercase tracking-[0.17em] text-white/75">
+                Wybrano {selectedPhotoIds.size} z {photos.length}
+              </p>
+              {selectionError && (
+                <p className="mt-1 font-sans text-[11px] leading-4 text-red-300">
+                  {selectionError}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => void downloadSelectedPhotos()}
+              disabled={!selectedPhotoIds.size || isDownloadingSelection}
+              className="mt-3 inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-full bg-white px-5 font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-black transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-35 sm:mt-0 sm:w-auto"
+            >
+              {isDownloadingSelection ? (
+                <RefreshCw size={16} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Download size={16} aria-hidden="true" />
+              )}
+              {isDownloadingSelection
+                ? 'Przygotowuję ZIP…'
+                : `Pobierz wybrane (${selectedPhotoIds.size})`}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {selectedPhoto && selectedIndex !== null && (
