@@ -51,7 +51,7 @@ export const BestOfGalleryPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/admin-best-of', {
+      const response = await fetch('/api/admin-galleries?photosFor=best-of', {
         headers: { Accept: 'application/json' },
       });
 

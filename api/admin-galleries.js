@@ -141,6 +141,11 @@ export default async function handler(request, response) {
         const photos = await listPhotosOrEmpty(gallery);
 
         return sendJson(response, 200, {
+          gallery: {
+            slug: gallery.slug,
+            title: gallery.title,
+            photoCount: photos.length,
+          },
           coverPhoto: gallery.coverPhoto || '',
           photos: photos.map((photo) => {
             const query = new URLSearchParams({
@@ -153,6 +158,7 @@ export default async function handler(request, response) {
               id: photo.id,
               name: photo.name,
               thumbnailUrl: `/api/admin-gallery-photo?${query.toString()}`,
+              largeUrl: `/api/admin-gallery-photo?${query.toString()}&size=large`,
               downloadUrl: `/api/admin-gallery-photo?${query.toString()}&download=1`,
             };
           }),
