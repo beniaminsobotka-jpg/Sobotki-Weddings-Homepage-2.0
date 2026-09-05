@@ -6,7 +6,7 @@ export const SITE_NAME = 'Sobotki Weddings';
 export const SITE_LOCALE = 'pl_PL';
 export const DEFAULT_ROBOTS = 'index,follow,max-image-preview:large';
 export const SITE_DESCRIPTION =
-  'Fotografia i film ślubny oraz fotostacja premium na wesela, eventy firmowe i sesje portretowe.';
+  'Naturalna fotografia ślubna oraz fotostacja premium na wesela, eventy firmowe i sesje portretowe.';
 export const SITE_LOGO =
   '/favicon.svg';
 export const SITE_DEFAULT_IMAGE =
@@ -35,9 +35,9 @@ type PageSeo = {
 export const seoPages: Record<SeoPageKey, PageSeo> = {
   home: {
     path: '/',
-    title: 'Sobotki Weddings | Naturalna fotografia i film ślubny',
+    title: 'Sobotki Weddings | Naturalna fotografia ślubna',
     description:
-      'Sobotki Weddings tworzy naturalne zdjęcia ślubne, emocjonalne filmy i elegancką fotostację premium. Zobacz portfolio, filmy, portraits i skontaktuj się z nami.',
+      'Sobotki Weddings tworzy naturalne zdjęcia ślubne i elegancką fotostację premium. Zobacz portfolio, poznaj Sobotki Portraits i skontaktuj się z nami.',
     image: '/uploads/2026/03/Karuzela_homepage_2.jpg',
     ogType: 'website',
   },
@@ -163,14 +163,12 @@ export const getStructuredData = (page: SeoPageKey) => {
       },
       serviceType: [
         'Fotografia ślubna',
-        'Film ślubny',
         'Fotostacja ślubna',
         'Fotostacja eventowa',
         'Sesje portretowe',
       ],
       knowsAbout: [
         'Fotografia ślubna',
-        'Film ślubny',
         'Fotostacja premium',
         'Fotostacja ślubna',
         'Fotostacja eventowa',

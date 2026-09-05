@@ -5,7 +5,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 const footerLinks = [
   { label: 'Start', href: '/' },
   { label: 'Portfolio', href: '/portfolio' },
-  { label: 'Film', href: '/film' },
   { label: 'Portraits', href: '/portraits' },
   { label: 'Kontakt', href: '/kontakt' },
 ];

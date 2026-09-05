@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 export const Marquee: React.FC = () => {
   const items = [
     'ponadczasowe zdjęcia',
-    'filmowe kadry',
-    'wzruszające filmy',
+    'naturalny reportaż',
+    'prawdziwe emocje',
     'autentyczne uczucia',
   ];
   const repeatedItems = [...items, ...items, ...items, ...items];

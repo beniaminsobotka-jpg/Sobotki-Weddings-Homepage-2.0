@@ -6,7 +6,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 const links = [
   { name: 'O Nas', href: '/#o-nas' },
   { name: 'Portfolio', href: '/portfolio' },
-  { name: 'Film', href: '/film' },
   { name: 'Portraits', href: '/portraits' },
   { name: 'Kontakt', href: '/kontakt' },
 ];

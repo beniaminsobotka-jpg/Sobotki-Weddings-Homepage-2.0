@@ -118,7 +118,7 @@ export const About: React.FC = () => {
              {/* Opis wspólny */}
              <div className="max-w-md px-4 pb-2 md:pb-0">
                 <p className="font-serif text-sm md:text-base leading-relaxed text-brand-black/80">
-                   Jesteśmy nierozłącznym duetem już od 14 lat. Kochamy dobry design, harmonię i spokój w życiu, nasze dziecko, psiecko oraz tworzenie dla Was autentycznych zdjęć i filmów pełnych emocji!
+                   Jesteśmy nierozłącznym duetem już od 14 lat. Kochamy dobry design, harmonię i spokój w życiu, nasze dziecko, psiecko oraz tworzenie dla Was autentycznych zdjęć pełnych emocji!
                 </p>
                 <div className="w-12 h-[1px] bg-brand-black/20 mx-auto mt-4 md:mt-6"></div>
              </div>
@@ -142,7 +142,7 @@ export const About: React.FC = () => {
             >
                 <img 
                     src="/uploads/2026/03/O-Nas_compressed_3.webp" 
-                    alt="Benek, filmowiec i współtwórca Sobotki Weddings" 
+                    alt="Benek, fotograf i współtwórca Sobotki Weddings"
                     loading="lazy"
                     fetchPriority="low"
                     decoding="async"
@@ -173,13 +173,10 @@ export const About: React.FC = () => {
                 <div className="liquid-glass backdrop-blur-xl bg-white/30 border border-white/40 p-6 rounded-2xl shadow-lg">
                      <div className="flex flex-col items-start mb-3">
                         <h3 className="font-serif font-black text-2xl md:text-3xl uppercase text-brand-black leading-none mb-1">Benek</h3>
-                        <div className="flex flex-col">
-                            <p className="font-sans text-[9px] uppercase tracking-widest text-brand-black/60 font-bold">Filmowiec</p>
-                            <p className="font-sans text-[7px] uppercase tracking-widest text-brand-black/40 font-bold mt-0.5">(nie mówić kamerzysta!)</p>
-                        </div>
+                        <p className="font-sans text-[9px] uppercase tracking-widest text-brand-black/60 font-bold">Fotograf</p>
                     </div>
                     <p className="font-serif italic text-xs md:text-sm leading-relaxed text-brand-black/80">
-                        Ten, który w duecie trzyma kamerę i składa historię w całość. Miłośnik burgerów i niewymuszonych emocji. Na ślubach najbardziej ceni luz, szczere chwile i dobrze zaopatrzony słodki stół.
+                        Ten, który wypatruje nieoczywiste momenty i składa reportaż w spójną historię. Miłośnik burgerów i niewymuszonych emocji. Na ślubach najbardziej ceni luz, szczere chwile i dobrze zaopatrzony słodki stół.
                     </p>
                 </div>
             </motion.div>

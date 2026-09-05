@@ -159,13 +159,10 @@ export const Contact: React.FC = () => {
                 <div className="space-y-4">
                     <label className="block font-sans text-[10px] md:text-xs text-gray-500 uppercase tracking-widest ml-1">Interesuje nas...</label>
                     <div className="flex flex-wrap gap-3">
-                    {['Zdjęcia', 'Film', 'Zdjęcia + Film', 'Jeszcze nie wiemy'].map((opt) => {
-                        const isUnavailable = opt === 'Film' || opt === 'Zdjęcia + Film';
-
-                        return (
+                    {['Zdjęcia', 'Jeszcze nie wiemy'].map((opt) => (
                         <label
                             key={opt}
-                            className={`relative flex-shrink-0 group ${isUnavailable ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                            className="relative flex-shrink-0 group cursor-pointer"
                         >
                         <input 
                             type="radio" 
@@ -173,23 +170,14 @@ export const Contact: React.FC = () => {
                             value={opt}
                             checked={formData.offer === opt}
                             onChange={handleChange}
-                            disabled={isUnavailable}
                             className="peer sr-only" 
                         />
-                        <span className={`block px-4 py-2 border rounded-full font-sans text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 backdrop-blur-sm ${
-                            isUnavailable
-                                ? 'border-gray-300/70 bg-gray-200/60 text-gray-400 opacity-70'
-                                : 'border-brand-black/10 bg-white/40 hover:bg-white/60 peer-checked:bg-brand-black peer-checked:text-white peer-checked:shadow-lg'
-                        }`}>
+                        <span className="block px-4 py-2 border rounded-full font-sans text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 backdrop-blur-sm border-brand-black/10 bg-white/40 hover:bg-white/60 peer-checked:bg-brand-black peer-checked:text-white peer-checked:shadow-lg">
                             {opt}
                         </span>
                         </label>
-                        );
-                    })}
+                    ))}
                     </div>
-                    <p className="max-w-2xl font-sans text-[10px] md:text-xs leading-relaxed text-gray-500 ml-1">
-                        Uwaga, aktualnie przyjmujemy zlecenia tylko jako duet dwóch fotografów, bez opcji filmu
-                    </p>
                 </div>
 
                 {status === 'error' && (

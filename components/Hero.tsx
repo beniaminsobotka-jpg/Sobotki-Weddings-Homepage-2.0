@@ -60,7 +60,7 @@ export const Hero: React.FC = () => {
 
   return (
     <header ref={containerRef} id="home" className="relative w-full h-[110vh] md:h-[250vh]">
-      <h1 className="sr-only">Sobotki Weddings - fotografia i film ślubny</h1>
+      <h1 className="sr-only">Sobotki Weddings - naturalna fotografia ślubna</h1>
       
       {/* Sticky Viewport */}
       <div className="sticky top-0 w-full h-screen overflow-hidden flex flex-col items-center justify-center">
@@ -236,7 +236,7 @@ export const Hero: React.FC = () => {
 
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center w-full mix-blend-overlay px-4">
                         <h2 className="font-playfair italic text-4xl md:text-5xl lg:text-6xl leading-tight opacity-90">
-                          Wzruszające filmy<br/>i naturalne zdjęcia ślubne
+                          Naturalne zdjęcia ślubne<br/>pełne prawdziwych emocji
                         </h2>
                     </div>
 
