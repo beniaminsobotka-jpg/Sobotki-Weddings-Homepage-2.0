@@ -385,7 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const accessToken = new URLSearchParams(window.location.search).get("access");
     if (accessToken) {
-      const response = await fetch(`/api/offer-access?token=${encodeURIComponent(accessToken)}`, {
+      const response = await fetch(`/api/offer-lead?access=${encodeURIComponent(accessToken)}`, {
         headers: { Accept: "application/json" },
       });
       const result = await response.json().catch(() => ({}));

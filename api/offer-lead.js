@@ -1,3 +1,5 @@
+import { readOfferAccessToken } from '../server/offer-access-token.js';
+
 const BREVO_CONTACTS_API_URL = 'https://api.brevo.com/v3/contacts';
 const BREVO_EVENTS_API_URL = 'https://api.brevo.com/v3/events';
 const BREVO_SMTP_API_URL = 'https://api.brevo.com/v3/smtp/email';
@@ -336,6 +338,26 @@ const sendInquiryNotification = async ({ apiKey, lead }) => {
 };
 
 export default async function handler(request, response) {
+  if (request.method === 'GET') {
+    response.setHeader('Cache-Control', 'private, no-store');
+
+    try {
+      const token = Array.isArray(request.query?.access) ? request.query.access[0] : request.query?.access;
+      const payload = readOfferAccessToken(token);
+
+      if (payload.kind !== 'portraits_wedding') {
+        return sendJson(response, 400, { error: 'Invalid offer type' });
+      }
+
+      return sendJson(response, 200, { ok: true, lead: payload.lead });
+    } catch (error) {
+      const expired = error instanceof Error && error.message.includes('expired');
+      return sendJson(response, expired ? 410 : 400, {
+        error: expired ? 'Link do oferty wygasł.' : 'Link do oferty jest nieprawidłowy.',
+      });
+    }
+  }
+
   if (request.method !== 'POST') {
     return sendJson(response, 405, { error: 'Method not allowed' });
   }
