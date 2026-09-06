@@ -48,4 +48,6 @@ export const subscribeToBrevo = async (payload: BrevoLeadInput) => {
   if (!response.ok) {
     throw new Error(await buildReadableError(response));
   }
+
+  return response.json() as Promise<{ ok: boolean; offerPath?: string }>;
 };

@@ -1,3 +1,5 @@
+import { createOfferAccessToken } from '../server/offer-access-token.js';
+
 const BREVO_CONTACTS_API_URL = 'https://api.brevo.com/v3/contacts';
 const BREVO_SMTP_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
@@ -15,6 +17,12 @@ const PORTRAITS_WEDDING_SOURCES = new Set([
   'Strona WWW',
   'Inne',
 ]);
+
+const PORTRAITS_PACKAGE_PRICES = {
+  'up-to-150': { essential: 2900, exclusive: 3600 },
+  'up-to-250': { essential: 3200, exclusive: 3900 },
+  'up-to-350': { essential: 3600, exclusive: 4300 },
+};
 
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json');
@@ -231,6 +239,32 @@ export default async function handler(request, response) {
   }
 
   const { firstName, lastName } = splitName(fullName);
+  let offerPath = '';
+
+  if (formType === 'portraits_wedding' && PORTRAITS_PACKAGE_PRICES[pricingTier]) {
+    const weddingTimestamp = Date.parse(`${weddingDate}T23:59:59Z`);
+    const expiresAt = Number.isFinite(weddingTimestamp)
+      ? Math.max(Date.now() + 30 * 24 * 60 * 60 * 1000, weddingTimestamp + 30 * 24 * 60 * 60 * 1000)
+      : Date.now() + 730 * 24 * 60 * 60 * 1000;
+    const accessToken = createOfferAccessToken({
+      kind: 'portraits_wedding',
+      expiresAt,
+      lead: {
+        name: fullName,
+        email: normalizedEmail,
+        weddingDate,
+        venue,
+        guestsCount: guestCount,
+        howDidYouHear: source,
+        notes: message,
+        distanceKm,
+        pricingTier,
+        packagePrices: PORTRAITS_PACKAGE_PRICES[pricingTier],
+        resolvedLocation: venue,
+      },
+    });
+    offerPath = `/oferta-portrety/?access=${encodeURIComponent(accessToken)}`;
+  }
 
   const brevoPayload = {
     email: normalizedEmail,
@@ -287,7 +321,8 @@ export default async function handler(request, response) {
     });
 
     if (notifyToEmail && notifyFromEmail && notifyFromName) {
-      const internalSubject = `🔴 Zapytanie o ofertę | ${serviceType} | ${fullName} | ${normalizedEmail}`;
+      const subjectMarker = formType === 'weddings' ? '🟡' : '🔴';
+      const internalSubject = `${subjectMarker} Zapytanie o ofertę | ${serviceType} | ${fullName} | ${normalizedEmail}`;
       const internalLeadData = {
         formType,
         fullName,
@@ -363,6 +398,7 @@ export default async function handler(request, response) {
       }
 
       if (formType === 'portraits_wedding') {
+        const offerUrl = `https://www.sobotkiweddings.pl${offerPath || '/oferta-portrety/'}`;
         const buildAutoresponderHtml = (firstName) => `
           <!doctype html>
           <html>
@@ -385,7 +421,7 @@ export default async function handler(request, response) {
                     <p>Zapiszcie ten e-mail, aby móc łatwo wrócić do wyceny w dowolnym momencie.</p>
                     
                     <div style="text-align:center; margin:32px 0;">
-                      <a href="https://www.sobotkiweddings.pl/oferta-portrety/" style="display:inline-block; padding:16px 32px; background-color:#d42929; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:30px; font-size:14px; text-transform:uppercase; letter-spacing:1px;">Przejdź do oferty</a>
+                      <a href="${escapeHtml(offerUrl)}" style="display:inline-block; padding:16px 32px; background-color:#d42929; color:#ffffff; text-decoration:none; font-weight:bold; border-radius:30px; font-size:14px; text-transform:uppercase; letter-spacing:1px;">Przejdź do oferty</a>
                     </div>
                     
                     <p>W ofercie, na samym dole znajdziecie również formularz kontaktowy. Gdy już wybierzecie interesujące Was opcje, dajcie nam znać przez ten formularz - sprawdzimy dostępność terminu i odezwiemy się najszybciej jak to możliwe.</p>
@@ -402,7 +438,7 @@ Cześć ${firstName || '!'}
 
 Bardzo dziękujemy za zainteresowanie Fotostacją Ślubną! Abyście mogli na spokojnie przejrzeć wszystkie pakiety i opcje, przygotowaliśmy dla Was dedykowaną, odblokowaną stronę z ofertą. Zapiszcie ten e-mail, aby móc łatwo wrócić do wyceny w dowolnym momencie.
 
-Twój link do oferty: https://www.sobotkiweddings.pl/oferta-portrety/
+Twój link do oferty: ${offerUrl}
 
 W ofercie, na samym dole znajdziecie również formularz kontaktowy. Gdy już wybierzecie interesujące Was opcje, dajcie nam znać przez ten formularz - sprawdzimy dostępność terminu i odezwiemy się najszybciej jak to możliwe.
 
@@ -452,7 +488,7 @@ Zespół Sobotki Portraits
       });
     }
 
-    return sendJson(response, 200, { ok: true });
+    return sendJson(response, 200, { ok: true, ...(offerPath ? { offerPath } : {}) });
   } catch (error) {
     const messageText =
       error instanceof Error ? error.message : 'Unknown Brevo error';

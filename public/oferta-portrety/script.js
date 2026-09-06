@@ -348,35 +348,62 @@ rejectForm.addEventListener("submit", async (event) => {
 
 setConfigLinks();
 
-document.addEventListener("DOMContentLoaded", () => {
+function populateAndRevealSavedLead(parsed, { trackView = false } = {}) {
+  if (document.querySelector("#name")) document.querySelector("#name").value = parsed.name || "";
+  if (document.querySelector("#email")) document.querySelector("#email").value = parsed.email || "";
+  if (document.querySelector("#weddingDate")) document.querySelector("#weddingDate").value = parsed.weddingDate || "";
+  if (document.querySelector("#venue")) document.querySelector("#venue").value = parsed.venue || "";
+  if (document.querySelector("#guestsCount")) document.querySelector("#guestsCount").value = parsed.guestsCount || "";
+  if (document.querySelector("#howDidYouHear")) document.querySelector("#howDidYouHear").value = parsed.howDidYouHear || "";
+  if (document.querySelector("textarea[name='inquiryMessage']")) {
+    document.querySelector("textarea[name='inquiryMessage']").value = parsed.notes || "";
+  }
+
+  if (!parsed.pricingTier || !parsed.packagePrices || !parsed.distanceKm) return false;
+
+  applyPricing({
+    tier: parsed.pricingTier,
+    prices: parsed.packagePrices,
+    distanceKm: parsed.distanceKm,
+    resolvedLocation: parsed.resolvedLocation || "",
+  });
+  state.lastLead = getLeadData();
+  const headerEl = document.querySelector("header");
+  if (headerEl) headerEl.style.display = "none";
+  revealOffer();
+
+  if (trackView) {
+    saveLead(EVENTS.offerViewed, state.lastLead).catch((saveError) => {
+      console.warn("[Sobotki Portraits Offer] Nie udało się zapisać otwarcia oferty", saveError);
+    });
+  }
+
+  return true;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
   try {
+    const accessToken = new URLSearchParams(window.location.search).get("access");
+    if (accessToken) {
+      const response = await fetch(`/api/offer-access?token=${encodeURIComponent(accessToken)}`, {
+        headers: { Accept: "application/json" },
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.lead) {
+        throw new Error(result.error || "Nie udało się otworzyć oferty z tego linku.");
+      }
+
+      localStorage.setItem("sobotki_lead_portraits", JSON.stringify(result.lead));
+      if (populateAndRevealSavedLead(result.lead, { trackView: true })) return;
+    }
+
     const saved = localStorage.getItem('sobotki_lead_portraits');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (document.querySelector("#name")) document.querySelector("#name").value = parsed.name || "";
-      if (document.querySelector("#email")) document.querySelector("#email").value = parsed.email || "";
-      if (document.querySelector("#weddingDate")) document.querySelector("#weddingDate").value = parsed.weddingDate || "";
-      if (document.querySelector("#venue")) document.querySelector("#venue").value = parsed.venue || "";
-      if (document.querySelector("#guestsCount")) document.querySelector("#guestsCount").value = parsed.guestsCount || "";
-      if (document.querySelector("#howDidYouHear")) document.querySelector("#howDidYouHear").value = parsed.howDidYouHear || "";
-      if (document.querySelector("textarea[name='inquiryMessage']")) {
-        document.querySelector("textarea[name='inquiryMessage']").value = parsed.notes || "";
-      }
-
-      if (!parsed.pricingTier || !parsed.packagePrices || !parsed.distanceKm) return;
-
-      applyPricing({
-        tier: parsed.pricingTier,
-        prices: parsed.packagePrices,
-        distanceKm: parsed.distanceKm,
-        resolvedLocation: parsed.resolvedLocation || "",
-      });
-      state.lastLead = getLeadData();
-      
-      const headerEl = document.querySelector("header");
-      if (headerEl) headerEl.style.display = "none";
-      
-      revealOffer();
+      populateAndRevealSavedLead(parsed);
     }
-  } catch (e) {}
+  } catch (error) {
+    console.warn("[Sobotki Portraits Offer] Nie udało się automatycznie otworzyć oferty", error);
+    formError.textContent = error instanceof Error ? error.message : "Nie udało się automatycznie otworzyć oferty.";
+  }
 });

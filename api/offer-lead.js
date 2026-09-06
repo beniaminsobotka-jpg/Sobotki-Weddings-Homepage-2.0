@@ -449,7 +449,7 @@ export default async function handler(request, response) {
     warnings.push(message);
   }
 
-  if (lead.eventName === 'zapytanie_o_termin' || lead.eventName === 'oferta_obejrzana') {
+  if (lead.eventName === 'zapytanie_o_termin') {
     try {
       notificationResult = await sendInquiryNotification({ apiKey, lead });
 

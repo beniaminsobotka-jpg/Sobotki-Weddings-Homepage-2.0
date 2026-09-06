@@ -362,7 +362,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         return;
       }
 
-      await subscribeToBrevo({
+      const leadResponse = await subscribeToBrevo({
         formType: 'portraits_wedding',
         email: formData.email,
         fullName: formData.fullname,
@@ -393,7 +393,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         resolvedLocation: distanceData.resolvedLocation,
       }));
 
-      window.location.href = '/oferta-portrety/';
+      window.location.href = leadResponse.offerPath || '/oferta-portrety/';
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message);
