@@ -694,7 +694,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                   </p>
                   <div className="mt-8 inline-block rounded-2xl border border-[#d42929] px-5 py-3">
                     <p className="font-sans text-xs text-gray-300 m-0">
-                      Cena fotostacji ślubnej zaczyna się od 2900 zł w wersji standardowego przyjęcia.
+                      Cena fotostacji ślubnej zaczyna się od 3200 zł w wersji standardowego przyjęcia.
                     </p>
                   </div>
                 </div>

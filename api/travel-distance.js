@@ -12,20 +12,20 @@ const PRICE_TIERS = [
   {
     id: 'up-to-150',
     maxDistanceMeters: 150_000,
-    essential: 2_900,
-    exclusive: 3_600,
+    essential: 3_200,
+    exclusive: 4_200,
   },
   {
     id: 'up-to-250',
     maxDistanceMeters: 250_000,
-    essential: 3_200,
-    exclusive: 3_900,
+    essential: 3_500,
+    exclusive: 4_500,
   },
   {
     id: 'up-to-350',
     maxDistanceMeters: MAX_DISTANCE_METERS,
-    essential: 3_600,
-    exclusive: 4_300,
+    essential: 3_800,
+    exclusive: 4_800,
   },
 ];
 

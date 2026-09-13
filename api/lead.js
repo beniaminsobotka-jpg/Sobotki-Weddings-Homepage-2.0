@@ -19,9 +19,9 @@ const PORTRAITS_WEDDING_SOURCES = new Set([
 ]);
 
 const PORTRAITS_PACKAGE_PRICES = {
-  'up-to-150': { essential: 2900, exclusive: 3600 },
-  'up-to-250': { essential: 3200, exclusive: 3900 },
-  'up-to-350': { essential: 3600, exclusive: 4300 },
+  'up-to-150': { essential: 3200, exclusive: 4200 },
+  'up-to-250': { essential: 3500, exclusive: 4500 },
+  'up-to-350': { essential: 3800, exclusive: 4800 },
 };
 
 const sendJson = (response, status, body) => {
