@@ -440,7 +440,7 @@ textarea:focus {
   overflow: hidden;
   border: 0;
   border-radius: 0;
-  background: white;
+  background: transparent;
 }
 
 .intro-photo::after {
@@ -450,6 +450,20 @@ textarea:focus {
 .intro-photo img {
   height: auto;
   aspect-ratio: auto;
+}
+
+.offer .intro-section {
+  width: 100%;
+  max-width: none;
+  padding-right: max(var(--page-gutter), calc((100vw - 1760px) / 2));
+  padding-left: max(var(--page-gutter), calc((100vw - 1760px) / 2));
+  background: #f4f4f4;
+}
+
+.offer .intro-photo {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%);
+  mask-image: linear-gradient(to right, transparent, #000 10%);
+  mix-blend-mode: darken;
 }
 
 .portrait-gallery {
@@ -1484,6 +1498,11 @@ legend,
 @media (min-width: 780px) {
   .hero-grid {
     grid-template-columns: minmax(0, 1.25fr) minmax(390px, 0.72fr);
+  }
+
+  .offer .intro-section {
+    gap: clamp(20px, 2.2vw, 42px);
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
   }
 
   .intro-section,
