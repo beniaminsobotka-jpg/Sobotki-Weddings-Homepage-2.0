@@ -179,6 +179,62 @@ function initRevealObserver() {
   elements.forEach((element) => observer.observe(element));
 }
 
+let offerIntroSlideshowStarted = false;
+
+function startOfferIntroSlideshow() {
+  if (offerIntroSlideshowStarted) return;
+  offerIntroSlideshowStarted = true;
+
+  const intro = document.querySelector(".offer-intro");
+  const slides = [...document.querySelectorAll(".offer-intro-slide")];
+  if (!intro || slides.length !== 2) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (reducedMotion.matches) return;
+
+  const desktopPhotos = ["fs4tc-21", "fenaq-152", "dv8gj-137", "tygge-114", "usuvk-10", "fenaq-172"];
+  const mobilePhotos = ["fs4tc-21", "dv8gj-93", "6qmvn-211", "fs4tc-186", "fs4tc-230", "fs4tc-327"];
+  const photoNames = window.matchMedia("(max-width: 600px)").matches ? mobilePhotos : desktopPhotos;
+  const photoUrls = photoNames.map((name) => `./assets/mosaic/${name}.webp`);
+  let visible = false;
+  let activeSlide = 0;
+  let currentPhoto = 0;
+  let switching = false;
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    }, { threshold: 0.1 }).observe(intro);
+  } else {
+    visible = true;
+  }
+
+  Promise.all(photoUrls.map((url) => {
+    const image = new Image();
+    image.src = url;
+    return image.decode().then(() => url).catch(() => null);
+  })).then((results) => {
+    const availablePhotos = results.filter(Boolean);
+    if (availablePhotos.length < 2) return;
+
+    window.setInterval(() => {
+      if (!visible || document.hidden || reducedMotion.matches || switching) return;
+      switching = true;
+      const nextPhoto = (currentPhoto + 1) % availablePhotos.length;
+      const nextSlide = 1 - activeSlide;
+      slides[nextSlide].src = availablePhotos[nextPhoto];
+      slides[nextSlide].decode().then(() => {
+        slides[activeSlide].classList.remove("is-active");
+        slides[nextSlide].classList.add("is-active");
+        activeSlide = nextSlide;
+        currentPhoto = nextPhoto;
+      }).catch(() => {}).finally(() => {
+        switching = false;
+      });
+    }, 500);
+  });
+}
+
 function revealOffer() {
   if (!state.offerShown) {
     state.offerShown = true;
@@ -186,6 +242,7 @@ function revealOffer() {
     offerContent.setAttribute("aria-hidden", "false");
     document.body.classList.add("offer-open");
     initRevealObserver();
+    startOfferIntroSlideshow();
   }
 
   requestAnimationFrame(() => {
