@@ -859,14 +859,19 @@ li::before {
 }
 
 .addons-photo {
+  position: relative;
   overflow: hidden;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-lg);
   background: white;
 }
 
 .addons-photo img {
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .alert-section {
