@@ -1561,10 +1561,10 @@ export const GalleryAdminPage: React.FC = () => {
                         )}
                         <a
                           href={photo.downloadUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          download={photo.name}
                           className="absolute bottom-2 right-2 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-black shadow-md transition-transform hover:scale-105"
                           aria-label={`Pobierz zdjęcie ${index + 1}`}
+                          title="Pobierz zdjęcie"
                         >
                           <Download size={15} aria-hidden="true" />
                         </a>

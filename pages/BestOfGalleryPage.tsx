@@ -238,20 +238,34 @@ export const BestOfGalleryPage: React.FC = () => {
         {data && data.photos.length > 0 && (
           <div className="columns-2 gap-2 sm:columns-3 sm:gap-4 lg:columns-4 xl:columns-5">
             {data.photos.map((photo, index) => (
-              <button
+              <div
                 key={photo.id}
-                type="button"
-                onClick={() => setActivePhotoIndex(index)}
-                className="group relative mb-2 block w-full break-inside-avoid overflow-hidden rounded-lg bg-black/[0.05] text-left sm:mb-4"
+                className="group relative mb-2 break-inside-avoid overflow-hidden rounded-lg bg-black/[0.05] sm:mb-4"
               >
-                <img
-                  src={photo.thumbnailUrl}
-                  alt={`Zdjęcie Best Of ${index + 1}`}
-                  loading={index < 10 ? 'eager' : 'lazy'}
-                  className="h-auto w-full transition duration-500 group-hover:scale-[1.015]"
-                />
-                <span className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setActivePhotoIndex(index)}
+                  className="block w-full text-left"
+                  aria-label={`Otwórz zdjęcie Best Of ${index + 1}`}
+                >
+                  <img
+                    src={photo.thumbnailUrl}
+                    alt={`Zdjęcie Best Of ${index + 1}`}
+                    loading={index < 10 ? 'eager' : 'lazy'}
+                    className="h-auto w-full transition duration-500 group-hover:scale-[1.015]"
+                  />
+                  <span className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+                </button>
+                <a
+                  href={photo.downloadUrl}
+                  download={photo.name}
+                  className="absolute bottom-2 right-2 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-lg transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                  aria-label={`Pobierz zdjęcie Best Of ${index + 1}`}
+                  title="Pobierz zdjęcie"
+                >
+                  <Download size={17} aria-hidden="true" />
+                </a>
+              </div>
             ))}
           </div>
         )}
@@ -303,10 +317,10 @@ export const BestOfGalleryPage: React.FC = () => {
             </span>
             <a
               href={activePhoto.downloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              download={activePhoto.name}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-black"
               aria-label="Pobierz zdjęcie"
+              title="Pobierz zdjęcie"
             >
               <Download size={15} />
             </a>
