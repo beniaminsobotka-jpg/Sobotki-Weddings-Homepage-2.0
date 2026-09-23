@@ -181,6 +181,66 @@ function initRevealObserver() {
 
 let offerIntroSlideshowStarted = false;
 
+let portraitMosaicStarted = false;
+
+function startPortraitMosaic() {
+  if (portraitMosaicStarted) return;
+  portraitMosaicStarted = true;
+
+  const gallery = document.querySelector(".portrait-gallery-section .portrait-gallery");
+  if (!gallery) return;
+  const figures = [...gallery.querySelectorAll("figure")];
+  const images = figures.map((figure) => figure.querySelector("img"));
+  const largerPhotos = new Set([0, 1, 11, 19, 22]);
+
+  function layout() {
+    const width = gallery.clientWidth;
+    const columns = width < 560 ? 3 : width < 900 ? 4 : 6;
+    const gap = width < 560 ? 10 : width < 900 ? 14 : 18;
+    const unitWidth = (width - gap * (columns - 1)) / columns;
+    const bottoms = Array(columns).fill(0);
+
+    figures.forEach((figure, index) => {
+      const image = images[index];
+      const span = largerPhotos.has(index) ? 2 : 1;
+      const tileWidth = unitWidth * span + gap * (span - 1);
+      const ratio = image.naturalWidth && image.naturalHeight
+        ? image.naturalHeight / image.naturalWidth
+        : 1;
+      const tileHeight = tileWidth * ratio;
+      let column = 0;
+      let top = Infinity;
+
+      for (let start = 0; start <= columns - span; start += 1) {
+        const candidate = Math.max(...bottoms.slice(start, start + span));
+        if (candidate < top) {
+          top = candidate;
+          column = start;
+        }
+      }
+
+      figure.style.left = `${column * (unitWidth + gap)}px`;
+      figure.style.top = `${top}px`;
+      figure.style.width = `${tileWidth}px`;
+      figure.style.height = `${tileHeight}px`;
+      for (let i = column; i < column + span; i += 1) {
+        bottoms[i] = top + tileHeight + gap;
+      }
+    });
+
+    gallery.style.height = `${Math.max(...bottoms) - gap}px`;
+    gallery.classList.add("mosaic-ready");
+  }
+
+  images.forEach((image) => {
+    image.loading = "eager";
+  });
+  Promise.all(images.map((image) => image.decode().catch(() => {}))).then(() => {
+    layout();
+    window.addEventListener("resize", layout, { passive: true });
+  });
+}
+
 function startOfferIntroSlideshow() {
   if (offerIntroSlideshowStarted) return;
   offerIntroSlideshowStarted = true;
@@ -243,6 +303,7 @@ function revealOffer() {
     document.body.classList.add("offer-open");
     initRevealObserver();
     startOfferIntroSlideshow();
+    startPortraitMosaic();
   }
 
   requestAnimationFrame(() => {

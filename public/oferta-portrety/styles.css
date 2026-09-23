@@ -1378,16 +1378,26 @@ legend,
   display: block;
   width: 100%;
   padding: 0;
-  columns: 6;
-  column-gap: clamp(8px, 1.1vw, 16px);
+  columns: 5;
+  column-gap: clamp(12px, 1.5vw, 22px);
 }
 
 .portrait-gallery-section .portrait-gallery figure {
   width: 100%;
-  margin-bottom: clamp(8px, 1.1vw, 16px);
+  margin-bottom: clamp(14px, 1.8vw, 26px);
   break-inside: avoid;
   border-radius: 0;
   background: #e8e7e3;
+}
+
+.portrait-gallery-section .portrait-gallery.mosaic-ready {
+  position: relative;
+  columns: auto;
+}
+
+.portrait-gallery-section .portrait-gallery.mosaic-ready figure {
+  position: absolute;
+  margin: 0;
 }
 
 .portrait-gallery-section .portrait-gallery img {
@@ -1466,7 +1476,7 @@ legend,
 
 @media (max-width: 779px) {
   .portrait-gallery-section .portrait-gallery {
-    columns: 4;
+    columns: 3;
   }
 }
 
