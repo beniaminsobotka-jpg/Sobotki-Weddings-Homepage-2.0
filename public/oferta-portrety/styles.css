@@ -1038,7 +1038,7 @@ li::before {
   width: min(100%, 360px);
   aspect-ratio: 3 / 4;
   justify-self: center;
-  border-radius: 24px;
+  border-radius: 0;
   background: #171717;
   object-fit: cover;
 }
@@ -1061,7 +1061,7 @@ li::before {
   }
 
   .faq-video {
-    width: min(100%, 280px);
+    width: 100%;
   }
 }
 
