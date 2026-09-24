@@ -564,32 +564,6 @@ textarea:focus {
   line-height: 1.7;
 }
 
-.cloud-steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 24px 0;
-}
-
-.cloud-steps div {
-  border-top: 1px solid rgba(0, 0, 0, 0.22);
-  padding-top: 10px;
-  color: #222;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
-.cloud-steps span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--color-red);
-  font-family: var(--font-serif);
-  font-size: 1.55rem;
-  font-style: italic;
-  font-weight: 400;
-}
-
 .cloud-copy .cloud-included {
   display: inline-block;
   margin: 0 0 12px;
@@ -667,26 +641,6 @@ textarea:focus {
 @media (min-width: 780px) {
   .cloud-section {
     grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
-  }
-}
-
-@media (max-width: 520px) {
-  .cloud-steps {
-    grid-template-columns: 1fr;
-    gap: 7px;
-    margin: 18px 0;
-  }
-
-  .cloud-steps div {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-top: 7px;
-  }
-
-  .cloud-steps span {
-    margin: 0;
-    font-size: 1.25rem;
   }
 }
 
