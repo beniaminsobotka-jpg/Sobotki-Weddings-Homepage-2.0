@@ -529,6 +529,167 @@ textarea:focus {
   line-height: 1.75;
 }
 
+.cloud-section {
+  display: grid;
+  gap: clamp(24px, 4vw, 60px);
+  align-items: center;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: clamp(30px, 4vw, 54px);
+  background: #eae9e5;
+  overflow: hidden;
+}
+
+.cloud-copy {
+  min-width: 0;
+  max-width: 720px;
+}
+
+.cloud-copy .eyebrow {
+  color: #777;
+}
+
+.cloud-copy h2 {
+  max-width: 720px;
+  margin-bottom: 22px;
+  font-size: clamp(2.7rem, 5.5vw, 5.4rem);
+  text-wrap: balance;
+}
+
+.cloud-copy > p:not(.eyebrow, .cloud-included, .cloud-note) {
+  max-width: 610px;
+  margin-bottom: 16px;
+  color: #454541;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.cloud-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.cloud-steps div {
+  border-top: 1px solid rgba(0, 0, 0, 0.22);
+  padding-top: 10px;
+  color: #222;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.cloud-steps span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-red);
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.cloud-copy .cloud-included {
+  display: inline-block;
+  margin: 0 0 12px;
+  border-left: 3px solid var(--color-red);
+  padding: 10px 14px;
+  background: #fff;
+  color: #111;
+  font-size: 0.83rem;
+  font-weight: 800;
+}
+
+.cloud-copy .cloud-note {
+  margin: 0;
+  color: #777;
+  font-size: 0.75rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.cloud-visual {
+  display: grid;
+  min-width: 0;
+  place-items: center;
+}
+
+.iphone-shell {
+  position: relative;
+  width: clamp(220px, 23vw, 286px);
+  max-width: 100%;
+  aspect-ratio: 1320 / 2868;
+  border: 3px solid #8b8b89;
+  border-radius: 51px;
+  padding: 5px;
+  background: #171717;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.2), inset 0 0 0 1px #343434;
+}
+
+.iphone-shell::before,
+.iphone-shell::after {
+  position: absolute;
+  width: 3px;
+  border-radius: 2px;
+  background: #777;
+  content: "";
+}
+
+.iphone-shell::before {
+  top: 20%;
+  left: -6px;
+  height: 55px;
+  box-shadow: 0 64px 0 #777;
+}
+
+.iphone-shell::after {
+  top: 28%;
+  right: -6px;
+  height: 75px;
+}
+
+.iphone-screen {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 42px;
+  background: #fff;
+}
+
+.iphone-screen video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 780px) {
+  .cloud-section {
+    grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .cloud-steps {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    margin: 18px 0;
+  }
+
+  .cloud-steps div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 7px;
+  }
+
+  .cloud-steps span {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+}
+
 .comparison-section,
 .pricing-section,
 .faq-section {
