@@ -643,7 +643,7 @@ textarea:focus {
 }
 
 .comparison-row span:nth-child(3)::before {
-  content: "Sobotki Portraits";
+  content: "Fotostacja";
 }
 
 .comparison-head {
@@ -686,13 +686,25 @@ textarea:focus {
   margin-bottom: 18px;
 }
 
+.feature-kicker {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.feature-kicker .eyebrow {
+  margin: 0;
+}
+
 .feature-price {
   display: inline-block;
-  margin-top: 8px;
   color: var(--color-red);
   font-family: var(--font-heading);
-  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
   line-height: 1;
+  white-space: nowrap;
 }
 
 .feature-copy .small-note {
@@ -718,6 +730,26 @@ textarea:focus {
   max-width: 100%;
   max-height: 560px;
   object-fit: contain;
+}
+
+.feature-split-film {
+  width: 100%;
+  padding: clamp(36px, 4vw, 62px) max(var(--page-gutter), calc((100vw - var(--content-max)) / 2));
+  background: #111;
+  color: #fff;
+}
+
+.offer .feature-split-film .feature-copy > p:not(.eyebrow),
+.feature-split-film .feature-copy .small-note {
+  color: #aaa;
+}
+
+.feature-split-film .eyebrow {
+  color: #aaa;
+}
+
+.feature-split-film .feature-photo {
+  order: 2;
 }
 
 .packages-grid {
@@ -1595,6 +1627,63 @@ legend,
 
   .map-container {
     max-width: 290px;
+  }
+}
+
+@media (max-width: 639px) {
+  .comparison-heading {
+    margin-bottom: 24px;
+  }
+
+  .comparison-table {
+    border-radius: 0;
+  }
+
+  .comparison-head {
+    display: grid;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .comparison-row:not(.comparison-head) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .comparison-row:not(.comparison-head) strong {
+    grid-column: 1 / -1;
+    margin-bottom: 2px;
+  }
+
+  .comparison-row:not(.comparison-head) span {
+    min-width: 0;
+    padding: 12px;
+    line-height: 1.45;
+  }
+
+  .comparison-row:not(.comparison-head) span:nth-child(2) {
+    background: #efefed;
+    color: #4f4f4c;
+  }
+
+  .comparison-row:not(.comparison-head) span:nth-child(3) {
+    border-top: 3px solid var(--color-red);
+    background: #111;
+    color: #fff;
+  }
+
+  .comparison-row span::before {
+    margin-bottom: 8px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .comparison-row span:nth-child(3)::before {
+    color: #ff6666;
   }
 }
 
