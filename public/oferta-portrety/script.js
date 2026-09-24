@@ -36,6 +36,15 @@ const inquiryError = document.querySelector("#inquiryError");
 const showRejectSurvey = document.querySelector("#showRejectSurvey");
 const rejectForm = document.querySelector("#rejectForm");
 const rejectStatus = document.querySelector("#rejectStatus");
+const galleryToggle = document.querySelector("#galleryToggle");
+const portraitGallery = document.querySelector("#portraitGallery");
+
+galleryToggle?.addEventListener("click", () => {
+  const expanded = portraitGallery.classList.toggle("is-expanded");
+  galleryToggle.setAttribute("aria-expanded", String(expanded));
+  galleryToggle.textContent = expanded ? "Zwiń galerię" : "Zobacz wszystkie 34 zdjęcia";
+  if (!expanded) galleryToggle.closest(".portrait-gallery-section").scrollIntoView({ block: "start" });
+});
 
 function setConfigLinks() {
   document.querySelectorAll("[data-contact-email]").forEach((link) => {

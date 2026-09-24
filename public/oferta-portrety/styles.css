@@ -17,7 +17,7 @@
   --hero-image: url("./assets/mosaic/fs4tc-28.webp");
   --content-max: 1360px;
   --page-gutter: clamp(20px, 5.25vw, 96px);
-  --section-space: clamp(88px, 10vw, 144px);
+  --section-space: clamp(46px, 5vw, 76px);
 }
 
 * {
@@ -408,7 +408,7 @@ textarea:focus {
 
 .intro-section {
   display: grid;
-  gap: clamp(42px, 6vw, 88px);
+  gap: clamp(24px, 3vw, 48px);
   align-items: center;
 }
 
@@ -498,7 +498,7 @@ textarea:focus {
 
 .section-heading {
   max-width: 810px;
-  margin-bottom: clamp(42px, 5vw, 68px);
+  margin-bottom: clamp(24px, 3vw, 40px);
 }
 
 .process-grid {
@@ -509,13 +509,13 @@ textarea:focus {
 .process-grid article {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: clamp(28px, 5vw, 42px);
+  padding: clamp(22px, 2.5vw, 32px);
   background: #0c0c0c;
 }
 
 .process-grid .number {
   display: inline-block;
-  margin-bottom: 34px;
+  margin-bottom: 16px;
   color: var(--color-red);
   font-family: var(--font-serif);
   font-size: 2.4rem;
@@ -536,8 +536,8 @@ textarea:focus {
   color: var(--color-black);
   border: 1px solid rgba(255, 255, 255, 0.58);
   border-radius: clamp(30px, 4vw, 52px);
-  margin-top: clamp(24px, 3vw, 48px);
-  margin-bottom: clamp(24px, 3vw, 48px);
+  margin-top: clamp(14px, 2vw, 28px);
+  margin-bottom: clamp(14px, 2vw, 28px);
   padding-right: clamp(24px, 5vw, 72px);
   padding-left: clamp(24px, 5vw, 72px);
   box-shadow: 0 34px 90px rgba(0, 0, 0, 0.32);
@@ -545,7 +545,7 @@ textarea:focus {
 
 .comparison-inner {
   display: grid;
-  gap: clamp(44px, 6vw, 84px);
+  gap: clamp(20px, 3vw, 44px);
   align-items: center;
 }
 
@@ -557,7 +557,9 @@ textarea:focus {
 .comparison-photo img {
   width: 100%;
   height: auto;
+  max-height: 320px;
   border-radius: 0;
+  object-fit: contain;
 }
 
 @media (min-width: 780px) {
@@ -652,7 +654,7 @@ textarea:focus {
 
 .feature-split {
   display: grid;
-  gap: clamp(44px, 7vw, 96px);
+  gap: clamp(22px, 3vw, 48px);
   align-items: center;
 }
 
@@ -663,9 +665,17 @@ textarea:focus {
   border-radius: 0;
 }
 
+.feature-photo {
+  display: grid;
+  place-items: center;
+}
+
 .feature-photo img {
-  min-height: 460px;
-  object-fit: cover;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 560px;
+  object-fit: contain;
 }
 
 .feature-copy {
@@ -673,15 +683,15 @@ textarea:focus {
 }
 
 .feature-copy h2 {
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 }
 
 .feature-price {
   display: inline-block;
-  margin-top: 16px;
+  margin-top: 8px;
   color: var(--color-red);
   font-family: var(--font-heading);
-  font-size: clamp(2.4rem, 6vw, 4.2rem);
+  font-size: clamp(2rem, 3.5vw, 3rem);
   line-height: 1;
 }
 
@@ -698,17 +708,21 @@ textarea:focus {
 }
 
 .guestbook-gallery figure {
-  min-height: 460px;
+  display: grid;
+  place-items: center;
 }
 
 .guestbook-gallery img {
-  height: 100%;
-  object-fit: cover;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 560px;
+  object-fit: contain;
 }
 
 .packages-grid {
   display: grid;
-  gap: clamp(20px, 2.6vw, 36px);
+  gap: clamp(14px, 2vw, 28px);
 }
 
 .package-card {
@@ -719,7 +733,7 @@ textarea:focus {
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-md);
-  padding: clamp(32px, 4.2vw, 54px);
+  padding: clamp(24px, 2.8vw, 36px);
   background: var(--color-black-soft);
   color: white;
 }
@@ -753,7 +767,7 @@ textarea:focus {
 }
 
 .price {
-  margin: 34px 0 20px;
+  margin: 22px 0 14px;
   color: white;
   font-family: var(--font-heading);
   font-size: clamp(3.3rem, 10vw, 6.3rem);
@@ -800,7 +814,7 @@ li::before {
 .recommended {
   display: inline-flex;
   align-self: flex-start;
-  margin-top: 30px;
+  margin-top: 20px;
   border-radius: 999px;
   padding: 8px 12px;
   background: var(--color-red);
@@ -820,7 +834,7 @@ li::before {
 
 .addons-section {
   display: grid;
-  gap: clamp(48px, 7vw, 96px);
+  gap: clamp(22px, 3vw, 48px);
   align-items: center;
 }
 
@@ -842,14 +856,14 @@ li::before {
 .addons-list {
   display: grid;
   gap: 10px;
-  margin-top: 38px;
+  margin-top: 22px;
 }
 
 .addons-list article {
   display: grid;
   gap: 7px;
   border-bottom: 1px solid var(--color-line);
-  padding: 17px 0;
+  padding: 12px 0;
 }
 
 .addons-list span {
@@ -888,7 +902,7 @@ li::before {
 .alert-box {
   background: var(--color-red);
   color: white;
-  padding: clamp(32px, 6vw, 54px) clamp(24px, 5vw, 42px);
+  padding: clamp(26px, 3vw, 40px) clamp(24px, 4vw, 42px);
   border-radius: var(--radius-lg);
   max-width: 960px;
   margin: 0 auto;
@@ -911,7 +925,7 @@ li::before {
 .map-container {
   position: relative;
   width: 100%;
-  max-width: 450px;
+  max-width: 340px;
   margin: 0 auto;
 }
 
@@ -1068,7 +1082,7 @@ li::before {
 .final-cta {
   position: relative;
   display: grid;
-  min-height: 720px;
+  min-height: 620px;
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--content-max));
   overflow: hidden;
   margin: clamp(30px, 7vw, 90px) auto 20px;
@@ -1079,7 +1093,7 @@ li::before {
 }
 
 .final-image {
-  min-height: 430px;
+  min-height: 330px;
   background-image: linear-gradient(180deg, transparent 55%, #0b0b0b 100%), url("./assets/portrait-03.webp");
   background-position: 44% center;
   background-size: cover;
@@ -1088,7 +1102,7 @@ li::before {
 
 .final-content {
   align-self: center;
-  padding: clamp(34px, 7vw, 76px);
+  padding: clamp(28px, 4vw, 54px);
   text-align: center;
 }
 
@@ -1404,16 +1418,16 @@ legend,
 .portrait-gallery-section {
   width: min(calc(100% - (var(--page-gutter) * 2)), var(--content-max));
   margin: 0 auto;
-  padding: clamp(50px, 7vw, 104px) 0 var(--section-space);
+  padding: clamp(34px, 4vw, 62px) 0 var(--section-space);
 }
 
 .gallery-heading {
   display: grid;
   gap: 26px;
   align-items: end;
-  margin-bottom: clamp(28px, 4vw, 52px);
+  margin-bottom: clamp(20px, 2.5vw, 36px);
   border-top: 1px solid rgba(0, 0, 0, 0.16);
-  padding-top: clamp(32px, 5vw, 58px);
+  padding-top: clamp(24px, 3vw, 42px);
 }
 
 .gallery-heading h2 {
@@ -1431,8 +1445,34 @@ legend,
   display: block;
   width: 100%;
   padding: 0;
+  max-height: 900px;
+  overflow: hidden;
   columns: 5;
   column-gap: clamp(12px, 1.5vw, 22px);
+}
+
+.portrait-gallery-section .portrait-gallery.is-expanded {
+  max-height: none;
+}
+
+.gallery-toggle {
+  display: block;
+  margin: 24px auto 0;
+  border: 1px solid #111;
+  border-radius: 0;
+  padding: 14px 22px;
+  background: transparent;
+  color: #111;
+  cursor: pointer;
+  font: 800 11px var(--font-sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.gallery-toggle:hover,
+.gallery-toggle:focus-visible {
+  background: #111;
+  color: #fff;
 }
 
 .portrait-gallery-section .portrait-gallery figure {
@@ -1478,8 +1518,17 @@ legend,
 
 .process-section,
 .location-section {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.offer .intro-copy h2,
+.offer .process-section h2,
+.offer .comparison-heading h2,
+.offer .pricing-section h2,
+.offer .feature-copy h2,
+.offer .gallery-heading h2 {
+  font-size: clamp(2.6rem, 5vw, 4.5rem);
 }
 
 .process-section .section-heading > p:not(.eyebrow),
@@ -1530,6 +1579,21 @@ legend,
 @media (max-width: 779px) {
   .portrait-gallery-section .portrait-gallery {
     columns: 3;
+    max-height: 650px;
+  }
+
+  .feature-photo img,
+  .guestbook-gallery img {
+    max-height: 420px;
+  }
+
+  .addons-photo {
+    width: min(100%, 340px);
+    justify-self: center;
+  }
+
+  .map-container {
+    max-width: 290px;
   }
 }
 
@@ -1574,6 +1638,18 @@ legend,
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
   }
 
+  .feature-split:not(.location-section) {
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  }
+
+  .feature-split-reverse:not(.location-section) {
+    grid-template-columns: minmax(0, 1.28fr) minmax(0, 0.72fr);
+  }
+
+  .addons-section {
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  }
+
   .feature-split-reverse .feature-copy {
     order: 1;
   }
@@ -1605,7 +1681,7 @@ legend,
   }
 
   .final-image {
-    min-height: 760px;
+    min-height: 640px;
     background-image: linear-gradient(90deg, transparent 72%, #0b0b0b 100%), url("./assets/portrait-03.webp");
   }
 
@@ -1636,7 +1712,7 @@ legend,
 
 @media (max-width: 520px) {
   :root {
-    --section-space: 76px;
+    --section-space: 46px;
   }
 
   .hero {
