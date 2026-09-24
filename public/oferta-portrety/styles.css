@@ -1441,38 +1441,36 @@ legend,
   line-height: 1.75;
 }
 
+.portrait-gallery-viewport {
+  height: min(68vh, 720px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.portrait-gallery-viewport.is-looping {
+  overflow: hidden;
+}
+
+.portrait-gallery-viewport.is-looping .portrait-gallery.mosaic-ready {
+  animation: portrait-mosaic-scroll var(--mosaic-loop-duration) linear infinite;
+  will-change: transform;
+}
+
+.portrait-gallery-viewport.is-looping:hover .portrait-gallery,
+.portrait-gallery-viewport.is-looping:focus-within .portrait-gallery {
+  animation-play-state: paused;
+}
+
+@keyframes portrait-mosaic-scroll {
+  to { transform: translateY(calc(-1 * var(--mosaic-loop-distance))); }
+}
+
 .portrait-gallery-section .portrait-gallery {
   display: block;
   width: 100%;
   padding: 0;
-  max-height: 900px;
-  overflow: hidden;
   columns: 5;
   column-gap: clamp(12px, 1.5vw, 22px);
-}
-
-.portrait-gallery-section .portrait-gallery.is-expanded {
-  max-height: none;
-}
-
-.gallery-toggle {
-  display: block;
-  margin: 24px auto 0;
-  border: 1px solid #111;
-  border-radius: 0;
-  padding: 14px 22px;
-  background: transparent;
-  color: #111;
-  cursor: pointer;
-  font: 800 11px var(--font-sans);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.gallery-toggle:hover,
-.gallery-toggle:focus-visible {
-  background: #111;
-  color: #fff;
 }
 
 .portrait-gallery-section .portrait-gallery figure {
@@ -1491,6 +1489,10 @@ legend,
 .portrait-gallery-section .portrait-gallery.mosaic-ready figure {
   position: absolute;
   margin: 0;
+}
+
+.portrait-gallery-section .portrait-gallery .mosaic-loop-copy[hidden] {
+  display: none;
 }
 
 .portrait-gallery-section .portrait-gallery img {
@@ -1577,9 +1579,8 @@ legend,
 }
 
 @media (max-width: 779px) {
-  .portrait-gallery-section .portrait-gallery {
-    columns: 3;
-    max-height: 650px;
+  .portrait-gallery-viewport {
+    height: 520px;
   }
 
   .feature-photo img,
@@ -1748,6 +1749,10 @@ legend,
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .portrait-gallery-viewport.is-looping .portrait-gallery.mosaic-ready {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {

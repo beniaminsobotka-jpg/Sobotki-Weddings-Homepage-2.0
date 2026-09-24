@@ -36,16 +36,6 @@ const inquiryError = document.querySelector("#inquiryError");
 const showRejectSurvey = document.querySelector("#showRejectSurvey");
 const rejectForm = document.querySelector("#rejectForm");
 const rejectStatus = document.querySelector("#rejectStatus");
-const galleryToggle = document.querySelector("#galleryToggle");
-const portraitGallery = document.querySelector("#portraitGallery");
-
-galleryToggle?.addEventListener("click", () => {
-  const expanded = portraitGallery.classList.toggle("is-expanded");
-  galleryToggle.setAttribute("aria-expanded", String(expanded));
-  galleryToggle.textContent = expanded ? "Zwiń galerię" : "Zobacz wszystkie 34 zdjęcia";
-  if (!expanded) galleryToggle.closest(".portrait-gallery-section").scrollIntoView({ block: "start" });
-});
-
 function setConfigLinks() {
   document.querySelectorAll("[data-contact-email]").forEach((link) => {
     link.textContent = CONFIG.contactEmail;
@@ -198,16 +188,30 @@ function startPortraitMosaic() {
 
   const gallery = document.querySelector(".portrait-gallery-section .portrait-gallery");
   if (!gallery) return;
+  const viewport = gallery.closest(".portrait-gallery-viewport");
   const figures = [...gallery.querySelectorAll("figure")];
   const images = figures.map((figure) => figure.querySelector("img"));
   const largerPhotos = new Set([0, 1, 11, 19, 22]);
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const copies = figures.map((figure) => {
+    const copy = figure.cloneNode(true);
+    copy.classList.add("mosaic-loop-copy");
+    copy.setAttribute("aria-hidden", "true");
+    const image = copy.querySelector("img");
+    image.alt = "";
+    image.loading = "eager";
+    gallery.append(copy);
+    return copy;
+  });
 
   function layout() {
+    viewport.classList.remove("is-looping");
     const width = gallery.clientWidth;
     const columns = width < 560 ? 3 : width < 900 ? 4 : 6;
     const gap = width < 560 ? 10 : width < 900 ? 14 : 18;
     const unitWidth = (width - gap * (columns - 1)) / columns;
     const bottoms = Array(columns).fill(0);
+    const positions = [];
 
     figures.forEach((figure, index) => {
       const image = images[index];
@@ -232,13 +236,26 @@ function startPortraitMosaic() {
       figure.style.top = `${top}px`;
       figure.style.width = `${tileWidth}px`;
       figure.style.height = `${tileHeight}px`;
+      positions.push({ left: figure.style.left, top, width: figure.style.width, height: figure.style.height });
       for (let i = column; i < column + span; i += 1) {
         bottoms[i] = top + tileHeight + gap;
       }
     });
 
-    gallery.style.height = `${Math.max(...bottoms) - gap}px`;
+    const cycleHeight = Math.max(...bottoms);
+    copies.forEach((copy, index) => {
+      const position = positions[index];
+      copy.style.left = position.left;
+      copy.style.top = `${position.top + cycleHeight}px`;
+      copy.style.width = position.width;
+      copy.style.height = position.height;
+      copy.hidden = reducedMotion.matches;
+    });
+    gallery.style.height = `${cycleHeight * (reducedMotion.matches ? 1 : 2) - gap}px`;
+    gallery.style.setProperty("--mosaic-loop-distance", `${cycleHeight}px`);
+    gallery.style.setProperty("--mosaic-loop-duration", `${cycleHeight / 32}s`);
     gallery.classList.add("mosaic-ready");
+    viewport.classList.toggle("is-looping", !reducedMotion.matches);
   }
 
   images.forEach((image) => {
@@ -247,6 +264,7 @@ function startPortraitMosaic() {
   Promise.all(images.map((image) => image.decode().catch(() => {}))).then(() => {
     layout();
     window.addEventListener("resize", layout, { passive: true });
+    reducedMotion.addEventListener("change", layout);
   });
 }
 
