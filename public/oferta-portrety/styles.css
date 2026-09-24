@@ -687,24 +687,22 @@ textarea:focus {
 }
 
 .feature-kicker {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .feature-kicker .eyebrow {
   margin: 0;
 }
 
-.feature-price {
-  display: inline-block;
-  color: var(--color-red);
-  font-family: var(--font-heading);
-  font-size: clamp(1.35rem, 2vw, 1.8rem);
-  line-height: 1;
-  white-space: nowrap;
+.feature-package-note {
+  margin: 5px 0 0;
+  color: #555;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.55;
+  text-transform: uppercase;
 }
 
 .feature-copy .small-note {
@@ -746,6 +744,10 @@ textarea:focus {
 
 .feature-split-film .eyebrow {
   color: #aaa;
+}
+
+.feature-split-film .feature-package-note {
+  color: #ccc;
 }
 
 .feature-split-film .feature-photo {
