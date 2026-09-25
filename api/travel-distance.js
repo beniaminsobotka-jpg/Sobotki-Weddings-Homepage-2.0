@@ -1,33 +1,14 @@
+import { createOfferAccessToken } from '../server/offer-access-token.js';
+import { getPricingForDistance } from '../server/portrait-pricing.js';
+
 const GLIWICE_COORDINATES = {
   latitude: 50.2945,
   longitude: 18.6714,
 };
 
 const MAX_VENUE_LENGTH = 180;
-const MAX_DISTANCE_METERS = 350_000;
 const OUT_OF_RANGE_MESSAGE =
   'Przepraszamy, aktualnie dojeżdżamy maksymalnie do 300 km od Gliwic (woj.śląskie)';
-
-const PRICE_TIERS = [
-  {
-    id: 'up-to-150',
-    maxDistanceMeters: 150_000,
-    essential: 3_200,
-    exclusive: 4_200,
-  },
-  {
-    id: 'up-to-250',
-    maxDistanceMeters: 250_000,
-    essential: 3_500,
-    exclusive: 4_500,
-  },
-  {
-    id: 'up-to-350',
-    maxDistanceMeters: MAX_DISTANCE_METERS,
-    essential: 3_800,
-    exclusive: 4_800,
-  },
-];
 
 const sendJson = (response, status, body) => {
   response
@@ -55,19 +36,6 @@ const fetchJson = async (url, options = {}) => {
   } finally {
     clearTimeout(timeout);
   }
-};
-
-const getPricingForDistance = (distanceMeters) => {
-  const tier = PRICE_TIERS.find((item) => distanceMeters <= item.maxDistanceMeters);
-  if (!tier) return null;
-
-  return {
-    tier: tier.id,
-    prices: {
-      essential: tier.essential,
-      exclusive: tier.exclusive,
-    },
-  };
 };
 
 const geocodeVenue = async (venue) => {
@@ -152,12 +120,26 @@ export default async function handler(request, response) {
       });
     }
 
+    const pricingQuote = createOfferAccessToken({
+      kind: 'portraits_pricing_quote',
+      expiresAt: Date.now() + 14 * 24 * 60 * 60 * 1000,
+      quote: {
+        venue,
+        distanceKm,
+        resolvedLocation: destination.displayName,
+        tier: pricing.tier,
+        prices: pricing.prices,
+        quotedAt: new Date().toISOString(),
+      },
+    });
+
     return sendJson(response, 200, {
       ok: true,
       overLimit: false,
       distanceKm,
       resolvedLocation: destination.displayName,
       ...pricing,
+      pricingQuote,
     });
   } catch (error) {
     console.error('[Travel Distance] Distance calculation failed', {

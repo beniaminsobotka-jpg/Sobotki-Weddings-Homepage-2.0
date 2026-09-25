@@ -1,4 +1,5 @@
-import { createOfferAccessToken } from '../server/offer-access-token.js';
+import { createOfferAccessToken, readOfferAccessToken } from '../server/offer-access-token.js';
+import { getPricingForTier } from '../server/portrait-pricing.js';
 
 const BREVO_CONTACTS_API_URL = 'https://api.brevo.com/v3/contacts';
 const BREVO_SMTP_API_URL = 'https://api.brevo.com/v3/smtp/email';
@@ -17,12 +18,6 @@ const PORTRAITS_WEDDING_SOURCES = new Set([
   'Strona WWW',
   'Inne',
 ]);
-
-const PORTRAITS_PACKAGE_PRICES = {
-  'up-to-150': { essential: 3200, exclusive: 4200 },
-  'up-to-250': { essential: 3500, exclusive: 4500 },
-  'up-to-350': { essential: 3800, exclusive: 4800 },
-};
 
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json');
@@ -89,7 +84,9 @@ const buildInternalRows = (entries) =>
             ${escapeHtml(label)}
           </td>
           <td style="padding:10px 14px; border:1px solid #e5e5e5; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:22px; color:#333333; vertical-align:top;">
-            ${escapeHtml(value || '-')}
+            ${label === 'Link do oferty' && value
+              ? `<a href="${escapeHtml(value)}" style="color:#d42929; overflow-wrap:anywhere;">${escapeHtml(value)}</a>`
+              : escapeHtml(value || '-')}
           </td>
         </tr>
       `
@@ -101,6 +98,9 @@ const getPricingTierLabel = (tier) => ({
   'up-to-250': 'Próg II — do 250 km',
   'up-to-350': 'Próg III — powyżej 250 km',
 }[tier] || tier || '-');
+
+const formatPrice = (price) =>
+  typeof price === 'number' ? `${new Intl.NumberFormat('pl-PL').format(price)} zł` : '-';
 
 const buildInternalHtml = (leadData) => `
   <!doctype html>
@@ -132,6 +132,12 @@ const buildInternalHtml = (leadData) => `
                 ['venue', leadData.venue],
                 ['Odległość od Gliwic', leadData.distanceKm ? `${leadData.distanceKm} km (w jedną stronę)` : ''],
                 ['Próg cenowy oferty', getPricingTierLabel(leadData.pricingTier)],
+                ...(leadData.offerUrl ? [
+                  ['Cena Essential', formatPrice(leadData.packagePrices?.essential)],
+                  ['Cena Exclusive', formatPrice(leadData.packagePrices?.exclusive)],
+                  ['Link do oferty', leadData.offerUrl],
+                  ['Data wyceny', leadData.quotedAt || ''],
+                ] : []),
                 ['serviceType', leadData.serviceType],
                 ['guestCount', leadData.guestCount],
                 ['company', leadData.company],
@@ -160,6 +166,12 @@ const buildInternalText = (leadData) => [
   `venue: ${leadData.venue || '-'}`,
   `Odległość od Gliwic: ${leadData.distanceKm ? `${leadData.distanceKm} km (w jedną stronę)` : '-'}`,
   `Próg cenowy oferty: ${getPricingTierLabel(leadData.pricingTier)}`,
+  ...(leadData.offerUrl ? [
+    `Cena Essential: ${formatPrice(leadData.packagePrices?.essential)}`,
+    `Cena Exclusive: ${formatPrice(leadData.packagePrices?.exclusive)}`,
+    `Link do oferty: ${leadData.offerUrl}`,
+    `Data wyceny: ${leadData.quotedAt || '-'}`,
+  ] : []),
   `serviceType: ${leadData.serviceType}`,
   `guestCount: ${leadData.guestCount || '-'}`,
   `company: ${leadData.company || '-'}`,
@@ -201,8 +213,9 @@ export default async function handler(request, response) {
   const company = normalizeString(parsedBody.company);
   const guestCount = normalizeString(parsedBody.guestCount);
   const source = normalizeString(parsedBody.source);
-  const distanceKm = Number.isFinite(Number(parsedBody.distanceKm)) ? Number(parsedBody.distanceKm) : 0;
-  const pricingTier = normalizeString(parsedBody.pricingTier);
+  const submittedDistanceKm = Number.isFinite(Number(parsedBody.distanceKm)) ? Number(parsedBody.distanceKm) : 0;
+  const submittedPricingTier = normalizeString(parsedBody.pricingTier);
+  const pricingQuote = normalizeString(parsedBody.pricingQuote);
 
   if (!formType) {
     return sendJson(response, 400, { error: 'formType is required' });
@@ -240,12 +253,51 @@ export default async function handler(request, response) {
 
   const { firstName, lastName } = splitName(fullName);
   let offerPath = '';
+  let packagePrices = null;
+  let pricingTier = submittedPricingTier;
+  let distanceKm = submittedDistanceKm;
+  let resolvedLocation = venue;
+  let quotedAt = '';
 
-  if (formType === 'portraits_wedding' && PORTRAITS_PACKAGE_PRICES[pricingTier]) {
+  if (formType === 'portraits_wedding') {
+    if (pricingQuote) {
+      try {
+        const snapshot = readOfferAccessToken(pricingQuote);
+        const quote = snapshot?.quote;
+        const sameVenue = (value) => normalizeString(value).replace(/\s+/g, ' ').toLocaleLowerCase('pl-PL');
+        if (
+          snapshot?.kind !== 'portraits_pricing_quote' ||
+          sameVenue(quote?.venue) !== sameVenue(venue) ||
+          typeof quote?.tier !== 'string' || !quote.tier || quote.tier.length > 50 ||
+          !Number.isFinite(quote?.distanceKm) || quote.distanceKm < 0 ||
+          !Number.isFinite(quote?.prices?.essential) || quote.prices.essential <= 0 ||
+          !Number.isFinite(quote?.prices?.exclusive) || quote.prices.exclusive <= 0
+        ) {
+          throw new Error('Invalid pricing snapshot');
+        }
+        pricingTier = quote.tier;
+        distanceKm = quote.distanceKm;
+        packagePrices = quote.prices;
+        resolvedLocation = quote.resolvedLocation || venue;
+        quotedAt = quote.quotedAt || '';
+      } catch {
+        return sendJson(response, 400, { error: 'Wycena wygasła. Odśwież stronę i wyślij formularz ponownie.' });
+      }
+    } else {
+      // Older clients may still submit without a signed quote during rollout.
+      packagePrices = getPricingForTier(pricingTier)?.prices || null;
+      quotedAt = new Date().toISOString();
+    }
+
+    if (!packagePrices) {
+      return sendJson(response, 400, { error: 'Nie udało się ustalić ceny oferty. Odśwież stronę i spróbuj ponownie.' });
+    }
+
     const weddingTimestamp = Date.parse(`${weddingDate}T23:59:59Z`);
+    const fiveYears = 5 * 365 * 24 * 60 * 60 * 1000;
     const expiresAt = Number.isFinite(weddingTimestamp)
-      ? Math.max(Date.now() + 30 * 24 * 60 * 60 * 1000, weddingTimestamp + 30 * 24 * 60 * 60 * 1000)
-      : Date.now() + 730 * 24 * 60 * 60 * 1000;
+      ? Math.max(Date.now() + fiveYears, weddingTimestamp + fiveYears)
+      : Date.now() + fiveYears;
     const accessToken = createOfferAccessToken({
       kind: 'portraits_wedding',
       expiresAt,
@@ -259,12 +311,14 @@ export default async function handler(request, response) {
         notes: message,
         distanceKm,
         pricingTier,
-        packagePrices: PORTRAITS_PACKAGE_PRICES[pricingTier],
-        resolvedLocation: venue,
+        packagePrices,
+        resolvedLocation,
+        quotedAt,
       },
     });
     offerPath = `/oferta-portrety/?access=${encodeURIComponent(accessToken)}`;
   }
+  const offerUrl = offerPath ? `https://www.sobotkiweddings.pl${offerPath}` : '';
 
   const brevoPayload = {
     email: normalizedEmail,
@@ -334,6 +388,9 @@ export default async function handler(request, response) {
         venue,
         distanceKm,
         pricingTier,
+        packagePrices,
+        offerUrl,
+        quotedAt,
         serviceType,
         guestCount,
         company,
@@ -398,7 +455,6 @@ export default async function handler(request, response) {
       }
 
       if (formType === 'portraits_wedding') {
-        const offerUrl = `https://www.sobotkiweddings.pl${offerPath || '/oferta-portrety/'}`;
         const buildAutoresponderHtml = (firstName) => `
           <!doctype html>
           <html>

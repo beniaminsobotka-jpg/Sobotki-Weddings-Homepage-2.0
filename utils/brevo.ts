@@ -17,6 +17,7 @@ type BrevoLeadInput = {
   source?: string;
   distanceKm?: number;
   pricingTier?: string;
+  pricingQuote?: string;
 };
 
 const buildReadableError = async (response: Response) => {

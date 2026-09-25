@@ -375,6 +375,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         source: formData.source,
         distanceKm: distanceData.distanceKm,
         pricingTier: distanceData.tier,
+        pricingQuote: distanceData.pricingQuote,
       });
 
       setStatus('success');
