@@ -1253,8 +1253,19 @@ li::before {
 
 .final-content {
   align-self: center;
+  min-width: 0;
   padding: clamp(28px, 4vw, 54px);
   text-align: center;
+}
+
+.final-content h2 {
+  font-size: clamp(2.6rem, 6vw, 5.6rem);
+}
+
+.final-content h2 .accent-label {
+  display: inline;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .final-content > p {
@@ -1831,6 +1842,10 @@ legend,
 }
 
 @media (min-width: 780px) {
+  .final-content h2 {
+    font-size: clamp(2.2rem, 4.2vw, 4.4rem);
+  }
+
   .hero-grid {
     grid-template-columns: minmax(0, 1.25fr) minmax(390px, 0.72fr);
   }
