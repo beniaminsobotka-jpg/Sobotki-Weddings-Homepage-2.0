@@ -1278,6 +1278,39 @@ li::before {
   margin-top: 20px;
 }
 
+.final-content .booking-note {
+  margin-top: 22px;
+  margin-bottom: 12px;
+  color: #d7ff9a;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  font-weight: 800;
+}
+
+.button-reserve {
+  background: #bcff58;
+  color: #101807;
+  box-shadow: 0 0 0 1px rgba(188, 255, 88, 0.7), 0 0 22px rgba(143, 255, 57, 0.55), 0 0 54px rgba(143, 255, 57, 0.26);
+  animation: reserve-glow 2.6s ease-in-out infinite alternate;
+}
+
+.button-reserve:hover,
+.button-reserve:focus-visible {
+  background: #d5ff95;
+  color: #101807;
+  box-shadow: 0 0 0 2px rgba(213, 255, 149, 0.95), 0 0 30px rgba(143, 255, 57, 0.75), 0 0 70px rgba(143, 255, 57, 0.4);
+}
+
+.button-reserve:disabled {
+  animation: none;
+  box-shadow: none;
+}
+
+@keyframes reserve-glow {
+  to {
+    box-shadow: 0 0 0 2px rgba(188, 255, 88, 0.85), 0 0 32px rgba(143, 255, 57, 0.75), 0 0 68px rgba(143, 255, 57, 0.38);
+  }
+}
+
 .pdf-inline-link {
   display: table;
   margin: 22px auto 30px;
@@ -1366,16 +1399,20 @@ legend,
 }
 
 .contact-line {
-  margin-top: 46px !important;
-  color: #777 !important;
-  font-size: 0.7rem !important;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin-top: 25px !important;
+  color: #bcbcbc !important;
+  font-size: 0.86rem !important;
+  letter-spacing: 0;
 }
 
 .contact-line a {
   color: white;
-  text-decoration: none;
+  text-decoration-color: #bcff58;
+  text-underline-offset: 3px;
+}
+
+.contact-line span {
+  padding: 0 6px;
 }
 
 .modal {
