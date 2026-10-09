@@ -6,8 +6,8 @@ import {
   resolveGallery,
 } from '../server/dropbox-gallery.js';
 
-const MAX_ARCHIVE_PHOTOS = 2000;
-const MAX_ARCHIVE_BYTES = 250 * 1024 * 1024;
+const MAX_ARCHIVE_PHOTOS = 100;
+const MAX_ARCHIVE_BYTES = 50 * 1024 * 1024;
 const DOWNLOAD_CONCURRENCY = 8;
 
 const sendJson = (response, status, body) => {
@@ -188,7 +188,7 @@ export default async function handler(request, response) {
 
     if (declaredSize > MAX_ARCHIVE_BYTES) {
       throw new GalleryError(
-        'Wybrane zdjęcia są zbyt duże do jednego pobrania. Pobierz je w dwóch mniejszych partiach.',
+        'Ta paczka jest zbyt duża. Odśwież galerię i spróbuj ponownie — zdjęcia zostaną automatycznie podzielone na mniejsze paczki.',
         413,
         'archive_too_large'
       );
@@ -253,6 +253,11 @@ export default async function handler(request, response) {
           );
 
     if (response.headersSent) {
+      if (typeof response.destroy === 'function') {
+        response.destroy(galleryError);
+        return;
+      }
+
       return response.end();
     }
 

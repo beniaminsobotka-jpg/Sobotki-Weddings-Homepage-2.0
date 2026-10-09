@@ -36,6 +36,60 @@ type GalleryData = {
 };
 
 const DEFAULT_REFRESH_INTERVAL = 10_000;
+const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
+const MAX_ZIP_PART_PHOTOS = 80;
+
+const splitPhotosIntoZipParts = (photos: GalleryPhoto[]) => {
+  const parts: GalleryPhoto[][] = [];
+  let currentPart: GalleryPhoto[] = [];
+  let currentSize = 0;
+
+  photos.forEach((photo) => {
+    const photoSize = Math.max(0, Number(photo.size) || 0);
+    const exceedsPhotoLimit = currentPart.length >= MAX_ZIP_PART_PHOTOS;
+    const exceedsSizeLimit =
+      currentPart.length > 0 && currentSize + photoSize > MAX_ZIP_PART_BYTES;
+
+    if (exceedsPhotoLimit || exceedsSizeLimit) {
+      parts.push(currentPart);
+      currentPart = [];
+      currentSize = 0;
+    }
+
+    currentPart.push(photo);
+    currentSize += photoSize;
+  });
+
+  if (currentPart.length > 0) {
+    parts.push(currentPart);
+  }
+
+  return parts;
+};
+
+const hasCompleteZipEndRecord = async (archive: Blob) => {
+  if (archive.size < 22) {
+    return false;
+  }
+
+  const maxEndRecordSize = 65_557;
+  const tail = new Uint8Array(
+    await archive.slice(Math.max(0, archive.size - maxEndRecordSize)).arrayBuffer()
+  );
+
+  for (let index = tail.length - 22; index >= 0; index -= 1) {
+    if (
+      tail[index] === 0x50 &&
+      tail[index + 1] === 0x4b &&
+      tail[index + 2] === 0x05 &&
+      tail[index + 3] === 0x06
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+};
 
 const GalleryBrand = ({ light = true }: { light?: boolean }) => (
   <Link
@@ -70,6 +124,7 @@ export const GalleryPage: React.FC = () => {
     () => new Set()
   );
   const [isDownloadingSelection, setIsDownloadingSelection] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState('');
   const [selectionError, setSelectionError] = useState('');
   const touchStartX = useRef<number | null>(null);
   const requestInProgress = useRef(false);
@@ -176,6 +231,13 @@ export const GalleryPage: React.FC = () => {
 
   const photos = data?.photos || [];
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
+  const selectedZipPartCount = useMemo(
+    () =>
+      splitPhotosIntoZipParts(
+        photos.filter((photo) => selectedPhotoIds.has(photo.id))
+      ).length,
+    [photos, selectedPhotoIds]
+  );
 
   useEffect(() => {
     const availablePhotoIds = new Set(photos.map((photo) => photo.id));
@@ -207,15 +269,14 @@ export const GalleryPage: React.FC = () => {
   const closeSelectionMode = useCallback(() => {
     setIsSelectionMode(false);
     setSelectedPhotoIds(new Set());
+    setDownloadProgress('');
     setSelectionError('');
   }, []);
 
   const downloadSelectedPhotos = useCallback(async () => {
-    const names = photos
-      .filter((photo) => selectedPhotoIds.has(photo.id))
-      .map((photo) => photo.name);
+    const selectedPhotos = photos.filter((photo) => selectedPhotoIds.has(photo.id));
 
-    if (!names.length || isDownloadingSelection) {
+    if (!selectedPhotos.length || isDownloadingSelection) {
       return;
     }
 
@@ -223,32 +284,55 @@ export const GalleryPage: React.FC = () => {
     setSelectionError('');
 
     try {
-      const response = await fetch('/api/gallery-batch-download', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/zip, application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ slug, names }),
-      });
+      const zipParts = splitPhotosIntoZipParts(selectedPhotos);
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
-        throw new Error(
-          payload?.error || 'Nie udało się przygotować wybranych zdjęć.'
+      for (let partIndex = 0; partIndex < zipParts.length; partIndex += 1) {
+        const part = zipParts[partIndex];
+        const names = part.map((photo) => photo.name);
+
+        setDownloadProgress(
+          zipParts.length > 1
+            ? `Przygotowuję paczkę ${partIndex + 1} z ${zipParts.length}…`
+            : 'Przygotowuję ZIP…'
         );
+
+        const response = await fetch('/api/gallery-batch-download', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/zip, application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ slug, names }),
+        });
+
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null);
+          throw new Error(
+            payload?.error || 'Nie udało się przygotować wybranych zdjęć.'
+          );
+        }
+
+        const archive = await response.blob();
+
+        if (!(await hasCompleteZipEndRecord(archive))) {
+          throw new Error(
+            'Pobieranie paczki zostało przerwane. Spróbuj ponownie za chwilę.'
+          );
+        }
+
+        const downloadUrl = window.URL.createObjectURL(archive);
+        const downloadLink = document.createElement('a');
+        const partSuffix =
+          zipParts.length > 1 ? `-czesc-${partIndex + 1}-z-${zipParts.length}` : '';
+
+        downloadLink.href = downloadUrl;
+        downloadLink.download = `sobotki-${slug}${partSuffix}-${names.length}-zdjec.zip`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+        window.setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 5_000);
       }
 
-      const archive = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(archive);
-      const downloadLink = document.createElement('a');
-
-      downloadLink.href = downloadUrl;
-      downloadLink.download = `sobotki-${slug}-${names.length}-zdjec.zip`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-      window.setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 1_000);
       closeSelectionMode();
     } catch (downloadError) {
       setSelectionError(
@@ -258,6 +342,7 @@ export const GalleryPage: React.FC = () => {
       );
     } finally {
       setIsDownloadingSelection(false);
+      setDownloadProgress('');
     }
   }, [closeSelectionMode, isDownloadingSelection, photos, selectedPhotoIds, slug]);
 
@@ -600,6 +685,11 @@ export const GalleryPage: React.FC = () => {
               <p className="font-sans text-[10px] font-bold uppercase tracking-[0.17em] text-white/75">
                 Wybrano {selectedPhotoIds.size} z {photos.length}
               </p>
+              {!isDownloadingSelection && selectedZipPartCount > 1 && !selectionError && (
+                <p className="mt-1 font-sans text-[10px] leading-4 text-white/55">
+                  Zdjęcia zostaną pobrane w {selectedZipPartCount} bezpiecznych paczkach ZIP.
+                </p>
+              )}
               {selectionError && (
                 <p className="mt-1 font-sans text-[11px] leading-4 text-red-300">
                   {selectionError}
@@ -618,7 +708,7 @@ export const GalleryPage: React.FC = () => {
                 <Download size={16} aria-hidden="true" />
               )}
               {isDownloadingSelection
-                ? 'Przygotowuję ZIP…'
+                ? downloadProgress || 'Przygotowuję ZIP…'
                 : `Pobierz wybrane (${selectedPhotoIds.size})`}
             </button>
           </motion.div>
