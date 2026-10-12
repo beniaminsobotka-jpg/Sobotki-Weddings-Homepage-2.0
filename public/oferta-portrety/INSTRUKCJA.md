@@ -35,6 +35,6 @@ Każdy event z tej podstrony ma źródło `hidden_offer_portraits_2026_2027`, dz
 
 ## PDF
 
-Przycisk pobierania prowadzi do:
+Nie publikujemy cennika PDF. Aktualne ceny są dostępne wyłącznie w indywidualnym linku do oferty.
 
-`/oferta-portrety-2026-2027.pdf`
+Uwaga: stara automatyzacja Brevo nadal zawiera mail z nieaktualnym PDF. Do czasu jej wyłączenia kod nie synchronizuje kontaktów ani zdarzeń oferty Portraits do Brevo, żeby nie uruchamiać tej wysyłki. Bezpośredni e-mail z linkiem do oferty i powiadomienia o zapytaniach nadal działają.

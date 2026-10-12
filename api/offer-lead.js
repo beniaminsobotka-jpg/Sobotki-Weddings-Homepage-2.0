@@ -452,30 +452,34 @@ export default async function handler(request, response) {
 
   const { firstName, lastName } = splitName(lead.name);
 
-  try {
-    const contactResult = await syncContactToBrevo({
-      apiKey,
-      listId,
-      lead,
-      firstName,
-      lastName,
-    });
+  // Brevo's legacy Portraits automation sends an obsolete PDF. Preserve direct
+  // inquiry notifications while suppressing marketing-list and event triggers.
+  if (!isPortraitsOffer(lead)) {
+    try {
+      const contactResult = await syncContactToBrevo({
+        apiKey,
+        listId,
+        lead,
+        firstName,
+        lastName,
+      });
 
-    if (contactResult.skipped) {
-      warnings.push(contactResult.reason);
+      if (contactResult.skipped) {
+        warnings.push(contactResult.reason);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown contact sync error';
+      console.error('[Offer Lead] Contact sync failed', { eventName: lead.eventName, message });
+      warnings.push(message);
     }
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown contact sync error';
-    console.error('[Offer Lead] Contact sync failed', { eventName: lead.eventName, message });
-    warnings.push(message);
-  }
 
-  try {
-    await trackBrevoEvent({ apiKey, lead, firstName, lastName });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown event tracking error';
-    console.error('[Offer Lead] Event tracking failed', { eventName: lead.eventName, message });
-    warnings.push(message);
+    try {
+      await trackBrevoEvent({ apiKey, lead, firstName, lastName });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown event tracking error';
+      console.error('[Offer Lead] Event tracking failed', { eventName: lead.eventName, message });
+      warnings.push(message);
+    }
   }
 
   if (lead.eventName === 'zapytanie_o_termin') {

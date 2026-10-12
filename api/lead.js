@@ -229,7 +229,7 @@ export default async function handler(request, response) {
 
   const listId = Number(process.env[listEnvName]);
 
-  if (!Number.isInteger(listId) || listId <= 0) {
+  if (formType !== 'portraits_wedding' && (!Number.isInteger(listId) || listId <= 0)) {
     return sendJson(response, 500, {
       error: `Brevo list ID is not configured for ${formType}`,
     });
@@ -339,40 +339,44 @@ export default async function handler(request, response) {
   };
 
   try {
-    const brevoResponse = await fetch(BREVO_CONTACTS_API_URL, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'api-key': apiKey,
-      },
-      body: JSON.stringify(brevoPayload),
-    });
+    // The legacy Brevo list automation still emails an outdated PDF price list.
+    // Keep the transactional offer-link email, but do not trigger that automation.
+    if (formType !== 'portraits_wedding') {
+      const brevoResponse = await fetch(BREVO_CONTACTS_API_URL, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'api-key': apiKey,
+        },
+        body: JSON.stringify(brevoPayload),
+      });
 
-    if (!brevoResponse.ok) {
-      const errorBody = await brevoResponse.text();
+      if (!brevoResponse.ok) {
+        const errorBody = await brevoResponse.text();
 
-      console.error('[Brevo] Contact sync failed', {
+        console.error('[Brevo] Contact sync failed', {
+          formType,
+          listId,
+          emailDomain: getEmailDomain(normalizedEmail),
+          status: brevoResponse.status,
+          body: errorBody.slice(0, 1000),
+        });
+
+        return sendJson(response, 502, {
+          error: 'Brevo contact sync failed',
+          details: errorBody.slice(0, 300),
+        });
+      }
+
+      console.info('[Brevo] Contact synced', {
         formType,
         listId,
         emailDomain: getEmailDomain(normalizedEmail),
-        status: brevoResponse.status,
-        body: errorBody.slice(0, 1000),
-      });
-
-      return sendJson(response, 502, {
-        error: 'Brevo contact sync failed',
-        details: errorBody.slice(0, 300),
+        hasFirstName: Boolean(firstName),
+        hasLastName: Boolean(lastName),
       });
     }
-
-    console.info('[Brevo] Contact synced', {
-      formType,
-      listId,
-      emailDomain: getEmailDomain(normalizedEmail),
-      hasFirstName: Boolean(firstName),
-      hasLastName: Boolean(lastName),
-    });
 
     if (notifyToEmail && notifyFromEmail && notifyFromName) {
       const subjectMarker = formType === 'weddings' ? '🟡' : '🔴';

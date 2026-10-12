@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import leadHandler from '../api/lead.js';
+import offerLeadHandler from '../api/offer-lead.js';
 import travelDistanceHandler from '../api/travel-distance.js';
 import { createOfferAccessToken, readOfferAccessToken } from '../server/offer-access-token.js';
 
@@ -53,8 +54,9 @@ test('signed quote freezes the same prices and offer URL in both emails', async 
     await leadHandler({ method: 'POST', body: { ...baseLead, pricingQuote } }, response);
 
     assert.equal(response.statusCode, 200);
-    assert.equal(calls.length, 3);
-    const [, internal, customer] = calls.map((call) => call.body);
+    assert.equal(calls.length, 2);
+    assert.ok(calls.every((call) => call.url.endsWith('/smtp/email')));
+    const [internal, customer] = calls.map((call) => call.body);
     const offerUrl = `https://www.sobotkiweddings.pl${response.body.offerPath}`;
     assert.equal(internal.to[0].email, 'kontakt@sobotkiweddings.pl');
     assert.equal(customer.to[0].email, baseLead.email);
@@ -64,6 +66,8 @@ test('signed quote freezes the same prices and offer URL in both emails', async 
     assert.ok(internal.htmlContent.includes(offerUrl.replaceAll('&', '&amp;')));
     assert.ok(customer.textContent.includes(offerUrl));
     assert.ok(customer.htmlContent.includes(offerUrl.replaceAll('&', '&amp;')));
+    assert.ok(!customer.htmlContent.includes('.pdf'));
+    assert.ok(!customer.textContent.includes('.pdf'));
 
     const access = new URL(offerUrl).searchParams.get('access');
     const saved = readOfferAccessToken(access);
@@ -108,6 +112,47 @@ test('a quote for a different venue is rejected before sending mail', async () =
     else process.env.BREVO_API_KEY = previousKey;
     if (previousList === undefined) delete process.env.BREVO_LIST_ID_PORTRAITS_WEDDING;
     else process.env.BREVO_LIST_ID_PORTRAITS_WEDDING = previousList;
+  }
+});
+
+test('portrait offer events do not trigger legacy Brevo automation', async () => {
+  const previousFetch = global.fetch;
+  const previousKey = process.env.BREVO_API_KEY;
+  process.env.BREVO_API_KEY = 'test-secret';
+  const calls = [];
+  global.fetch = async (url, options) => {
+    calls.push({ url, body: JSON.parse(options.body) });
+    return { ok: true, json: async () => ({ messageId: 'test-message' }) };
+  };
+
+  try {
+    const body = {
+      eventName: 'oferta_obejrzana',
+      source: 'hidden_offer_portraits',
+      name: 'Anna Kowalska',
+      email: 'client@example.com',
+      weddingDate: '2027-07-10',
+      venue: 'Sala Testowa, Kraków',
+    };
+    const viewed = makeResponse();
+    await offerLeadHandler({ method: 'POST', body }, viewed);
+    assert.equal(viewed.statusCode, 200);
+    assert.equal(calls.length, 0);
+
+    const inquiry = makeResponse();
+    await offerLeadHandler({ method: 'POST', body: {
+      ...body,
+      eventName: 'zapytanie_o_termin',
+      interestedOffers: ['Fotostacja Exclusive - 4200 zł'],
+    } }, inquiry);
+    assert.equal(inquiry.statusCode, 200);
+    assert.equal(calls.length, 1);
+    assert.ok(calls[0].url.endsWith('/smtp/email'));
+    assert.equal(calls[0].body.to[0].email, 'kontakt@sobotkiweddings.pl');
+  } finally {
+    global.fetch = previousFetch;
+    if (previousKey === undefined) delete process.env.BREVO_API_KEY;
+    else process.env.BREVO_API_KEY = previousKey;
   }
 });
 

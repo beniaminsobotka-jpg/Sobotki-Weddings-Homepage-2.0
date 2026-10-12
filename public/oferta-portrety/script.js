@@ -2,7 +2,6 @@ const CONFIG = {
   brandName: "Sobotki Portraits",
   contactEmail: "kontakt@sobotkiweddings.pl",
   instagramUrl: "https://www.instagram.com/sobotki.portraits/",
-  pdfUrl: "/oferta-portrety-2026-2027.pdf",
 
   // Zostaw ten adres przy wdrożeniu strony w obecnym projekcie na Vercelu.
   leadEndpoint: "/api/offer-lead",
@@ -47,9 +46,6 @@ function setConfigLinks() {
     link.href = CONFIG.instagramUrl;
   });
 
-  document.querySelectorAll("[data-pdf-link]").forEach((link) => {
-    link.href = CONFIG.pdfUrl;
-  });
 }
 
 function getLeadData() {
@@ -91,10 +87,6 @@ function applyPricing(pricing) {
     if (text) text.textContent = `${label} - ${formatPrice(price)}`;
   });
 
-  document.querySelectorAll("[data-pdf-link]").forEach((link) => {
-    link.hidden = true;
-    link.style.display = "none";
-  });
 }
 
 async function getTravelPricing(venue) {
