@@ -10,6 +10,10 @@
   },
   "rewrites": [
     {
+      "source": "/oferta-firmowa/:slug",
+      "destination": "/api/corporate-offer?slug=:slug"
+    },
+    {
       "source": "/galeria/:slug",
       "destination": "/api/gallery-page?slug=:slug"
     },
