@@ -10,6 +10,10 @@
   },
   "rewrites": [
     {
+      "source": "/oferta-warszawianka",
+      "destination": "/api/corporate-offer?slug=warszawianka-281026-e14e2a54cd1cf6465b716933"
+    },
+    {
       "source": "/oferta-firmowa/:slug",
       "destination": "/api/corporate-offer?slug=:slug"
     },
