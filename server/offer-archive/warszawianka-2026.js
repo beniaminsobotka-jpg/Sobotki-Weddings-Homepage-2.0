@@ -13,6 +13,24 @@ export const warszawiankaOffer = Object.freeze({
 });
 
 const imageBase = '/oferta-portrety/assets/mosaic/';
+const galleryPhotos = [
+  'tygge-119', 'fs4tc-95', '6qmvn-211', 'tygge-120', 'fenaq-14',
+  'fs4tc-470', 'tygge-114', 'dv8gj-89', 'usuvk-10', 'fs4tc-230',
+  'fenaq-172', '6qmvn-297', 'fs4tc-327', 'fs4tc-377', 'fenaq-266',
+  'tygge-40', 'fenaq-152', 'tygge-147', '6qmvn-350', 'fenaq-99',
+  'fs4tc-117', 'fs4tc-421', 'fenaq-387', 'fs4tc-131', 'fs4tc-419',
+  'tygge-116', 'ukkup-223', 'fs4tc-28', 'dv8gj-93', 'dv8gj-137',
+  'z65cg-23', 'fs4tc-186', 'fs4tc-21', 'fs4tc-366',
+];
+const landscapePhotos = new Set([
+  'tygge-114', 'usuvk-10', 'fenaq-172', 'fs4tc-377', 'fenaq-152',
+  'tygge-147', 'fs4tc-131', 'ukkup-223', 'fs4tc-28', 'dv8gj-137',
+  'z65cg-23', 'fs4tc-21',
+]);
+
+function renderGalleryPhotos(duplicate = false) {
+  return galleryPhotos.map((name, index) => `<img src="${imageBase}${name}.webp" width="${landscapePhotos.has(name) ? 1280 : 853}" height="${landscapePhotos.has(name) ? 853 : 1280}" alt="${duplicate ? '' : `Przykładowy portret z Fotostacji ${index + 1}`}" loading="lazy" decoding="async">`).join('');
+}
 
 export function renderWarszawiankaOffer(offer = warszawiankaOffer) {
   const subject = encodeURIComponent('Fotostacja — 28.10.2026, Hotel Warszawianka');
@@ -33,7 +51,7 @@ export function renderWarszawiankaOffer(offer = warszawiankaOffer) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500;1,700&display=swap&subset=latin,latin-ext" rel="stylesheet">
   <link rel="stylesheet" href="https://use.typekit.net/oiv8gfj.css">
-  <link rel="stylesheet" href="/corporate-offer-warszawianka.css">
+  <link rel="stylesheet" href="/corporate-offer-warszawianka.css?v=2">
 </head>
 <body>
   <header class="site-header wrap">
@@ -45,7 +63,7 @@ export function renderWarszawiankaOffer(offer = warszawiankaOffer) {
     <section class="hero wrap" aria-labelledby="offer-title">
       <div class="hero-copy">
         <p class="eyebrow">Przygotowaliśmy to dla Was</p>
-        <h1 id="offer-title">PORTRETY,<br>KTÓRE <em>ZOSTAJĄ.</em></h1>
+        <h1 id="offer-title">PORTRETY,<br>KTÓRE <em>zostają.</em></h1>
         <p class="hero-lead">Fotostacja na wydarzenie firmowe w Hotelu Warszawianka. Profesjonalne portrety, gotowe odbitki i galeria online — doświadczenie, które uczestnicy zabiorą ze sobą.</p>
         <div class="event-meta" aria-label="Szczegóły wydarzenia">
           <div><span>Termin</span><strong>${offer.eventDate}</strong></div>
@@ -59,13 +77,13 @@ export function renderWarszawiankaOffer(offer = warszawiankaOffer) {
 
     <section class="intro band" aria-labelledby="intro-title">
       <div class="wrap intro-grid">
-        <div><p class="eyebrow">Fotostacja / event firmowy</p><h2 id="intro-title">MOBILNE STUDIO.<br><em>NA WASZYCH ZASADACH.</em></h2></div>
+        <div><p class="eyebrow">Fotostacja / event firmowy</p><h2 id="intro-title">MOBILNE STUDIO.<br><em>na Waszych zasadach.</em></h2></div>
         <div class="intro-text"><p>Na miejscu ustawiamy białe tło, oświetlenie studyjne oraz stanowisko do obróbki i druku. Fotograf prowadzi uczestników przez krótką, swobodną sesję, a gotowe zdjęcia można odebrać jeszcze podczas imprezy.</p><p>To nie jest automatyczna fotobudka. Każdy portret powstaje z udziałem fotografa — tak, aby dobrze wyglądał zarówno jako pamiątka, jak i zdjęcie do firmowej komunikacji.</p></div>
       </div>
     </section>
 
     <section class="scope wrap" aria-labelledby="scope-title">
-      <div class="section-heading"><p class="eyebrow">Zakres w cenie</p><h2 id="scope-title">WSZYSTKO,<br>CO <em>POTRZEBNE.</em></h2></div>
+      <div class="section-heading"><p class="eyebrow">Zakres w cenie</p><h2 id="scope-title">WSZYSTKO,<br>CO <em>potrzebne.</em></h2></div>
       <div class="scope-grid">
         <article><span class="scope-number">01</span><h3>3 godziny pracy</h3><p>Fotostacja dostępna dla uczestników przez trzy godziny; montaż i demontaż stanowiska poza tym czasem.</p></article>
         <article><span class="scope-number">02</span><h3>Dwuosobowa obsługa</h3><p>Fotograf pomaga w pozowaniu i wykonuje zdjęcia. Druga osoba na bieżąco obrabia portrety, drukuje i obsługuje stanowisko.</p></article>
@@ -76,11 +94,11 @@ export function renderWarszawiankaOffer(offer = warszawiankaOffer) {
       </div>
     </section>
 
-    <section class="gallery band" aria-labelledby="gallery-title"><div class="wrap"><div class="gallery-heading"><div><p class="eyebrow">Sobotki Portraits</p><h2 id="gallery-title">TAK WYGLĄDAJĄ <em>PORTRETY.</em></h2></div><p>Przykłady zdjęć wykonanych w naszej Fotostacji. Na Waszym wydarzeniu wybrany wariant brandingu będzie częścią gotowego zdjęcia lub odbitki.</p></div><div class="gallery-grid"><img src="${imageBase}tygge-119.webp" alt="Przykładowy portret uczestniczki" loading="lazy"><img src="${imageBase}fs4tc-117.webp" alt="Przykładowy portret uczestnika" loading="lazy"><img src="${imageBase}6qmvn-297.webp" alt="Przykładowy portret wykonany podczas wydarzenia" loading="lazy"></div></div></section>
+    <section class="gallery band" aria-labelledby="gallery-title"><div class="wrap"><div class="gallery-heading"><div><p class="eyebrow">Sobotki Portraits</p><h2 id="gallery-title">TAK WYGLĄDAJĄ <em>portrety.</em></h2></div><p>Przykłady zdjęć wykonanych w naszej Fotostacji. Na Waszym wydarzeniu wybrany wariant brandingu będzie częścią gotowego zdjęcia lub odbitki.</p></div><div class="gallery-viewport" role="region" aria-label="Galeria 34 portretów" tabindex="0"><div class="gallery-track"><div class="gallery-grid">${renderGalleryPhotos()}</div><div class="gallery-grid" aria-hidden="true">${renderGalleryPhotos(true)}</div></div></div></div></section>
 
-    <section id="wycena" class="pricing wrap" aria-labelledby="pricing-title"><div><p class="eyebrow">Hotel Warszawianka / 28.10.2026 / ok. 90 osób</p><h2 id="pricing-title">JEDNA CENA.<br><em>PEŁNY ZAKRES.</em></h2><p>Wycena obejmuje opisane wyżej 3 godziny pracy Fotostacji, do 200 odbitek, galerię online, jeden wariant brandingu zdjęć i dojazd zespołu z Gliwic. Bez osobnej dopłaty za transport ani za podstawowy projekt brandingu.</p></div><div class="price-card"><span>Indywidualna wycena wydarzenia</span><strong>${new Intl.NumberFormat('pl-PL').format(offer.pricePln)} zł</strong><small>za całość opisanego zakresu</small><div class="price-note">Dodatkowa godzina, większy nakład odbitek lub szersza produkcja materiałów wymagają osobnego uzgodnienia.</div></div></section>
+    <section id="wycena" class="pricing wrap" aria-labelledby="pricing-title"><div><p class="eyebrow">Hotel Warszawianka / 28.10.2026 / ok. 90 osób</p><h2 id="pricing-title">JEDNA CENA.<br><em>pełny zakres.</em></h2><p>Wycena obejmuje opisane wyżej 3 godziny pracy Fotostacji, do 200 odbitek, galerię online, jeden wariant brandingu zdjęć i dojazd zespołu z Gliwic. Bez osobnej dopłaty za transport ani za podstawowy projekt brandingu.</p></div><div class="price-card"><span>Indywidualna wycena wydarzenia</span><strong>${new Intl.NumberFormat('pl-PL').format(offer.pricePln)} zł</strong><small>za całość opisanego zakresu</small><div class="price-note">Dodatkowa godzina, większy nakład odbitek lub szersza produkcja materiałów wymagają osobnego uzgodnienia.</div></div></section>
 
-    <section class="next-step"><div class="wrap next-grid"><div><p class="eyebrow">Co dalej?</p><h2>TERAZ RUCH<br>JEST <em>PO WASZEJ STRONIE.</em></h2><p>Jeśli ta propozycja pasuje do Waszego wydarzenia, napiszcie do nas. Potwierdzimy dostępność terminu i ustalimy szczegóły brandingu. Samo otrzymanie oferty nie rezerwuje daty.</p></div><div class="actions"><a class="primary-button" href="${emailLink}">Zapytaj o dostępność terminu <span aria-hidden="true">↗</span></a><a class="secondary-link" href="https://www.instagram.com/sobotki.portraits/" target="_blank" rel="noopener noreferrer">Lub napisz na Instagramie @sobotki.portraits <span aria-hidden="true">↗</span></a><p>Oferta ważna do 28 października 2026, godz. 08:45 (czasu polskiego). Po tym terminie ten link wygaśnie.</p></div></div></section>
+    <section class="next-step"><div class="wrap next-grid"><div><p class="eyebrow">Co dalej?</p><h2>TERAZ RUCH<br>JEST <em>po Waszej stronie.</em></h2><p>Jeśli ta propozycja pasuje do Waszego wydarzenia, napiszcie do nas. Potwierdzimy dostępność terminu i ustalimy szczegóły brandingu. Samo otrzymanie oferty nie rezerwuje daty.</p></div><div class="actions"><a class="primary-button" href="${emailLink}">Zapytaj o dostępność terminu <span aria-hidden="true">↗</span></a><a class="secondary-link" href="https://www.instagram.com/sobotki.portraits/" target="_blank" rel="noopener noreferrer">Lub napisz na Instagramie @sobotki.portraits <span aria-hidden="true">↗</span></a><p>Oferta ważna do 28 października 2026, godz. 08:45 (czasu polskiego). Po tym terminie ten link wygaśnie.</p></div></div></section>
   </main>
   <footer class="wrap footer"><span>SOBOTKI PORTRAITS</span><span>Oferta przygotowana wyłącznie dla wydarzenia w Hotelu Warszawianka · 28.10.2026</span></footer>
 </body>
@@ -88,5 +106,5 @@ export function renderWarszawiankaOffer(offer = warszawiankaOffer) {
 }
 
 export function renderExpiredWarszawiankaOffer() {
-  return `<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>Oferta wygasła · Sobotki Portraits</title><link rel="stylesheet" href="/corporate-offer-warszawianka.css"></head><body class="expired"><main><p class="eyebrow">Sobotki Portraits</p><h1>TA OFERTA<br><em>WYGASŁA.</em></h1><p>Indywidualna oferta dla wydarzenia w Hotelu Warszawianka była ważna przez dwa tygodnie. Jeśli chcecie wrócić do rozmowy, napiszcie do nas — przygotujemy aktualną propozycję.</p><a class="primary-button" href="mailto:kontakt@sobotkiweddings.pl?subject=Aktualizacja%20oferty%20%E2%80%94%20Hotel%20Warszawianka">Poproś o aktualną ofertę <span aria-hidden="true">↗</span></a></main></body></html>`;
+  return `<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><title>Oferta wygasła · Sobotki Portraits</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500;1,700&display=swap&subset=latin,latin-ext" rel="stylesheet"><link rel="stylesheet" href="https://use.typekit.net/oiv8gfj.css"><link rel="stylesheet" href="/corporate-offer-warszawianka.css?v=2"></head><body class="expired"><main><p class="eyebrow">Sobotki Portraits</p><h1>TA OFERTA<br><em>wygasła.</em></h1><p>Indywidualna oferta dla wydarzenia w Hotelu Warszawianka była ważna przez dwa tygodnie. Jeśli chcecie wrócić do rozmowy, napiszcie do nas — przygotujemy aktualną propozycję.</p><a class="primary-button" href="mailto:kontakt@sobotkiweddings.pl?subject=Aktualizacja%20oferty%20%E2%80%94%20Hotel%20Warszawianka">Poproś o aktualną ofertę <span aria-hidden="true">↗</span></a></main></body></html>`;
 }
