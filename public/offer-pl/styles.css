@@ -2,7 +2,6 @@
 .polish-contact-grid label { min-width:0; display:flex; flex-direction:column; gap:7px; }
 .polish-contact-grid input,.polish-contact-grid select { width:100%; min-width:0; border:1px solid rgba(255,255,255,.16); border-radius:10px; padding:12px; font-family:var(--font-sans); font-size:14px; color:#fff; background:#171717; }
 .polish-contact-grid option { color:#fff; background:#171717; }
-.polish-offer .polish-tier-label { color:#eee!important; font-size:13px; }
 .polish-offer .transport-price-note { margin:-2px 0 18px; color:#ddd; font-size:13px; line-height:1.5; }
 .polish-offer .transport-price-note a { color:inherit; text-underline-offset:3px; }
 .polish-offer #transport-rate { scroll-margin-top:30px; }

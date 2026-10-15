@@ -3,7 +3,6 @@ import { ENGLISH_WEDDING_TIERS } from './english-wedding-offer.js';
 export const POLISH_WEDDING_TIERS = ENGLISH_WEDDING_TIERS.map((tier, index) => Object.freeze({
   ...tier,
   slug: `oferta-${[150, 250, 350][index]}`,
-  distanceLabel: ['Dla sal do 150 km od Gliwic', 'Dla sal oddalonych o 150–250 km od Gliwic', 'Dla sal oddalonych o 250–350 km od Gliwic'][index],
 }));
 
 function contactFields() {
@@ -49,7 +48,6 @@ export function renderPolishWeddingOffer(source, tier) {
   }
   html = html.replace(/(<p class="price" data-package-price="[^"]+">[^<]+<\/p>)/g, '$1<p class="transport-price-note">+ koszt transportu <a href="#transport-rate">(zobacz stawkę w dodatkowych opcjach poniżej)</a></p>');
   html = html.replace('<article><span>Transport od Gliwic</span>', '<article id="transport-rate"><span>Transport od Gliwic</span>');
-  html = html.replace('<p>Oba pakiety obejmują profesjonalne stanowisko, dwóch fotografów i 3 godziny pracy.</p>', `<p>Oba pakiety obejmują profesjonalne stanowisko, dwóch fotografów i 3 godziny pracy.</p><p class="polish-tier-label">${tier.distanceLabel}</p>`);
   html = html.replace(/(<p class="internet-note">[\s\S]*?<\/p>)/, '$1<p class="internet-note">Kwota netto = brutto. Wystawiamy fakturę ze zwolnieniem z VAT.</p>');
   return html.replace(/[ \t]+$/gm, '');
 }
