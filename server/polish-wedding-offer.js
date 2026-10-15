@@ -24,7 +24,7 @@ export function renderPolishWeddingOffer(source, tier) {
     .replace('<main id="offerContent" class="offer is-hidden" aria-hidden="true">', '<main id="offerContent" class="offer">')
     .replaceAll(' reveal"', ' reveal is-visible"')
     .replaceAll('./assets/', '/oferta-portrety/assets/')
-    .replace('<link rel="stylesheet" href="./styles.css" />', '<link rel="stylesheet" href="/oferta-portrety/styles.css" /><link rel="stylesheet" href="/offer-pl/styles.css?v=1" />')
+    .replace('<link rel="stylesheet" href="./styles.css" />', '<link rel="stylesheet" href="/oferta-portrety/styles.css" /><link rel="stylesheet" href="/offer-pl/styles.css?v=2" />')
     .replace('<script src="./script.js" defer></script>', '<script src="/offer-pl/script.js?v=1" defer></script>')
     .replace(/Wysłaliśmy link do tej strony[\s\S]*?<strong>Oferty<\/strong>\./, 'Poniżej znajdziecie pełną ofertę i ceny. Gdy zdecydujecie się na Fotostację, dajcie nam znać — sprawdzimy Waszą datę i potwierdzimy dostępność terminu.')
     .replace(/<a\b[^>]*data-pdf-link[^>]*>[\s\S]*?<\/a>/g, '')
@@ -47,6 +47,8 @@ export function renderPolishWeddingOffer(source, tier) {
     html = html.replace(new RegExp(`(data-package-price="${name}">)[^<]+`), `$1${formatted}`);
     html = html.replace(new RegExp(`(<input data-package-option="${name}"[^>]*value=")[^"]+("[^>]*\\/>\\s*<span>)[^<]+`), `$1Fotostacja ${label} - ${amount} zł$2Fotostacja ${label} — ${formatted}`);
   }
+  html = html.replace(/(<p class="price" data-package-price="[^"]+">[^<]+<\/p>)/g, '$1<p class="transport-price-note">+ koszt transportu <a href="#transport-rate">(zobacz stawkę w dodatkowych opcjach poniżej)</a></p>');
+  html = html.replace('<article><span>Transport od Gliwic</span>', '<article id="transport-rate"><span>Transport od Gliwic</span>');
   html = html.replace('<p>Oba pakiety obejmują profesjonalne stanowisko, dwóch fotografów i 3 godziny pracy.</p>', `<p>Oba pakiety obejmują profesjonalne stanowisko, dwóch fotografów i 3 godziny pracy.</p><p class="polish-tier-label">${tier.distanceLabel}</p>`);
   html = html.replace(/(<p class="internet-note">[\s\S]*?<\/p>)/, '$1<p class="internet-note">Kwota netto = brutto. Wystawiamy fakturę ze zwolnieniem z VAT.</p>');
   return html.replace(/[ \t]+$/gm, '');
