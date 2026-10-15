@@ -1,5 +1,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { POLISH_WEDDING_TIERS, renderPolishWeddingOffer, localizeOfferScript } from '../server/polish-wedding-offer.js';
+import { assertDraftTargetsAreWritable } from '../server/offer-versioning.js';
+
+await assertDraftTargetsAreWritable(POLISH_WEDDING_TIERS.map((tier) => new URL(`../public/${tier.slug}/index.html`, import.meta.url)));
 
 // Optional source argument allows generation from the current published Polish offer.
 const source = await readFile(process.argv[2] || new URL('../public/oferta-portrety/index.html', import.meta.url), 'utf8');

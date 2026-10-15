@@ -169,7 +169,7 @@ inquiryForm.addEventListener('submit', async (event) => {
       body: JSON.stringify({
         ...contact, source: 'hidden_offer_portraits', eventName: 'zapytanie_o_termin', timestamp, eventTimestamp: timestamp,
         pricingTier: document.body.dataset.pricingTier, interestedOffers: selected,
-        inquiryMessage: `${note}\n\nPolska oferta: ${window.location.origin}${window.location.pathname}\nEssential: PLN ${document.body.dataset.essential}\nExclusive: PLN ${document.body.dataset.exclusive}`,
+        inquiryMessage: `${note}\n\nPolska oferta: ${window.location.origin}${window.location.pathname}\nWersja oferty: ${document.body.dataset.offerVersion || 'unversioned'}\nIdentyfikator oferty: ${document.body.dataset.offerSnapshot || '-'}\nArchiwalna oferta: ${document.body.dataset.offerArchive ? window.location.origin + document.body.dataset.offerArchive : '-'}\nEssential: PLN ${document.body.dataset.essential}\nExclusive: PLN ${document.body.dataset.exclusive}`,
       }),
     });
     const result = await response.json();

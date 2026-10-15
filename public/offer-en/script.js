@@ -169,7 +169,7 @@ inquiryForm.addEventListener('submit', async (event) => {
       body: JSON.stringify({
         ...contact, source: 'hidden_offer_portraits', eventName: 'zapytanie_o_termin', timestamp, eventTimestamp: timestamp,
         pricingTier: document.body.dataset.pricingTier, interestedOffers: selected,
-        inquiryMessage: `${note}\n\nEnglish offer: ${window.location.origin}${window.location.pathname}\nEssential: PLN ${document.body.dataset.essential}\nExclusive: PLN ${document.body.dataset.exclusive}`,
+        inquiryMessage: `${note}\n\nEnglish offer: ${window.location.origin}${window.location.pathname}\nOffer version: ${document.body.dataset.offerVersion || 'unversioned'}\nOffer ID: ${document.body.dataset.offerSnapshot || '-'}\nArchived offer: ${document.body.dataset.offerArchive ? window.location.origin + document.body.dataset.offerArchive : '-'}\nEssential: PLN ${document.body.dataset.essential}\nExclusive: PLN ${document.body.dataset.exclusive}`,
       }),
     });
     const result = await response.json();

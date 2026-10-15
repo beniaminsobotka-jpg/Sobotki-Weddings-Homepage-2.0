@@ -1,0 +1,362 @@
+{
+  "version": "V1",
+  "frozenAt": "2026-10-15T10:36:23.448Z",
+  "offers": [
+    {
+      "snapshotId": "v1-pl-150",
+      "version": "V1",
+      "language": "pl",
+      "url": "/oferta-150",
+      "archivedUrl": "/offers/v1/pages/pl-150.html",
+      "pricingTier": "up-to-150",
+      "prices": {
+        "essential": 3200,
+        "exclusive": 4200
+      },
+      "sha256": "2d3a9e9809d20ea3f1ca8ba40d98616bcd488f8567e64877033736133904518c"
+    },
+    {
+      "snapshotId": "v1-en-150",
+      "version": "V1",
+      "language": "en",
+      "url": "/offer-en-150",
+      "archivedUrl": "/offers/v1/pages/en-150.html",
+      "pricingTier": "up-to-150",
+      "prices": {
+        "essential": 3200,
+        "exclusive": 4200
+      },
+      "sha256": "1f942daaea6ebf414c32a498de61141ac21ecda51f4272a76ff59105905b50ec"
+    },
+    {
+      "snapshotId": "v1-pl-250",
+      "version": "V1",
+      "language": "pl",
+      "url": "/oferta-250",
+      "archivedUrl": "/offers/v1/pages/pl-250.html",
+      "pricingTier": "up-to-250",
+      "prices": {
+        "essential": 3500,
+        "exclusive": 4500
+      },
+      "sha256": "7b405a4616ad2732218e9c10f6158b447dc3de78ffaa07aeb8cee81b8d10dd26"
+    },
+    {
+      "snapshotId": "v1-en-250",
+      "version": "V1",
+      "language": "en",
+      "url": "/offer-en-250",
+      "archivedUrl": "/offers/v1/pages/en-250.html",
+      "pricingTier": "up-to-250",
+      "prices": {
+        "essential": 3500,
+        "exclusive": 4500
+      },
+      "sha256": "32cc95cd0769a87d3cae1b982bbd4876f1867b56867d3bb70f7167a987b29004"
+    },
+    {
+      "snapshotId": "v1-pl-350",
+      "version": "V1",
+      "language": "pl",
+      "url": "/oferta-350",
+      "archivedUrl": "/offers/v1/pages/pl-350.html",
+      "pricingTier": "up-to-350",
+      "prices": {
+        "essential": 3800,
+        "exclusive": 4800
+      },
+      "sha256": "781030dc22be9209b352e8a41f5c13da7eb22c034b8f9346e49474578b904129"
+    },
+    {
+      "snapshotId": "v1-en-350",
+      "version": "V1",
+      "language": "en",
+      "url": "/offer-en-350",
+      "archivedUrl": "/offers/v1/pages/en-350.html",
+      "pricingTier": "up-to-350",
+      "prices": {
+        "essential": 3800,
+        "exclusive": 4800
+      },
+      "sha256": "8da9a74e4dea1cdf0a0cb6781e0fd7044719919519b32b3aaf807db557afc751"
+    }
+  ],
+  "files": [
+    {
+      "path": "oferta-150/index.html",
+      "sha256": "2d3a9e9809d20ea3f1ca8ba40d98616bcd488f8567e64877033736133904518c"
+    },
+    {
+      "path": "oferta-250/index.html",
+      "sha256": "7b405a4616ad2732218e9c10f6158b447dc3de78ffaa07aeb8cee81b8d10dd26"
+    },
+    {
+      "path": "oferta-350/index.html",
+      "sha256": "781030dc22be9209b352e8a41f5c13da7eb22c034b8f9346e49474578b904129"
+    },
+    {
+      "path": "offer-en-150/index.html",
+      "sha256": "1f942daaea6ebf414c32a498de61141ac21ecda51f4272a76ff59105905b50ec"
+    },
+    {
+      "path": "offer-en-250/index.html",
+      "sha256": "32cc95cd0769a87d3cae1b982bbd4876f1867b56867d3bb70f7167a987b29004"
+    },
+    {
+      "path": "offer-en-350/index.html",
+      "sha256": "8da9a74e4dea1cdf0a0cb6781e0fd7044719919519b32b3aaf807db557afc751"
+    },
+    {
+      "path": "offers/v1/assets/addons.webp",
+      "sha256": "0f4e31c29ef220842e331b4d7e9488e5a04f8d4b23a3d8520029b8b98892681b"
+    },
+    {
+      "path": "offers/v1/assets/film-circle.webp",
+      "sha256": "f2a5b28076d827dff6d0dce015f40a22edd9c29055088ef0659372f518dacd47"
+    },
+    {
+      "path": "offers/v1/assets/final.webp",
+      "sha256": "67aefa03627f41cfdec84c5fe12c6e6cc36a56a399161c0496b13ac9a75d48a4"
+    },
+    {
+      "path": "offers/v1/assets/fotostacja-timelapse.m4v",
+      "sha256": "18047fe6d94413d1d2105edb4c9114aaa9e558085c1933effddafe10af6064e9"
+    },
+    {
+      "path": "offers/v1/assets/galeria-chmura-iphone.m4v",
+      "sha256": "f92655e74765c1815a67bf7ad6359c6e3edd1f4ce5a6a915d04104863114ebff"
+    },
+    {
+      "path": "offers/v1/assets/galeria-chmura-poster.webp",
+      "sha256": "db3d3fc58b9a6fc24e8995213514110fe81cd2e24705facf80eb17e8481ab455"
+    },
+    {
+      "path": "offers/v1/assets/guestbook-01.webp",
+      "sha256": "6f1bdbec7c352c748fee90220ce9b4cfe7fca0ac5348d74f2333c281af5fab1a"
+    },
+    {
+      "path": "offers/v1/assets/guestbook-02.webp",
+      "sha256": "492fd7edf4e86d15bacb2f4ce371f4ffa7948cfb4cb7ea7898675e9a19446846"
+    },
+    {
+      "path": "offers/v1/assets/hero.webp",
+      "sha256": "05d2eaf4e15cde6562c4629a31c32672206a3828fe4ca7061c8e8a5ad035308f"
+    },
+    {
+      "path": "offers/v1/assets/intro.webp",
+      "sha256": "0f3a034e0d059ae224c779e560b2aeba6d156cb05f7599be3cda7a01de2ff1cd"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/6qmvn-211.webp",
+      "sha256": "2a1aa4aa6e4aa50965300ea8b5cf43ea234b462b44a4def59fa2a760ed8a6164"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/6qmvn-297.webp",
+      "sha256": "2af529b54273a6b6f6549c3bab229ddafa6d9cfedf70e5d79b7b084663223a7d"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/6qmvn-350.webp",
+      "sha256": "bd00e692058f06bbad568675f5334f16536b84be4228d2e58769ff25080c79aa"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/dv8gj-137.webp",
+      "sha256": "756b4b1208604c2b23484477c96a460493c6a8161ab80bb888d3f3ef3fb2c369"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/dv8gj-89.webp",
+      "sha256": "2b0dc63c2d38cf88e55da104c3a65cfdf6583eff565b1146df5c394832b16a27"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/dv8gj-93.webp",
+      "sha256": "8f0f8ad415f2b649b4ef940700be2270b949101e340382abb7fdc8394dcb8803"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fenaq-14.webp",
+      "sha256": "eda8a318295f4b41267bf98d16994e9eac9d5fa63b6d4ffa7f149725f842d868"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fenaq-152.webp",
+      "sha256": "2e3b2e0871910bf16936bf33a83a45fec78635cb2926ff5ff730615c5fbb78d8"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fenaq-172.webp",
+      "sha256": "84a7969db98859686f94bbe96cfe23300be57545a0a74cfc7bfd89ef02d33bdc"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fenaq-266.webp",
+      "sha256": "cb6d5e134960e46cf538eb890a2ca25ee0df1e77a17caca3665da278ace39b4f"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fenaq-387.webp",
+      "sha256": "1932bc5c01e13358ff0ffd56a539af04d873697b9b7d86a5ccf4945247bb6fca"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fenaq-99.webp",
+      "sha256": "c1ab25d50b6d634f893896888946b7e396278d2b3ab1a5de04614076586ad61b"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-117.webp",
+      "sha256": "4169559ad2ea090db60163860634c6eb9a6f9e07791b7e431f65f1d6a9b86b3b"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-131.webp",
+      "sha256": "7c53c8b1194da6b6d9383044384472ed0c1e8d2878f01d6c3556feddf0d6043d"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-186.webp",
+      "sha256": "3a0e30f6fdede81a0d7418c570b47a62e66caf1b5c9eea8e73653a9c4d551dca"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-21.webp",
+      "sha256": "7ea3dcc1a021b575b101826a30ca5b8fd9797cf7e5a7ff89bd92d4ab3b4a77af"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-230.webp",
+      "sha256": "33cd3080117b9751e3779eb5101565e75bdb32c7a3c0e3e8e15fc180bfdaa307"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-28.webp",
+      "sha256": "1083676b2848b9ba443469ba88402ca01648c211d421daab7d36ff8c670e4a52"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-327.webp",
+      "sha256": "66cc28cf37a2baee475af74f7e34af9d532255105ed8d8ef9959f7e302eaf813"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-366.webp",
+      "sha256": "fc7fb9c057a7237afa6e105039168de33c38ecb82c1aca1a2d8cb3c1fdcc1ff6"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-377.webp",
+      "sha256": "2fb192e3d2c4887ee7c6bc91e40b685024112bd0df888b42d886a2113e28aaef"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-419.webp",
+      "sha256": "44e89ef30848889f36ed8f9fe8cee3c9cf12803f53121abe84531b36521e4d58"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-421.webp",
+      "sha256": "726ac4dfc5f3149f92a10afa95531ade1bfd38f3d72dea5403ca3c5e384434e8"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-470.webp",
+      "sha256": "baac5d3fb560c81c5eb2f5aa653489781e0966d834a8354892ebeb2cd1143dc7"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/fs4tc-95.webp",
+      "sha256": "fa2b79cb0c36a1000e68a79dec28061ef846ed7d5199dfe17eadfb04293162e6"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/tygge-114.webp",
+      "sha256": "da65341965e411b55b174dff51b953a70a9096bf6a6f6203143b924e520f63a4"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/tygge-116.webp",
+      "sha256": "e78c091722775b805712d8aaa5e9caab80b710b53424bd77440c33340b31da04"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/tygge-119.webp",
+      "sha256": "ab1cca2f9ca8b53fbfbe5ed640c90cf0b971c9951e4845e46c61e96c7d7ffe16"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/tygge-120.webp",
+      "sha256": "07aa17e31862f123a59d280ba6cd203e32ce6406865673010a35f7ff7680fec7"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/tygge-147.webp",
+      "sha256": "46035d33bea2b820beaa2e44234fad2c6f923084c12c6835de2c596ea2741c7a"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/tygge-40.webp",
+      "sha256": "5116b1a7ce141c9aa3274d31c832e9573e3b4296a9d05ac107713fed7ed93a0b"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/ukkup-223.webp",
+      "sha256": "fee2b73915dbf1fffcaf6d3bdeaf107a78abd6c15010a330eddab0a4553844a8"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/usuvk-10.webp",
+      "sha256": "2fd4b4d6603ec1b73c2e16616492a679b75b71dabbce5c35dc17498556121c8f"
+    },
+    {
+      "path": "offers/v1/assets/mosaic/z65cg-23.webp",
+      "sha256": "5bf7481e3428f4a661a4caf88a63b2dabfe408912a39842fe038929e495e4b99"
+    },
+    {
+      "path": "offers/v1/assets/photobooth-crossed.webp",
+      "sha256": "7dccc3186070e2fd7765e82bc9cad45699a8852865031b5ca178e9074f46e9a2"
+    },
+    {
+      "path": "offers/v1/assets/poland.svg",
+      "sha256": "73ee0a51b0f78a844fc52dadc09992a1eee66f0b7f2afb91bffe90adaded24dd"
+    },
+    {
+      "path": "offers/v1/assets/portrait-01.webp",
+      "sha256": "2d3e441b888db831e0804ed1ab5fbf7eed89e0beaf7101eeb4f9a7219cced777"
+    },
+    {
+      "path": "offers/v1/assets/portrait-02.webp",
+      "sha256": "8257eb9df4ca787f68f14c13d5c2b424422d25fad8c33c553a14c11c5db96022"
+    },
+    {
+      "path": "offers/v1/assets/portrait-03.webp",
+      "sha256": "fbd6b2888ea54e2039e1d1326c371134b4b4e00e9d7380128c2c8cdc17ebbdfa"
+    },
+    {
+      "path": "offers/v1/assets/portrait-04.webp",
+      "sha256": "f5ee1b991d4f0abaa2d1daf265c9e505322b988fe450b1d706133da945e84805"
+    },
+    {
+      "path": "offers/v1/assets/portrait-05.webp",
+      "sha256": "867006f7f0ca1668e80f2412290a5a1de2cf4aa9861bec9d7a67aefad414f34e"
+    },
+    {
+      "path": "offers/v1/assets/portrait-06.webp",
+      "sha256": "e44878f24a3310683bd0b8808edb20fe341674c6492ef461f279f47efc19b844"
+    },
+    {
+      "path": "offers/v1/base.css",
+      "sha256": "b1ad74e4a62b53feec7be105098d06d3cacb4a9fcd1f967d8bde7abc84e993fc"
+    },
+    {
+      "path": "offers/v1/en.css",
+      "sha256": "e5747d22153a86c39dabd32566959b7abea06933da579d9babd4259c419700da"
+    },
+    {
+      "path": "offers/v1/en.js",
+      "sha256": "2d378348ef5420723fc728fedad46266f0a290983a6e2e6b25a2a65e632dab28"
+    },
+    {
+      "path": "offers/v1/pages/en-150.html",
+      "sha256": "1f942daaea6ebf414c32a498de61141ac21ecda51f4272a76ff59105905b50ec"
+    },
+    {
+      "path": "offers/v1/pages/en-250.html",
+      "sha256": "32cc95cd0769a87d3cae1b982bbd4876f1867b56867d3bb70f7167a987b29004"
+    },
+    {
+      "path": "offers/v1/pages/en-350.html",
+      "sha256": "8da9a74e4dea1cdf0a0cb6781e0fd7044719919519b32b3aaf807db557afc751"
+    },
+    {
+      "path": "offers/v1/pages/pl-150.html",
+      "sha256": "2d3a9e9809d20ea3f1ca8ba40d98616bcd488f8567e64877033736133904518c"
+    },
+    {
+      "path": "offers/v1/pages/pl-250.html",
+      "sha256": "7b405a4616ad2732218e9c10f6158b447dc3de78ffaa07aeb8cee81b8d10dd26"
+    },
+    {
+      "path": "offers/v1/pages/pl-350.html",
+      "sha256": "781030dc22be9209b352e8a41f5c13da7eb22c034b8f9346e49474578b904129"
+    },
+    {
+      "path": "offers/v1/pl.css",
+      "sha256": "aa4c0298e75fb2d45f3d8d2216489c0ccf49013d31d6c94465b5a2f30bb6040f"
+    },
+    {
+      "path": "offers/v1/pl.js",
+      "sha256": "2a3b20972e44fe2c4e49a5a1a8f971e3e1e23bd67f0189a1bf3a1beb17311347"
+    }
+  ]
+}

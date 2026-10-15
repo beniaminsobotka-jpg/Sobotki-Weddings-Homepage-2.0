@@ -1,5 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { ENGLISH_WEDDING_TIERS, renderEnglishWeddingOffer } from '../server/english-wedding-offer.js';
+import { assertDraftTargetsAreWritable } from '../server/offer-versioning.js';
+
+await assertDraftTargetsAreWritable(ENGLISH_WEDDING_TIERS.map((tier) => new URL(`../public/${tier.slug}/index.html`, import.meta.url)));
 
 for (const tier of ENGLISH_WEDDING_TIERS) {
   const directory = new URL(`../public/${tier.slug}/`, import.meta.url);
