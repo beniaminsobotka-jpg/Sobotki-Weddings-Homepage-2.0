@@ -31,6 +31,27 @@ and English. The user explicitly requested this question, including for small
 copy or design changes. Future versions use their own new short URLs and their
 own dependency directories. Do not overwrite or redirect existing V1 URLs.
 
+### Opaque links and discreet version labels
+
+Starting with the next approved release, use independent random four-character
+lowercase alphanumeric suffixes for all six new short links. For example,
+`/oferta-k7m4` is an illustrative format, not an existing published link. Never
+put `v2`, `v3` or a sequential release identifier in a client-facing URL. Check
+all historical routes for collisions and never reuse an existing link.
+
+Put the actual version (for example "Wersja oferty: V2" / "Offer version: V2")
+in small, subtle but readable type at the end of each new offer. This is visible
+to clients too, but should not compete with the offer or booking call to action.
+Keep the actual version, snapshot reference and displayed prices in enquiries.
+
+New archive page routes must also be opaque: do not make earlier offers
+discoverable by changing a version number in the URL. Keep release-to-link
+mappings outside public files, and do not publish a client-readable manifest or
+index listing historical offer links. Short random identifiers discourage simple
+guessing; they are not authentication or a confidentiality guarantee.
+
+This policy does not create V2 now or change any frozen V1 page, URL or archive.
+
 The existing generation scripts now refuse to overwrite marked, frozen pages.
 To prepare V2 after approval, use new release records/slugs and a new archive
 directory, rather than bypassing this protection. Draft generation must finish

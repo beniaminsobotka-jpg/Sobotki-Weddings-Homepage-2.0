@@ -26,6 +26,7 @@ const INTERESTED_OFFERS = new Set([
   'Foto Duo - reportaż foto',
   'Video - pakiet standardowy',
   'Fotostacja portretowa',
+  'Fotostacja eventowa',
   // Zachowujemy starsze wartości dla ofert otwartych przed zmianą cennika.
   'Fotostacja Essential - 2900 zł',
   'Fotostacja Exclusive - 3600 zł',
@@ -90,10 +91,12 @@ const parseJsonBody = (body) => {
   return body ?? {};
 };
 
-const isPortraitsOffer = (lead) => lead.source === 'hidden_offer_portraits';
+const isEventOffer = (lead) => lead.source === 'event_offer_portraits';
+const isPortraitsOffer = (lead) => lead.source === 'hidden_offer_portraits' || isEventOffer(lead);
+const getDateLabel = (lead) => isEventOffer(lead) ? 'Data eventu' : 'Data ślubu';
 
 const getOfferLabel = (lead) =>
-  isPortraitsOffer(lead)
+  isEventOffer(lead) ? 'Sobotki Portraits - oferta Fotostacji Eventowej' : isPortraitsOffer(lead)
     ? 'Sobotki Portraits - oferta Fotostacji Ślubnej'
     : 'Sobotki Weddings - ukryta oferta 2027/2028';
 
@@ -108,7 +111,7 @@ const buildEventMessage = (lead) => [
   `Source: ${lead.source || 'hidden_offer_2027_2028'}`,
   `Timestamp: ${lead.timestamp}`,
   `Event timestamp: ${lead.eventTimestamp}`,
-  `Data ślubu: ${lead.weddingDate}`,
+  `${getDateLabel(lead)}: ${lead.weddingDate}`,
   `Miejsce / sala: ${lead.venue}`,
   lead.distanceKm ? `Odległość drogowa od Gliwic: ${lead.distanceKm} km (w jedną stronę)` : '',
   lead.pricingTier ? `Próg cenowy oferty: ${getPricingTierLabel(lead.pricingTier)}` : '',
@@ -128,7 +131,7 @@ const buildInquiryText = (lead) => [
   '',
   `Imię: ${lead.name}`,
   `E-mail: ${lead.email}`,
-  `Data ślubu: ${lead.weddingDate}`,
+  `${getDateLabel(lead)}: ${lead.weddingDate}`,
   `Miejsce / sala: ${lead.venue}`,
   `Odległość drogowa od Gliwic: ${lead.distanceKm ? `${lead.distanceKm} km (w jedną stronę)` : '-'}`,
   `Próg cenowy oferty: ${getPricingTierLabel(lead.pricingTier)}`,
@@ -163,7 +166,7 @@ const buildInquiryHtml = (lead) => `
               ${[
                 ['Imię', lead.name],
                 ['E-mail', lead.email],
-                ['Data ślubu', lead.weddingDate],
+                [getDateLabel(lead), lead.weddingDate],
                 ['Miejsce / sala', lead.venue],
                 ['Odległość drogowa od Gliwic', lead.distanceKm ? `${lead.distanceKm} km (w jedną stronę)` : ''],
                 ['Próg cenowy oferty', getPricingTierLabel(lead.pricingTier)],
