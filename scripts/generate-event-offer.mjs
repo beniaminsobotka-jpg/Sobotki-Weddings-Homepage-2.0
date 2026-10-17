@@ -51,7 +51,7 @@ section('pricing-section', `<section id="wycena" class="section pricing-section 
       <input id="eventGuestsSlider" class="event-range" type="range" min="20" max="500" step="1" value="90" aria-describedby="sliderHint">
       <p id="sliderHint" class="event-muted">20 osób <span>500 osób</span></p><p class="event-fine">Większy event? Liczbę powyżej 500 wpiszcie w polu obok suwaka.</p>
       <div class="event-mobile-total"><span>Razem bez transportu</span><strong id="eventMobileTotal">3 500 zł</strong></div>
-      <div class="event-tier-list" aria-label="Progi cenowe">${EVENT_TIERS.map((tier, index) => `<div data-event-tier="${index}"><span>${tier.label}</span><strong>${tier.price.toLocaleString('pl-PL')} zł</strong></div>`).join('')}</div>
+      <details class="event-tier-details"><summary>Zobacz progi cenowe</summary><div class="event-tier-list" aria-label="Progi cenowe">${EVENT_TIERS.map((tier, index) => `<div data-event-tier="${index}"><span>${tier.label}</span><strong>${tier.price.toLocaleString('pl-PL')} zł</strong></div>`).join('')}</div></details>
       <fieldset class="event-options"><legend>Opcjonalne dodatki</legend>
         <label><input id="eventFilm" type="checkbox"><span>Filmowe kółko</span><strong>+300 zł</strong></label>
         <label><input id="eventBook" type="checkbox"><span>Drukowana księga gości</span><strong>+600 zł</strong></label>

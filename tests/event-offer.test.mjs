@@ -31,6 +31,7 @@ test('event copy has no wedding-only wording or package promises', async () => {
   const html = await readFile(new URL('../public/event-21aa/index.html',import.meta.url),'utf8');
   assert.doesNotMatch(html,/ślub|wesel|młod|Essential|Exclusive/i);
   assert.match(html,/Wersja V1/);
+  assert.match(html,/<details class="event-tier-details"><summary>Zobacz progi cenowe<\/summary>/);
   assert.match(html,/1,75 zł\/szt/);
   assert.equal((html.match(/<figure[^>]*><img src="\/offers\/v1\/assets\/mosaic/g)||[]).length >= 34,true);
 });
