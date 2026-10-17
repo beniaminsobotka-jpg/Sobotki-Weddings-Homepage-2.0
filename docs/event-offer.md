@@ -9,6 +9,8 @@ Explicit exception approved by the owner on 17 October 2026: keep V1 and its
 existing URL for the cosmetic calculator revision (rounded green-glow numeric
 fields, hidden spinner buttons, and collapsed minimalist pricing tiers).
 This exception changes no prices and does not authorize editing wedding V1.
+The owner also requested hiding the version/ID line in the enquiry form's visible
+quote summary. Keep both in the email payload; this is another cosmetic V1 edit.
 
 The page uses the frozen wedding V1 design and media, without modifying them.
 The generic gallery/hero/video behaviour is copied into `visuals.js` to avoid

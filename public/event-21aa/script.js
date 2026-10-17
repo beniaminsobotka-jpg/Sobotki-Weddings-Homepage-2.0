@@ -13,8 +13,9 @@ const modal = byId('inquiryModal');
 const form = byId('inquiryForm');
 let quote;
 
-function quoteText() {
-  return `Oferta eventowa ${EVENT_OFFER.version} · ${EVENT_OFFER.id}\n${quote.guests} uczestników · ${quote.hours}h · ${quote.photographers} fotografów\nPakiet: ${money(quote.base)}\nFilmowe kółko: ${film.checked ? '+300 zł' : 'nie wybrano'}\nKsięga gości: ${book.checked ? '+600 zł' : 'nie wybrano'}\nDodatkowa godzina: ${hour.checked ? '+500 zł' : 'nie wybrano'}\n200 odbitek w cenie; planowane dodatkowe: ${quote.extraPrints} × 1,75 zł = ${money(quote.printCost)}\nRazem bez transportu: ${money(quote.total)}\nTransport: 1 zł/km od Gliwic, do ustalenia po otrzymaniu lokalizacji.\nOdbitki ponad 200 rozliczane według faktycznego wydruku.`;
+function quoteText(includeMetadata = true) {
+  const metadata = includeMetadata ? `Oferta eventowa ${EVENT_OFFER.version} · ${EVENT_OFFER.id}\n` : '';
+  return `${metadata}${quote.guests} uczestników · ${quote.hours}h · ${quote.photographers} fotografów\nPakiet: ${money(quote.base)}\nFilmowe kółko: ${film.checked ? '+300 zł' : 'nie wybrano'}\nKsięga gości: ${book.checked ? '+600 zł' : 'nie wybrano'}\nDodatkowa godzina: ${hour.checked ? '+500 zł' : 'nie wybrano'}\n200 odbitek w cenie; planowane dodatkowe: ${quote.extraPrints} × 1,75 zł = ${money(quote.printCost)}\nRazem bez transportu: ${money(quote.total)}\nTransport: 1 zł/km od Gliwic, do ustalenia po otrzymaniu lokalizacji.\nOdbitki ponad 200 rozliczane według faktycznego wydruku.`;
 }
 
 function update() {
@@ -34,7 +35,7 @@ function update() {
     byId('eventHourSuggestion').hidden = !quote.recommendHour || hour.checked;
     const tierIndex = EVENT_TIERS.findIndex((tier) => quote.guests <= tier.max);
     document.querySelectorAll('[data-event-tier]').forEach((row, index) => row.classList.toggle('is-selected', index === tierIndex));
-    byId('eventInquiryQuote').textContent = quoteText();
+    byId('eventInquiryQuote').textContent = quoteText(false);
     reserve.disabled = false;
     return true;
   } catch (error) {
