@@ -33,6 +33,25 @@ const replaceCanonical = (html, url) => {
     : html.replace('</head>', `    ${tag}\n  </head>`);
 };
 
+const injectGalleryBootstrap = (html, gallery) => {
+  const serializedGallery = JSON.stringify(gallery)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026');
+  const script = `<script>window.__SOBOTKI_GALLERY_BOOTSTRAP__=${serializedGallery};</script>`;
+
+  return html.replace('</head>', `    ${script}\n  </head>`);
+};
+
+const injectImagePreload = (html, imageUrl) => {
+  if (!imageUrl) {
+    return html;
+  }
+
+  const preload = `<link rel="preload" as="image" href="${escapeHtml(imageUrl)}" fetchpriority="high" />`;
+  return html.replace('</head>', `    ${preload}\n  </head>`);
+};
+
 const getIndexHtml = async () => {
   const deploymentHost = String(process.env.VERCEL_URL || '').trim();
   const indexOrigin = deploymentHost ? `https://${deploymentHost}` : PUBLIC_ORIGIN;
@@ -64,21 +83,30 @@ export default async function handler(request, response) {
   try {
     const gallery = await resolveGallery(request.query?.slug);
     const photos = await listGalleryPhotos(gallery);
-    const coverPhoto =
-      photos.find((photo) => photo.name === gallery.coverPhoto) || photos[0] || null;
+    const selectedCoverPhoto =
+      photos.find((photo) => photo.name === gallery.coverPhoto) || null;
+    const sharePhoto = selectedCoverPhoto || photos[0] || null;
     const galleryUrl = `${PUBLIC_ORIGIN}/galeria/${encodeURIComponent(gallery.slug)}`;
     const title = `${gallery.title} — galeria zdjęć | Sobotki Portraits`;
     const description = gallery.date
       ? `Galeria zdjęć: ${gallery.title}, ${gallery.date}. Portrety tworzone na żywo przez Sobotki Portraits.`
       : `Galeria zdjęć: ${gallery.title}. Portrety tworzone na żywo przez Sobotki Portraits.`;
-    const imageUrl = coverPhoto
+    const imageUrl = sharePhoto
       ? `${PUBLIC_ORIGIN}/api/gallery-photo?${new URLSearchParams({
           slug: gallery.slug,
-          name: coverPhoto.name,
-          rev: coverPhoto.rev,
+          name: sharePhoto.name,
+          rev: sharePhoto.rev,
           size: 'large',
         }).toString()}`
       : `${PUBLIC_ORIGIN}/sobotki-portraits-logo.png`;
+    const coverUrl = selectedCoverPhoto
+      ? `${PUBLIC_ORIGIN}/api/gallery-photo?${new URLSearchParams({
+          slug: gallery.slug,
+          name: selectedCoverPhoto.name,
+          rev: selectedCoverPhoto.rev,
+          size: 'large',
+        }).toString()}`
+      : '';
 
     html = html.replace(/<title>[\s\S]*?<\/title>/i, () => `<title>${escapeHtml(title)}</title>`);
     html = replaceMeta(html, 'name', 'description', description);
@@ -96,6 +124,13 @@ export default async function handler(request, response) {
     html = replaceMeta(html, 'name', 'twitter:description', description);
     html = replaceMeta(html, 'name', 'twitter:image', imageUrl);
     html = replaceCanonical(html, galleryUrl);
+    html = injectGalleryBootstrap(html, {
+      slug: gallery.slug,
+      title: gallery.title,
+      date: gallery.date,
+      coverUrl,
+    });
+    html = injectImagePreload(html, coverUrl);
   } catch {
     // The client application will render its normal error state for missing galleries.
   }

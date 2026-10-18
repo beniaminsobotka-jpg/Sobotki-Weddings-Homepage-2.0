@@ -35,6 +35,12 @@ type GalleryData = {
   generatedAt: string;
 };
 
+declare global {
+  interface Window {
+    __SOBOTKI_GALLERY_BOOTSTRAP__?: GalleryData['gallery'];
+  }
+}
+
 const DEFAULT_REFRESH_INTERVAL = 10_000;
 const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
 const MAX_ZIP_PART_PHOTOS = 80;
@@ -91,6 +97,16 @@ const hasCompleteZipEndRecord = async (archive: Blob) => {
   return false;
 };
 
+const getGalleryBootstrap = (slug: string) => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const gallery = window.__SOBOTKI_GALLERY_BOOTSTRAP__;
+
+  return gallery?.slug === slug ? gallery : null;
+};
+
 const GalleryBrand = ({ light = true }: { light?: boolean }) => (
   <Link
     to="/portraits"
@@ -114,6 +130,7 @@ const GalleryBrand = ({ light = true }: { light?: boolean }) => (
 
 export const GalleryPage: React.FC = () => {
   const { slug = '' } = useParams();
+  const bootstrapGallery = getGalleryBootstrap(slug);
   const [data, setData] = useState<GalleryData | null>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -214,8 +231,10 @@ export const GalleryPage: React.FC = () => {
       document.head.appendChild(activeRobotsMeta);
     }
 
-    document.title = data?.gallery.title
-      ? `${data.gallery.title} — galeria Sobotki Portraits`
+    const displayedTitle = data?.gallery.title || bootstrapGallery?.title;
+
+    document.title = displayedTitle
+      ? `${displayedTitle} — galeria Sobotki Portraits`
       : 'Galeria — Sobotki Portraits';
 
     return () => {
@@ -227,9 +246,10 @@ export const GalleryPage: React.FC = () => {
         activeRobotsMeta.remove();
       }
     };
-  }, [data?.gallery.title]);
+  }, [bootstrapGallery?.title, data?.gallery.title]);
 
   const photos = data?.photos || [];
+  const displayedGallery = data?.gallery || bootstrapGallery;
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
   const selectedZipPartCount = useMemo(
     () =>
@@ -416,15 +436,15 @@ export const GalleryPage: React.FC = () => {
     <div className="min-h-screen bg-[#f3f2ed] text-brand-black">
       <header
         className={`relative flex flex-col overflow-hidden bg-[#111111] px-5 pt-7 text-white sm:px-8 sm:pt-9 ${
-          data?.gallery.coverUrl
+          displayedGallery?.coverUrl
             ? 'min-h-[72svh] pb-10 sm:min-h-[78svh] sm:pb-14'
             : 'pb-16 sm:pb-20'
         }`}
       >
-        {data?.gallery.coverUrl && (
+        {displayedGallery?.coverUrl && (
           <>
             <img
-              src={data.gallery.coverUrl}
+              src={displayedGallery.coverUrl}
               alt=""
               className="pointer-events-none absolute inset-0 h-full w-full object-cover"
               aria-hidden="true"
@@ -437,7 +457,7 @@ export const GalleryPage: React.FC = () => {
         )}
         <div
           className={`pointer-events-none absolute inset-0 ${
-            data?.gallery.coverUrl ? 'opacity-[0.07]' : 'opacity-[0.035]'
+            displayedGallery?.coverUrl ? 'opacity-[0.07]' : 'opacity-[0.035]'
           }`}
           style={{ backgroundImage: 'url(/noise.svg)' }}
           aria-hidden="true"
@@ -448,18 +468,18 @@ export const GalleryPage: React.FC = () => {
 
         <div
           className={`relative mx-auto max-w-3xl text-center ${
-            data?.gallery.coverUrl ? 'mt-auto pt-32' : 'mt-16 sm:mt-20'
+            displayedGallery?.coverUrl ? 'mt-auto pt-32' : 'mt-16 sm:mt-20'
           }`}
         >
           <p className="font-sans text-[10px] font-bold uppercase tracking-[0.32em] text-white/45 sm:text-xs">
             Wasza galeria
           </p>
           <h1 className="mt-5 text-balance font-serif text-[clamp(2.7rem,11vw,6.5rem)] font-black uppercase leading-[0.86] tracking-[-0.055em]">
-            {data?.gallery.title || 'Wasze portrety'}
+            {displayedGallery?.title || '\u00a0'}
           </h1>
-          {data?.gallery.date && (
+          {displayedGallery?.date && (
             <p className="mt-6 font-playfair text-lg italic text-white/58 sm:text-xl">
-              {data.gallery.date}
+              {displayedGallery.date}
             </p>
           )}
           <p className="mx-auto mt-7 max-w-xl font-sans text-sm font-light leading-6 text-white/66 sm:text-base sm:leading-7">
