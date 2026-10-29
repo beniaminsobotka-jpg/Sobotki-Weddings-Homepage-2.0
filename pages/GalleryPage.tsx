@@ -241,6 +241,7 @@ export const GalleryPage: React.FC = () => {
     () => new Set()
   );
   const [favoriteError, setFavoriteError] = useState('');
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [favoriteVisitorId] = useState(() => {
     if (typeof window === 'undefined') {
@@ -391,7 +392,16 @@ export const GalleryPage: React.FC = () => {
   const displayedGallery = data?.gallery || bootstrapGallery;
   const isWeddingGallery = displayedGallery?.kind === 'weddings';
   const visiblePhotos = isWeddingGallery ? photos.slice(0, visiblePhotoCount) : photos;
+  const favoritePhotos = useMemo(
+    () => photos.filter((photo) => favoritePhotoNames.has(photo.name)),
+    [favoritePhotoNames, photos]
+  );
+  const displayedPhotos = showFavoritesOnly ? favoritePhotos : visiblePhotos;
+  const navigationPhotos = showFavoritesOnly ? favoritePhotos : photos;
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
+  const selectedNavigationIndex = selectedPhoto
+    ? navigationPhotos.findIndex((photo) => photo.id === selectedPhoto.id)
+    : -1;
   const selectedZipPartCount = useMemo(
     () =>
       splitPhotosIntoZipParts(
@@ -414,6 +424,7 @@ export const GalleryPage: React.FC = () => {
 
   useEffect(() => {
     setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
+    setShowFavoritesOnly(false);
   }, [slug]);
 
   useEffect(() => {
@@ -482,6 +493,10 @@ export const GalleryPage: React.FC = () => {
         [photo.name]: Math.max(0, (current[photo.name] || 0) + (nextFavorite ? 1 : -1)),
       }));
 
+      if (showFavoritesOnly && wasFavorite && selectedPhoto?.id === photo.id) {
+        setSelectedIndex(null);
+      }
+
       const saveMutation = async () => {
         const response = await fetch('/api/gallery-favorites', {
           method: 'POST',
@@ -539,7 +554,14 @@ export const GalleryPage: React.FC = () => {
         });
       }
     },
-    [favoritePhotoNames, favoriteVisitorId, pendingFavoritePhotos, slug]
+    [
+      favoritePhotoNames,
+      favoriteVisitorId,
+      pendingFavoritePhotos,
+      selectedPhoto,
+      showFavoritesOnly,
+      slug,
+    ]
   );
 
   const togglePhotoSelection = useCallback((photoId: string) => {
@@ -638,33 +660,44 @@ export const GalleryPage: React.FC = () => {
   }, [closeSelectionMode, isDownloadingSelection, photos, selectedPhotoIds, slug]);
 
   const showPrevious = useCallback(() => {
-    if (!photos.length) {
+    if (!navigationPhotos.length) {
       return;
     }
 
-    setSelectedIndex((current) =>
-      current === null ? 0 : (current - 1 + photos.length) % photos.length
-    );
-  }, [photos.length]);
+    const currentPosition = selectedPhoto
+      ? navigationPhotos.findIndex((photo) => photo.id === selectedPhoto.id)
+      : 0;
+    const targetPhoto =
+      navigationPhotos[
+        (Math.max(0, currentPosition) - 1 + navigationPhotos.length) % navigationPhotos.length
+      ];
+    setSelectedIndex(photos.findIndex((photo) => photo.id === targetPhoto.id));
+  }, [navigationPhotos, photos, selectedPhoto]);
 
   const showNext = useCallback(() => {
-    if (!photos.length) {
+    if (!navigationPhotos.length) {
       return;
     }
 
-    setSelectedIndex((current) =>
-      current === null ? 0 : (current + 1) % photos.length
-    );
-  }, [photos.length]);
+    const currentPosition = selectedPhoto
+      ? navigationPhotos.findIndex((photo) => photo.id === selectedPhoto.id)
+      : -1;
+    const targetPhoto = navigationPhotos[(currentPosition + 1) % navigationPhotos.length];
+    setSelectedIndex(photos.findIndex((photo) => photo.id === targetPhoto.id));
+  }, [navigationPhotos, photos, selectedPhoto]);
 
   useEffect(() => {
-    if (selectedIndex === null || photos.length < 2) {
+    if (selectedIndex === null || navigationPhotos.length < 2 || selectedNavigationIndex < 0) {
       return;
     }
 
-    preloadLargePhoto(photos[(selectedIndex + 1) % photos.length]);
-    preloadLargePhoto(photos[(selectedIndex - 1 + photos.length) % photos.length]);
-  }, [photos, preloadLargePhoto, selectedIndex]);
+    preloadLargePhoto(navigationPhotos[(selectedNavigationIndex + 1) % navigationPhotos.length]);
+    preloadLargePhoto(
+      navigationPhotos[
+        (selectedNavigationIndex - 1 + navigationPhotos.length) % navigationPhotos.length
+      ]
+    );
+  }, [navigationPhotos, preloadLargePhoto, selectedIndex, selectedNavigationIndex]);
 
   useEffect(() => {
     if (!selectedPhoto) {
@@ -865,6 +898,28 @@ export const GalleryPage: React.FC = () => {
             {!isSelectionMode && (
               <button
                 type="button"
+                onClick={() => setShowFavoritesOnly((current) => !current)}
+                disabled={!favoritePhotoNames.size && !showFavoritesOnly}
+                className={`hidden min-h-11 items-center gap-2 rounded-full border px-4 font-sans text-[9px] font-bold uppercase tracking-[0.14em] transition-colors disabled:cursor-not-allowed disabled:opacity-35 sm:inline-flex ${
+                  showFavoritesOnly
+                    ? 'border-black bg-black text-white'
+                    : 'border-black/10 hover:bg-black hover:text-white'
+                }`}
+              >
+                {showFavoritesOnly ? (
+                  <Images size={14} aria-hidden="true" />
+                ) : (
+                  <Heart size={14} fill={favoritePhotoNames.size ? 'currentColor' : 'none'} aria-hidden="true" />
+                )}
+                {showFavoritesOnly
+                  ? 'Pokaż wszystkie'
+                  : `Wybrane do druku (${favoritePhotoNames.size})`}
+              </button>
+            )}
+
+            {!isSelectionMode && (
+              <button
+                type="button"
                 onClick={() => void loadGallery(true)}
                 disabled={isRefreshing}
                 className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[10px] font-bold uppercase tracking-[0.16em] transition-colors hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-50"
@@ -934,10 +989,31 @@ export const GalleryPage: React.FC = () => {
           </div>
         )}
 
-        {photos.length > 0 && (
+        {showFavoritesOnly && displayedPhotos.length === 0 && (
+          <div className="mx-auto flex min-h-[38vh] max-w-md flex-col items-center justify-center px-6 text-center">
+            <Heart size={30} strokeWidth={1.4} className="text-black/25" aria-hidden="true" />
+            <h2 className="mt-5 font-serif text-2xl font-black uppercase tracking-[-0.035em]">
+              Brak wybranych zdjęć
+            </h2>
+            <p className="mt-3 font-sans text-sm leading-6 text-black/50">
+              Dodaj serce przy zdjęciu albo wróć do całej galerii.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowFavoritesOnly(false)}
+              className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-black px-6 font-sans text-[9px] font-bold uppercase tracking-[0.16em] text-white"
+            >
+              <Images size={14} aria-hidden="true" />
+              Pokaż wszystkie zdjęcia
+            </button>
+          </div>
+        )}
+
+        {photos.length > 0 && displayedPhotos.length > 0 && (
           <div className="columns-2 gap-2 sm:columns-3 sm:gap-4 lg:columns-4">
-            {visiblePhotos.map((photo, index) => {
+            {displayedPhotos.map((photo, index) => {
               const isSelected = selectedPhotoIds.has(photo.id);
+              const photoIndex = photos.findIndex((item) => item.id === photo.id);
 
               return (
                 <motion.div
@@ -956,7 +1032,7 @@ export const GalleryPage: React.FC = () => {
                         togglePhotoSelection(photo.id);
                       } else {
                         preloadLargePhoto(photo);
-                        setSelectedIndex(index);
+                        setSelectedIndex(photoIndex);
                       }
                     }}
                     onPointerEnter={() => preloadLargePhoto(photo)}
@@ -965,7 +1041,7 @@ export const GalleryPage: React.FC = () => {
                     aria-label={
                       isSelectionMode
                         ? `${isSelected ? 'Odznacz' : 'Zaznacz'} zdjęcie ${index + 1}`
-                        : `Otwórz zdjęcie ${index + 1} z ${photos.length}`
+                        : `Otwórz zdjęcie ${index + 1} z ${displayedPhotos.length}`
                     }
                     aria-pressed={isSelectionMode ? isSelected : undefined}
                   >
@@ -1052,7 +1128,7 @@ export const GalleryPage: React.FC = () => {
           </div>
         )}
 
-        {isWeddingGallery && visiblePhotos.length < photos.length && (
+        {!showFavoritesOnly && isWeddingGallery && visiblePhotos.length < photos.length && (
           <div className="mt-10 flex justify-center">
             <button
               type="button"
@@ -1074,21 +1150,36 @@ export const GalleryPage: React.FC = () => {
 
       <AnimatePresence>
         {!isSelectionMode && photos.length > 0 && (
-          <motion.div
+          <motion.button
+            type="button"
+            onClick={() => setShowFavoritesOnly((current) => !current)}
+            disabled={!favoritePhotoNames.size && !showFavoritesOnly}
             initial={{ opacity: 0, y: 12, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
-            className="fixed bottom-3 left-1/2 z-[8000] inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-white/10 bg-black/90 px-4 py-2.5 text-white shadow-xl backdrop-blur-md sm:hidden"
-            role="status"
-            aria-live="polite"
+            className={`fixed bottom-3 left-1/2 z-[8000] inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2.5 shadow-xl backdrop-blur-md transition-colors disabled:opacity-60 sm:hidden ${
+              showFavoritesOnly
+                ? 'border-black/10 bg-white/95 text-black'
+                : 'border-white/10 bg-black/90 text-white'
+            }`}
+            aria-pressed={showFavoritesOnly}
+            aria-label={showFavoritesOnly ? 'Wróć do wszystkich zdjęć' : 'Pokaż wybrane do druku'}
           >
-            <Heart
-              size={13}
-              fill={favoritePhotoNames.size > 0 ? 'currentColor' : 'none'}
-              aria-hidden="true"
-            />
-            <span className="font-sans text-[9px] font-bold uppercase tracking-[0.13em] text-white/80">
-              Wybrane do druku
+            {showFavoritesOnly ? (
+              <Images size={13} aria-hidden="true" />
+            ) : (
+              <Heart
+                size={13}
+                fill={favoritePhotoNames.size > 0 ? 'currentColor' : 'none'}
+                aria-hidden="true"
+              />
+            )}
+            <span
+              className={`font-sans text-[9px] font-bold uppercase tracking-[0.13em] ${
+                showFavoritesOnly ? 'text-black/75' : 'text-white/80'
+              }`}
+            >
+              {showFavoritesOnly ? 'Wszystkie zdjęcia' : 'Wybrane do druku'}
             </span>
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.span
@@ -1102,7 +1193,7 @@ export const GalleryPage: React.FC = () => {
                 {favoritePhotoNames.size}
               </motion.span>
             </AnimatePresence>
-          </motion.div>
+          </motion.button>
         )}
       </AnimatePresence>
 
@@ -1153,7 +1244,7 @@ export const GalleryPage: React.FC = () => {
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label={`Portret ${selectedIndex + 1} z ${photos.length}`}
+            aria-label={`Zdjęcie ${selectedNavigationIndex + 1} z ${navigationPhotos.length}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -1189,7 +1280,7 @@ export const GalleryPage: React.FC = () => {
           >
             <div className="flex min-h-16 items-center justify-between border-b border-white/10 px-3 sm:px-5">
               <span className="px-2 font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-white/52">
-                {selectedIndex + 1} / {photos.length}
+                {selectedNavigationIndex + 1} / {navigationPhotos.length}
               </span>
               <div className="flex items-center gap-1">
                 <button
@@ -1265,7 +1356,7 @@ export const GalleryPage: React.FC = () => {
                 alt={`Zdjęcie ${selectedIndex + 1}`}
               />
 
-              {photos.length > 1 && (
+              {navigationPhotos.length > 1 && (
                 <>
                   <button
                     type="button"
