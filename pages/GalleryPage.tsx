@@ -245,7 +245,9 @@ export const GalleryPage: React.FC = () => {
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(WEDDING_GALLERY_BATCH_SIZE);
   const [favoriteCounts, setFavoriteCounts] = useState<Record<string, number>>({});
   const [favoritePhotoNames, setFavoritePhotoNames] = useState<Set<string>>(() => new Set());
-  const [pendingFavoritePhoto, setPendingFavoritePhoto] = useState('');
+  const [pendingFavoritePhotos, setPendingFavoritePhotos] = useState<Set<string>>(
+    () => new Set()
+  );
   const [favoriteError, setFavoriteError] = useState('');
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [favoriteVisitorId] = useState(() => {
@@ -275,6 +277,7 @@ export const GalleryPage: React.FC = () => {
   const touchStartX = useRef<number | null>(null);
   const requestInProgress = useRef(false);
   const preloadedLargePhotos = useRef<Set<string>>(new Set());
+  const favoriteMutationQueue = useRef<Promise<void>>(Promise.resolve());
 
   const preloadLargePhoto = useCallback((photo: GalleryPhoto) => {
     if (preloadedLargePhotos.current.has(photo.largeUrl)) {
@@ -469,13 +472,13 @@ export const GalleryPage: React.FC = () => {
 
   const toggleFavorite = useCallback(
     async (photo: GalleryPhoto) => {
-      if (!favoriteVisitorId || pendingFavoritePhoto) {
+      if (!favoriteVisitorId || pendingFavoritePhotos.has(photo.name)) {
         return;
       }
 
       const wasFavorite = favoritePhotoNames.has(photo.name);
       const nextFavorite = !wasFavorite;
-      setPendingFavoritePhoto(photo.name);
+      setPendingFavoritePhotos((current) => new Set(current).add(photo.name));
       setFavoriteError('');
       setFavoritePhotoNames((current) => {
         const next = new Set(current);
@@ -487,7 +490,7 @@ export const GalleryPage: React.FC = () => {
         [photo.name]: Math.max(0, (current[photo.name] || 0) + (nextFavorite ? 1 : -1)),
       }));
 
-      try {
+      const saveMutation = async () => {
         const response = await fetch('/api/gallery-favorites', {
           method: 'POST',
           headers: {
@@ -511,6 +514,18 @@ export const GalleryPage: React.FC = () => {
           ...current,
           [photo.name]: Number(payload?.count) || 0,
         }));
+      };
+
+      const queuedMutation = favoriteMutationQueue.current
+        .catch(() => undefined)
+        .then(saveMutation);
+      favoriteMutationQueue.current = queuedMutation.then(
+        () => undefined,
+        () => undefined
+      );
+
+      try {
+        await queuedMutation;
       } catch (saveError) {
         setFavoritePhotoNames((current) => {
           const next = new Set(current);
@@ -525,10 +540,14 @@ export const GalleryPage: React.FC = () => {
           saveError instanceof Error ? saveError.message : 'Nie udało się zapisać wyboru.'
         );
       } finally {
-        setPendingFavoritePhoto('');
+        setPendingFavoritePhotos((current) => {
+          const next = new Set(current);
+          next.delete(photo.name);
+          return next;
+        });
       }
     },
-    [favoritePhotoNames, favoriteVisitorId, pendingFavoritePhoto, slug]
+    [favoritePhotoNames, favoriteVisitorId, pendingFavoritePhotos, slug]
   );
 
   const togglePhotoSelection = useCallback((photoId: string) => {
@@ -993,8 +1012,8 @@ export const GalleryPage: React.FC = () => {
                         event.stopPropagation();
                         void toggleFavorite(photo);
                       }}
-                      disabled={Boolean(pendingFavoritePhoto)}
-                      className={`absolute left-2 top-2 z-20 inline-flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-full px-3 shadow-lg backdrop-blur-md transition-all hover:scale-105 disabled:cursor-wait disabled:opacity-60 sm:left-3 sm:top-3 ${
+                      disabled={pendingFavoritePhotos.has(photo.name)}
+                      className={`absolute left-2 top-2 z-20 inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-full px-2.5 shadow-lg backdrop-blur-md transition-all hover:scale-105 disabled:cursor-wait disabled:opacity-65 sm:left-3 sm:top-3 ${
                         favoritePhotoNames.has(photo.name)
                           ? 'bg-black text-white'
                           : 'bg-white/[0.92] text-black'
@@ -1008,15 +1027,15 @@ export const GalleryPage: React.FC = () => {
                     >
                       <motion.span
                         animate={
-                          pendingFavoritePhoto === photo.name
-                            ? { scale: [1, 1.28, 0.92, 1] }
+                          pendingFavoritePhotos.has(photo.name)
+                            ? { scale: [1, 1.2, 0.96, 1] }
                             : { scale: 1 }
                         }
-                        transition={{ duration: 0.38 }}
+                        transition={{ duration: 0.18 }}
                         className="inline-flex"
                       >
                         <Heart
-                          size={17}
+                          size={14}
                           fill={favoritePhotoNames.has(photo.name) ? 'currentColor' : 'none'}
                           aria-hidden="true"
                         />
@@ -1028,8 +1047,8 @@ export const GalleryPage: React.FC = () => {
                             initial={{ opacity: 0, y: 7, scale: 0.65 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -7, scale: 0.65 }}
-                            transition={{ type: 'spring', stiffness: 520, damping: 24 }}
-                            className="font-sans text-[10px] font-bold tabular-nums"
+                            transition={{ type: 'spring', stiffness: 700, damping: 30 }}
+                            className="font-sans text-[9px] font-bold tabular-nums"
                           >
                             {favoriteCounts[photo.name]}
                           </motion.span>
@@ -1062,6 +1081,40 @@ export const GalleryPage: React.FC = () => {
           {isWeddingGallery ? 'Reportaż ślubny' : 'Portrety tworzone na żywo'}
         </p>
       </footer>
+
+      <AnimatePresence>
+        {!isSelectionMode && photos.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+            className="fixed bottom-3 left-1/2 z-[8000] inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-white/10 bg-black/90 px-4 py-2.5 text-white shadow-xl backdrop-blur-md sm:hidden"
+            role="status"
+            aria-live="polite"
+          >
+            <Heart
+              size={13}
+              fill={favoritePhotoNames.size > 0 ? 'currentColor' : 'none'}
+              aria-hidden="true"
+            />
+            <span className="font-sans text-[9px] font-bold uppercase tracking-[0.13em] text-white/80">
+              Wybrane do druku
+            </span>
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.span
+                key={favoritePhotoNames.size}
+                initial={{ opacity: 0, y: 6, scale: 0.7 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.7 }}
+                transition={{ duration: 0.16 }}
+                className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1.5 font-sans text-[9px] font-black text-black"
+              >
+                {favoritePhotoNames.size}
+              </motion.span>
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isSelectionMode && (
@@ -1152,8 +1205,8 @@ export const GalleryPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => void toggleFavorite(selectedPhoto)}
-                  disabled={Boolean(pendingFavoritePhoto)}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-3 font-sans text-[10px] font-bold tabular-nums transition-colors disabled:cursor-wait disabled:opacity-60 sm:px-4 ${
+                  disabled={pendingFavoritePhotos.has(selectedPhoto.name)}
+                  className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-2.5 font-sans text-[9px] font-bold tabular-nums transition-colors disabled:cursor-wait disabled:opacity-65 sm:px-3 ${
                     favoritePhotoNames.has(selectedPhoto.name)
                       ? 'bg-white text-black'
                       : 'text-white/75 hover:bg-white/10 hover:text-white'
@@ -1167,15 +1220,15 @@ export const GalleryPage: React.FC = () => {
                 >
                   <motion.span
                     animate={
-                      pendingFavoritePhoto === selectedPhoto.name
-                        ? { scale: [1, 1.28, 0.92, 1] }
+                      pendingFavoritePhotos.has(selectedPhoto.name)
+                        ? { scale: [1, 1.2, 0.96, 1] }
                         : { scale: 1 }
                     }
-                    transition={{ duration: 0.38 }}
+                    transition={{ duration: 0.18 }}
                     className="inline-flex"
                   >
                     <Heart
-                      size={17}
+                      size={14}
                       fill={favoritePhotoNames.has(selectedPhoto.name) ? 'currentColor' : 'none'}
                       aria-hidden="true"
                     />
