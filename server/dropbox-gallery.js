@@ -570,6 +570,8 @@ export const listGalleryPhotos = async (gallery) => {
     entries.push(...result.entries);
   }
 
+  const chronologicalDirection = getGalleryKind(gallery) === 'weddings' ? 1 : -1;
+
   return entries
     .filter(
       (entry) =>
@@ -578,8 +580,9 @@ export const listGalleryPhotos = async (gallery) => {
     )
     .sort(
       (first, second) =>
-        new Date(second.client_modified || second.server_modified || 0).getTime() -
-        new Date(first.client_modified || first.server_modified || 0).getTime()
+        chronologicalDirection *
+        (new Date(first.client_modified || first.server_modified || 0).getTime() -
+          new Date(second.client_modified || second.server_modified || 0).getTime())
     )
     .map((entry) => ({
       id: entry.id || `${entry.name}:${entry.rev}`,
