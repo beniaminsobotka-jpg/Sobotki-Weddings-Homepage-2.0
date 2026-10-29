@@ -160,23 +160,17 @@ const ProgressiveThumbnail = ({
         alt={alt}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
-        className={`h-auto w-full scale-[1.025] blur-[6px] transition duration-700 ease-out group-hover:scale-[1.04] ${
-          selected ? 'opacity-65' : 'opacity-90 group-hover:opacity-80'
+        className={`h-auto w-full transition-transform duration-300 ease-out group-hover:scale-[1.01] ${
+          selected ? 'opacity-75' : 'opacity-100 group-hover:opacity-90'
         }`}
       />
-      {!thumbnailLoaded && (
-        <span
-          className="pointer-events-none absolute inset-0 animate-pulse bg-gradient-to-br from-white/15 via-transparent to-black/[0.06]"
-          aria-hidden="true"
-        />
-      )}
       <img
         src={photo.thumbnailUrl}
         alt=""
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
         onLoad={() => setThumbnailLoaded(true)}
-        className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out group-hover:scale-[1.015] ${
+        className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-150 ease-out ${
           thumbnailLoaded ? 'opacity-100' : 'opacity-0'
         } ${selected ? '!opacity-75' : 'group-hover:opacity-90'}`}
         aria-hidden="true"
@@ -196,17 +190,15 @@ const ProgressiveLightboxImage = ({ photo, alt }: { photo: GalleryPhoto; alt: st
         transition={{ duration: 0.22 }}
         src={photo.thumbnailUrl}
         alt={alt}
-        className={`max-h-full max-w-full select-none object-contain transition duration-500 ${
-          largeLoaded ? 'scale-[1.006] opacity-0 blur-sm' : 'opacity-100'
-        }`}
+        className="max-h-full max-w-full select-none object-contain"
         draggable={false}
       />
       <img
         src={photo.largeUrl}
         alt=""
         onLoad={() => setLargeLoaded(true)}
-        className={`pointer-events-none absolute max-h-full max-w-full select-none object-contain transition-[opacity,transform] duration-500 ease-out ${
-          largeLoaded ? 'scale-100 opacity-100' : 'scale-[0.995] opacity-0'
+        className={`pointer-events-none absolute max-h-full max-w-full select-none object-contain transition-opacity duration-200 ease-out ${
+          largeLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         draggable={false}
         aria-hidden="true"
@@ -747,17 +739,15 @@ export const GalleryPage: React.FC = () => {
             <img
               src={displayedGallery.coverPreviewUrl || displayedGallery.coverUrl}
               alt=""
-              className={`pointer-events-none absolute inset-0 h-full w-full scale-[1.025] object-cover blur-[8px] transition-opacity duration-700 ${
-                coverLoaded ? 'opacity-0' : 'opacity-100'
-              }`}
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
               aria-hidden="true"
             />
             <img
               src={displayedGallery.coverUrl}
               alt=""
               onLoad={() => setCoverLoaded(true)}
-              className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out ${
-                coverLoaded ? 'scale-100 opacity-100' : 'scale-[1.01] opacity-0'
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ease-out ${
+                coverLoaded ? 'opacity-100' : 'opacity-0'
               }`}
               aria-hidden="true"
             />
