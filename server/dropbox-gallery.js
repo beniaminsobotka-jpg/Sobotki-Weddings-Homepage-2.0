@@ -11,6 +11,7 @@ const IMAGE_EXTENSIONS = new Set([
   'bmp',
 ]);
 const BEST_OF_FOLDER_NAME = 'Best Of';
+const FAVORITES_FILE_NAME = '_sobotki-favorites.json';
 
 let cachedAccessToken = null;
 let cachedAccessTokenExpiresAt = 0;
@@ -352,6 +353,7 @@ const normalizeRegistry = (payload) => {
 };
 
 const getRegistryPath = () => `${getGalleryRoot()}/_sobotki-galleries.json`;
+const getFavoritesPath = (gallery) => `${gallery.folder}/${FAVORITES_FILE_NAME}`;
 
 const stringifyDropboxHeader = (payload) =>
   JSON.stringify(payload).replace(/[\u007f-\uffff]/g, (character) =>
@@ -498,6 +500,152 @@ export const saveGalleryRegistry = async (registry) => {
   cachedRegistry = normalized;
   cachedRegistryExpiresAt = Date.now() + 5_000;
   return normalized;
+};
+
+const normalizeFavoritesState = (payload) => {
+  const selections = {};
+
+  if (payload?.selections && typeof payload.selections === 'object') {
+    Object.entries(payload.selections).forEach(([visitorId, photoNames]) => {
+      if (!/^[a-zA-Z0-9_-]{8,80}$/.test(visitorId) || !Array.isArray(photoNames)) {
+        return;
+      }
+
+      selections[visitorId] = [
+        ...new Set(
+          photoNames
+            .map((photoName) => String(photoName || '').trim())
+            .filter((photoName) => photoName && photoName.length <= 255)
+        ),
+      ].slice(0, 2000);
+    });
+  }
+
+  return {
+    version: 1,
+    updatedAt: String(payload?.updatedAt || ''),
+    selections,
+  };
+};
+
+export const getGalleryFavorites = async (gallery) => {
+  const accessToken = await getAccessToken();
+  const dropboxResponse = await fetch(`${DROPBOX_CONTENT_URL}/files/download`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Dropbox-API-Arg': stringifyDropboxHeader({ path: getFavoritesPath(gallery) }),
+    },
+  });
+
+  if (!dropboxResponse.ok) {
+    const errorSummary = await readDropboxError(dropboxResponse);
+    throwDropboxAuthError(dropboxResponse, errorSummary);
+
+    if (dropboxResponse.status === 409 && errorSummary.includes('not_found')) {
+      return normalizeFavoritesState(null);
+    }
+
+    throw new GalleryError(
+      'Nie udało się odczytać wybranych zdjęć.',
+      502,
+      'gallery_favorites_read_failed'
+    );
+  }
+
+  try {
+    return normalizeFavoritesState(await dropboxResponse.json());
+  } catch {
+    return normalizeFavoritesState(null);
+  }
+};
+
+const saveGalleryFavorites = async (gallery, favorites) => {
+  const normalized = normalizeFavoritesState({
+    ...favorites,
+    updatedAt: new Date().toISOString(),
+  });
+  const accessToken = await getAccessToken();
+  const dropboxResponse = await fetch(`${DROPBOX_CONTENT_URL}/files/upload`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/octet-stream',
+      'Dropbox-API-Arg': stringifyDropboxHeader({
+        path: getFavoritesPath(gallery),
+        mode: 'overwrite',
+        autorename: false,
+        mute: true,
+        strict_conflict: false,
+      }),
+    },
+    body: JSON.stringify(normalized, null, 2),
+  });
+
+  if (!dropboxResponse.ok) {
+    throw new GalleryError(
+      'Nie udało się zapisać wybranych zdjęć.',
+      502,
+      'gallery_favorites_write_failed'
+    );
+  }
+
+  return normalized;
+};
+
+export const getGalleryFavoriteSummary = async (gallery, visitorId = '') => {
+  const favorites = await getGalleryFavorites(gallery);
+  const counts = {};
+
+  Object.values(favorites.selections).forEach((photoNames) => {
+    photoNames.forEach((photoName) => {
+      counts[photoName] = (counts[photoName] || 0) + 1;
+    });
+  });
+
+  return {
+    counts,
+    selected: favorites.selections[visitorId] || [],
+  };
+};
+
+export const setGalleryFavorite = async (gallery, visitorId, photoName, liked) => {
+  if (!/^[a-zA-Z0-9_-]{8,80}$/.test(String(visitorId || ''))) {
+    throw new GalleryError('Nie udało się zapisać wyboru.', 400, 'invalid_visitor_id');
+  }
+
+  const validPhotoName = validatePhotoName(photoName);
+  const favorites = await getGalleryFavorites(gallery);
+  const selected = new Set(favorites.selections[visitorId] || []);
+
+  if (liked) {
+    selected.add(validPhotoName);
+  } else {
+    selected.delete(validPhotoName);
+  }
+
+  if (selected.size > 2000) {
+    throw new GalleryError('Wybrano zbyt wiele zdjęć.', 413, 'too_many_favorites');
+  }
+
+  if (selected.size) {
+    favorites.selections[visitorId] = [...selected];
+  } else {
+    delete favorites.selections[visitorId];
+  }
+
+  const saved = await saveGalleryFavorites(gallery, favorites);
+  const counts = {};
+  Object.values(saved.selections).forEach((photoNames) => {
+    photoNames.forEach((name) => {
+      counts[name] = (counts[name] || 0) + 1;
+    });
+  });
+
+  return {
+    count: counts[validPhotoName] || 0,
+    selected: liked,
+  };
 };
 
 export const listGalleryFolders = async () => {

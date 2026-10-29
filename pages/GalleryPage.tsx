@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Heart,
   Images,
   RefreshCw,
   X,
@@ -44,6 +45,7 @@ declare global {
 
 const DEFAULT_REFRESH_INTERVAL = 10_000;
 const WEDDING_GALLERY_BATCH_SIZE = 80;
+const FAVORITE_VISITOR_STORAGE_KEY = 'sobotki-gallery-favorite-visitor';
 const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
 const MAX_ZIP_PART_PHOTOS = 80;
 
@@ -152,6 +154,34 @@ export const GalleryPage: React.FC = () => {
   const [downloadProgress, setDownloadProgress] = useState('');
   const [selectionError, setSelectionError] = useState('');
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(WEDDING_GALLERY_BATCH_SIZE);
+  const [favoriteCounts, setFavoriteCounts] = useState<Record<string, number>>({});
+  const [favoritePhotoNames, setFavoritePhotoNames] = useState<Set<string>>(() => new Set());
+  const [pendingFavoritePhoto, setPendingFavoritePhoto] = useState('');
+  const [favoriteError, setFavoriteError] = useState('');
+  const [favoriteVisitorId] = useState(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+
+    const generatedVisitorId =
+      typeof window.crypto?.randomUUID === 'function'
+        ? window.crypto.randomUUID()
+        : `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+
+    try {
+      const existingVisitorId = window.localStorage.getItem(FAVORITE_VISITOR_STORAGE_KEY);
+
+      if (existingVisitorId) {
+        return existingVisitorId;
+      }
+
+      window.localStorage.setItem(FAVORITE_VISITOR_STORAGE_KEY, generatedVisitorId);
+    } catch {
+      // Private browsing can block persistent storage; the choice still works for this visit.
+    }
+
+    return generatedVisitorId;
+  });
   const touchStartX = useRef<number | null>(null);
   const requestInProgress = useRef(false);
 
@@ -289,6 +319,112 @@ export const GalleryPage: React.FC = () => {
   useEffect(() => {
     setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
   }, [slug]);
+
+  useEffect(() => {
+    if (!slug || !favoriteVisitorId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadFavorites = async () => {
+      try {
+        const query = new URLSearchParams({ slug, visitorId: favoriteVisitorId });
+        const response = await fetch(`/api/gallery-favorites?${query.toString()}`, {
+          headers: { Accept: 'application/json' },
+        });
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(payload?.error || 'Nie udało się wczytać wybranych zdjęć.');
+        }
+
+        if (!cancelled) {
+          setFavoriteCounts(payload?.counts || {});
+          setFavoritePhotoNames(new Set(Array.isArray(payload?.selected) ? payload.selected : []));
+          setFavoriteError('');
+        }
+      } catch (loadError) {
+        if (!cancelled) {
+          setFavoriteError(
+            loadError instanceof Error
+              ? loadError.message
+              : 'Nie udało się wczytać wybranych zdjęć.'
+          );
+        }
+      }
+    };
+
+    void loadFavorites();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [favoriteVisitorId, slug]);
+
+  const toggleFavorite = useCallback(
+    async (photo: GalleryPhoto) => {
+      if (!favoriteVisitorId || pendingFavoritePhoto) {
+        return;
+      }
+
+      const wasFavorite = favoritePhotoNames.has(photo.name);
+      const nextFavorite = !wasFavorite;
+      setPendingFavoritePhoto(photo.name);
+      setFavoriteError('');
+      setFavoritePhotoNames((current) => {
+        const next = new Set(current);
+        nextFavorite ? next.add(photo.name) : next.delete(photo.name);
+        return next;
+      });
+      setFavoriteCounts((current) => ({
+        ...current,
+        [photo.name]: Math.max(0, (current[photo.name] || 0) + (nextFavorite ? 1 : -1)),
+      }));
+
+      try {
+        const response = await fetch('/api/gallery-favorites', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            slug,
+            visitorId: favoriteVisitorId,
+            photoName: photo.name,
+            liked: nextFavorite,
+          }),
+        });
+        const payload = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(payload?.error || 'Nie udało się zapisać wyboru.');
+        }
+
+        setFavoriteCounts((current) => ({
+          ...current,
+          [photo.name]: Number(payload?.count) || 0,
+        }));
+      } catch (saveError) {
+        setFavoritePhotoNames((current) => {
+          const next = new Set(current);
+          wasFavorite ? next.add(photo.name) : next.delete(photo.name);
+          return next;
+        });
+        setFavoriteCounts((current) => ({
+          ...current,
+          [photo.name]: Math.max(0, (current[photo.name] || 0) + (nextFavorite ? -1 : 1)),
+        }));
+        setFavoriteError(
+          saveError instanceof Error ? saveError.message : 'Nie udało się zapisać wyboru.'
+        );
+      } finally {
+        setPendingFavoritePhoto('');
+      }
+    },
+    [favoritePhotoNames, favoriteVisitorId, pendingFavoritePhoto, slug]
+  );
 
   const togglePhotoSelection = useCallback((photoId: string) => {
     setSelectionError('');
@@ -610,6 +746,15 @@ export const GalleryPage: React.FC = () => {
           </div>
         </div>
 
+        {favoriteError && (
+          <p
+            className="mb-5 rounded-xl border border-red-700/15 bg-red-700/[0.06] px-4 py-3 font-sans text-xs text-red-800"
+            role="alert"
+          >
+            {favoriteError}
+          </p>
+        )}
+
         {isLoading && !data && (
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => (
@@ -661,58 +806,113 @@ export const GalleryPage: React.FC = () => {
               const isSelected = selectedPhotoIds.has(photo.id);
 
               return (
-                <motion.button
-                  type="button"
+                <motion.div
                   key={photo.id}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.45, delay: Math.min(index * 0.025, 0.35) }}
-                  onClick={() => {
-                    if (isSelectionMode) {
-                      togglePhotoSelection(photo.id);
-                    } else {
-                      setSelectedIndex(index);
-                    }
-                  }}
                   className={`group relative mb-2 block w-full break-inside-avoid overflow-hidden bg-black/[0.08] text-left sm:mb-4 ${
                     isSelected ? 'ring-4 ring-black ring-offset-2 ring-offset-[#f3f2ed]' : ''
                   }`}
-                  aria-label={
-                    isSelectionMode
-                      ? `${isSelected ? 'Odznacz' : 'Zaznacz'} zdjęcie ${index + 1}`
-                      : `Otwórz zdjęcie ${index + 1} z ${photos.length}`
-                  }
-                  aria-pressed={isSelectionMode ? isSelected : undefined}
                 >
-                  <img
-                    src={photo.thumbnailUrl}
-                    alt={`Zdjęcie ${index + 1}`}
-                    loading={index < 6 ? 'eager' : 'lazy'}
-                    decoding="async"
-                    className={`h-auto w-full transition duration-700 ease-out group-hover:scale-[1.015] ${
-                      isSelected ? 'opacity-75' : 'group-hover:opacity-90'
-                    }`}
-                  />
-                  {isSelectionMode && (
-                    <span
-                      className={`pointer-events-none absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
-                        isSelected
-                          ? 'border-black bg-black text-white'
-                          : 'border-white bg-black/25 text-transparent backdrop-blur-sm'
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isSelectionMode) {
+                        togglePhotoSelection(photo.id);
+                      } else {
+                        setSelectedIndex(index);
+                      }
+                    }}
+                    className="block w-full text-left"
+                    aria-label={
+                      isSelectionMode
+                        ? `${isSelected ? 'Odznacz' : 'Zaznacz'} zdjęcie ${index + 1}`
+                        : `Otwórz zdjęcie ${index + 1} z ${photos.length}`
+                    }
+                    aria-pressed={isSelectionMode ? isSelected : undefined}
+                  >
+                    <img
+                      src={photo.thumbnailUrl}
+                      alt={`Zdjęcie ${index + 1}`}
+                      loading={index < 6 ? 'eager' : 'lazy'}
+                      decoding="async"
+                      className={`h-auto w-full transition duration-700 ease-out group-hover:scale-[1.015] ${
+                        isSelected ? 'opacity-75' : 'group-hover:opacity-90'
                       }`}
-                      aria-hidden="true"
-                    >
-                      <Check size={18} strokeWidth={3} />
+                    />
+                    {isSelectionMode && (
+                      <span
+                        className={`pointer-events-none absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border-2 shadow-sm transition-colors ${
+                          isSelected
+                            ? 'border-black bg-black text-white'
+                            : 'border-white bg-black/25 text-transparent backdrop-blur-sm'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <Check size={18} strokeWidth={3} />
+                      </span>
+                    )}
+                    <span className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-black/60 to-transparent px-4 pb-3 pt-10 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-white opacity-0 transition-opacity group-hover:opacity-100 sm:block">
+                      {isSelectionMode
+                        ? isSelected
+                          ? 'Odznacz zdjęcie'
+                          : 'Zaznacz zdjęcie'
+                        : 'Zobacz zdjęcie'}
                     </span>
+                  </button>
+                  {!isSelectionMode && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        void toggleFavorite(photo);
+                      }}
+                      disabled={Boolean(pendingFavoritePhoto)}
+                      className={`absolute left-2 top-2 z-20 inline-flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-full px-3 shadow-lg backdrop-blur-md transition-all hover:scale-105 disabled:cursor-wait disabled:opacity-60 sm:left-3 sm:top-3 ${
+                        favoritePhotoNames.has(photo.name)
+                          ? 'bg-black text-white'
+                          : 'bg-white/[0.92] text-black'
+                      }`}
+                      aria-label={
+                        favoritePhotoNames.has(photo.name)
+                          ? 'Usuń zdjęcie z wybranych do druku'
+                          : 'Wybierz zdjęcie do druku'
+                      }
+                      aria-pressed={favoritePhotoNames.has(photo.name)}
+                    >
+                      <motion.span
+                        animate={
+                          pendingFavoritePhoto === photo.name
+                            ? { scale: [1, 1.28, 0.92, 1] }
+                            : { scale: 1 }
+                        }
+                        transition={{ duration: 0.38 }}
+                        className="inline-flex"
+                      >
+                        <Heart
+                          size={17}
+                          fill={favoritePhotoNames.has(photo.name) ? 'currentColor' : 'none'}
+                          aria-hidden="true"
+                        />
+                      </motion.span>
+                      <AnimatePresence mode="popLayout" initial={false}>
+                        {(favoriteCounts[photo.name] || 0) > 0 && (
+                          <motion.span
+                            key={`${photo.name}-${favoriteCounts[photo.name]}`}
+                            initial={{ opacity: 0, y: 7, scale: 0.65 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -7, scale: 0.65 }}
+                            transition={{ type: 'spring', stiffness: 520, damping: 24 }}
+                            className="font-sans text-[10px] font-bold tabular-nums"
+                          >
+                            {favoriteCounts[photo.name]}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </button>
                   )}
-                  <span className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-gradient-to-t from-black/60 to-transparent px-4 pb-3 pt-10 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-white opacity-0 transition-opacity group-hover:opacity-100 sm:block">
-                    {isSelectionMode
-                      ? isSelected
-                        ? 'Odznacz zdjęcie'
-                        : 'Zaznacz zdjęcie'
-                      : 'Zobacz zdjęcie'}
-                  </span>
-                </motion.button>
+                </motion.div>
               );
             })}
           </div>
@@ -824,6 +1024,51 @@ export const GalleryPage: React.FC = () => {
                 {selectedIndex + 1} / {photos.length}
               </span>
               <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => void toggleFavorite(selectedPhoto)}
+                  disabled={Boolean(pendingFavoritePhoto)}
+                  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-3 font-sans text-[10px] font-bold tabular-nums transition-colors disabled:cursor-wait disabled:opacity-60 sm:px-4 ${
+                    favoritePhotoNames.has(selectedPhoto.name)
+                      ? 'bg-white text-black'
+                      : 'text-white/75 hover:bg-white/10 hover:text-white'
+                  }`}
+                  aria-label={
+                    favoritePhotoNames.has(selectedPhoto.name)
+                      ? 'Usuń zdjęcie z wybranych do druku'
+                      : 'Wybierz zdjęcie do druku'
+                  }
+                  aria-pressed={favoritePhotoNames.has(selectedPhoto.name)}
+                >
+                  <motion.span
+                    animate={
+                      pendingFavoritePhoto === selectedPhoto.name
+                        ? { scale: [1, 1.28, 0.92, 1] }
+                        : { scale: 1 }
+                    }
+                    transition={{ duration: 0.38 }}
+                    className="inline-flex"
+                  >
+                    <Heart
+                      size={17}
+                      fill={favoritePhotoNames.has(selectedPhoto.name) ? 'currentColor' : 'none'}
+                      aria-hidden="true"
+                    />
+                  </motion.span>
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {(favoriteCounts[selectedPhoto.name] || 0) > 0 && (
+                      <motion.span
+                        key={`${selectedPhoto.name}-${favoriteCounts[selectedPhoto.name]}`}
+                        initial={{ opacity: 0, y: 7, scale: 0.65 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -7, scale: 0.65 }}
+                      >
+                        {favoriteCounts[selectedPhoto.name]}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                  <span className="hidden sm:inline">Do druku</span>
+                </button>
                 <a
                   href={selectedPhoto.downloadUrl}
                   target="_blank"

@@ -11,6 +11,7 @@ import {
   Eye,
   ExternalLink,
   Folder,
+  Heart,
   Image,
   Loader2,
   LockKeyhole,
@@ -47,6 +48,7 @@ type GalleryAdminMode = 'chooser' | 'portraits' | 'weddings';
 type AdminGalleryPhoto = {
   id: string;
   name: string;
+  favoriteCount: number;
   thumbnailUrl: string;
   downloadUrl: string;
 };
@@ -1709,6 +1711,15 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                         >
                           <Download size={15} aria-hidden="true" />
                         </a>
+                        {photo.favoriteCount > 0 && (
+                          <span
+                            className="pointer-events-none absolute bottom-2 left-2 z-20 inline-flex h-9 items-center gap-1.5 rounded-full bg-black px-3 font-sans text-[10px] font-bold text-white shadow-md"
+                            title={`${photo.favoriteCount} oznaczeń do druku`}
+                          >
+                            <Heart size={14} fill="currentColor" aria-hidden="true" />
+                            {photo.favoriteCount}
+                          </span>
+                        )}
                       </div>
                     );
                   })}

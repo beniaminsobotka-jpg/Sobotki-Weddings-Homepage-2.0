@@ -5,6 +5,7 @@ import {
   ensureDropboxFolder,
   GalleryError,
   getBestOfGallery,
+  getGalleryFavoriteSummary,
   getGalleryKind,
   getGalleryRegistry,
   getGalleryRoot,
@@ -139,7 +140,10 @@ export default async function handler(request, response) {
           return sendJson(response, 404, { error: 'Nie znaleziono galerii.' });
         }
 
-        const photos = await listPhotosOrEmpty(gallery);
+        const [photos, favorites] = await Promise.all([
+          listPhotosOrEmpty(gallery),
+          getGalleryFavoriteSummary(gallery).catch(() => ({ counts: {}, selected: [] })),
+        ]);
 
         return sendJson(response, 200, {
           gallery: {
@@ -158,6 +162,7 @@ export default async function handler(request, response) {
             return {
               id: photo.id,
               name: photo.name,
+              favoriteCount: favorites.counts[photo.name] || 0,
               thumbnailUrl: `/api/admin-gallery-photo?${query.toString()}`,
               largeUrl: `/api/admin-gallery-photo?${query.toString()}&size=large`,
               downloadUrl: `/api/admin-gallery-photo?${query.toString()}&download=1`,
