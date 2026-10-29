@@ -249,6 +249,7 @@ export const GalleryPage: React.FC = () => {
   const [favoriteError, setFavoriteError] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [coverLoaded, setCoverLoaded] = useState(false);
+  const [lightboxHeartBurst, setLightboxHeartBurst] = useState(0);
   const [favoriteVisitorId] = useState(() => {
     if (typeof window === 'undefined') {
       return '';
@@ -275,6 +276,7 @@ export const GalleryPage: React.FC = () => {
   });
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const lastLightboxTap = useRef<{ photoId: string; at: number } | null>(null);
   const lightboxIsDismissing = useRef(false);
   const requestInProgress = useRef(false);
   const preloadedLargePhotos = useRef<Set<string>>(new Set());
@@ -583,6 +585,21 @@ export const GalleryPage: React.FC = () => {
     ]
   );
 
+  const addLightboxFavorite = useCallback(() => {
+    if (!selectedPhoto) {
+      return;
+    }
+
+    setLightboxHeartBurst((current) => current + 1);
+
+    if (
+      !favoritePhotoNames.has(selectedPhoto.name) &&
+      !pendingFavoritePhotos.has(selectedPhoto.name)
+    ) {
+      void toggleFavorite(selectedPhoto);
+    }
+  }, [favoritePhotoNames, pendingFavoritePhotos, selectedPhoto, toggleFavorite]);
+
   const togglePhotoSelection = useCallback((photoId: string) => {
     setSelectionError('');
     setSelectedPhotoIds((current) => {
@@ -720,6 +737,8 @@ export const GalleryPage: React.FC = () => {
 
   useEffect(() => {
     lightboxIsDismissing.current = false;
+    lastLightboxTap.current = null;
+    setLightboxHeartBurst(0);
     lightboxY.set(0);
   }, [lightboxY, selectedPhoto?.id]);
 
@@ -1102,10 +1121,10 @@ export const GalleryPage: React.FC = () => {
                         void toggleFavorite(photo);
                       }}
                       disabled={pendingFavoritePhotos.has(photo.name)}
-                      className={`absolute left-2 top-2 z-20 inline-flex h-8 min-w-8 items-center justify-center gap-1 rounded-full px-2.5 shadow-lg backdrop-blur-md transition-all hover:scale-105 disabled:cursor-wait disabled:opacity-65 sm:left-3 sm:top-3 ${
+                      className={`absolute left-2 top-2 z-20 inline-flex h-7 min-w-7 items-center justify-center gap-1 rounded-full px-2 shadow-md backdrop-blur-md transition-all hover:scale-105 disabled:cursor-wait disabled:opacity-55 sm:left-3 sm:top-3 sm:h-8 sm:min-w-8 sm:px-2.5 ${
                         favoritePhotoNames.has(photo.name)
-                          ? 'bg-black text-white'
-                          : 'bg-white/[0.92] text-black'
+                          ? 'bg-black/65 text-white/85 hover:bg-black/80'
+                          : 'bg-white/65 text-black/70 hover:bg-white/80'
                       }`}
                       aria-label={
                         favoritePhotoNames.has(photo.name)
@@ -1124,7 +1143,7 @@ export const GalleryPage: React.FC = () => {
                         className="inline-flex"
                       >
                         <Heart
-                          size={14}
+                          size={12}
                           fill={favoritePhotoNames.has(photo.name) ? 'currentColor' : 'none'}
                           aria-hidden="true"
                         />
@@ -1137,7 +1156,7 @@ export const GalleryPage: React.FC = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -7, scale: 0.65 }}
                             transition={{ type: 'spring', stiffness: 700, damping: 30 }}
-                            className="font-sans text-[9px] font-bold tabular-nums"
+                            className="font-sans text-[8px] font-bold tabular-nums sm:text-[9px]"
                           >
                             {favoriteCounts[photo.name]}
                           </motion.span>
@@ -1180,10 +1199,10 @@ export const GalleryPage: React.FC = () => {
             initial={{ opacity: 0, y: 12, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.96 }}
-            className={`fixed bottom-3 left-1/2 z-[8000] inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2.5 shadow-xl backdrop-blur-md transition-colors disabled:opacity-60 sm:hidden ${
+            className={`fixed bottom-3 left-1/2 z-[8000] inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-2 shadow-lg backdrop-blur-md transition-colors disabled:opacity-50 sm:hidden ${
               showFavoritesOnly
-                ? 'border-black/10 bg-white/95 text-black'
-                : 'border-white/10 bg-black/90 text-white'
+                ? 'border-black/10 bg-white/70 text-black/75'
+                : 'border-white/10 bg-black/65 text-white/80'
             }`}
             aria-pressed={showFavoritesOnly}
             aria-label={showFavoritesOnly ? 'Wróć do wszystkich zdjęć' : 'Pokaż wybrane do druku'}
@@ -1198,7 +1217,7 @@ export const GalleryPage: React.FC = () => {
               />
             )}
             <span
-              className={`font-sans text-[9px] font-bold uppercase tracking-[0.13em] ${
+              className={`font-sans text-[8px] font-bold uppercase tracking-[0.13em] ${
                 showFavoritesOnly ? 'text-black/75' : 'text-white/80'
               }`}
             >
@@ -1211,7 +1230,7 @@ export const GalleryPage: React.FC = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.7 }}
                 transition={{ duration: 0.16 }}
-                className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1.5 font-sans text-[9px] font-black text-black"
+                className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white/75 px-1 font-sans text-[8px] font-black text-black/75"
               >
                 {favoritePhotoNames.size}
               </motion.span>
@@ -1333,6 +1352,36 @@ export const GalleryPage: React.FC = () => {
 
               const distanceX = endX - startX;
               const distanceY = endY - startY;
+              const isPhotoTap =
+                Math.abs(distanceX) < 14 &&
+                Math.abs(distanceY) < 14 &&
+                event.target instanceof Element &&
+                Boolean(event.target.closest('[data-lightbox-photo-area="true"]'));
+
+              if (isPhotoTap && selectedPhoto) {
+                const now = window.performance.now();
+                const previousTap = lastLightboxTap.current;
+
+                if (
+                  previousTap?.photoId === selectedPhoto.id &&
+                  now - previousTap.at < 320
+                ) {
+                  lastLightboxTap.current = null;
+                  addLightboxFavorite();
+                } else {
+                  lastLightboxTap.current = { photoId: selectedPhoto.id, at: now };
+                }
+
+                void animate(lightboxY, 0, {
+                  type: 'spring',
+                  stiffness: 430,
+                  damping: 38,
+                  mass: 0.65,
+                });
+                return;
+              }
+
+              lastLightboxTap.current = null;
 
               if (
                 Math.abs(distanceY) > 90 &&
@@ -1402,10 +1451,10 @@ export const GalleryPage: React.FC = () => {
                   type="button"
                   onClick={() => void toggleFavorite(selectedPhoto)}
                   disabled={pendingFavoritePhotos.has(selectedPhoto.name)}
-                  className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-2.5 font-sans text-[9px] font-bold tabular-nums transition-colors disabled:cursor-wait disabled:opacity-65 sm:px-3 ${
+                  className={`inline-flex min-h-8 items-center gap-1 rounded-full px-2 font-sans text-[8px] font-bold tabular-nums backdrop-blur-md transition-colors disabled:cursor-wait disabled:opacity-55 sm:min-h-9 sm:gap-1.5 sm:px-3 sm:text-[9px] ${
                     favoritePhotoNames.has(selectedPhoto.name)
-                      ? 'bg-white text-black'
-                      : 'text-white/75 hover:bg-white/10 hover:text-white'
+                      ? 'bg-white/70 text-black/75 hover:bg-white/85'
+                      : 'bg-white/10 text-white/60 hover:bg-white/15 hover:text-white/80'
                   }`}
                   aria-label={
                     favoritePhotoNames.has(selectedPhoto.name)
@@ -1424,7 +1473,7 @@ export const GalleryPage: React.FC = () => {
                     className="inline-flex"
                   >
                     <Heart
-                      size={14}
+                      size={12}
                       fill={favoritePhotoNames.has(selectedPhoto.name) ? 'currentColor' : 'none'}
                       aria-hidden="true"
                     />
@@ -1464,12 +1513,41 @@ export const GalleryPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="relative flex min-h-0 flex-1 items-center justify-center p-2 sm:p-6">
+              <div
+                className="relative flex min-h-0 flex-1 items-center justify-center p-2 sm:p-6"
+                data-lightbox-photo-area="true"
+              >
               <ProgressiveLightboxImage
                 key={selectedPhoto.id}
                 photo={selectedPhoto}
                 alt={`Zdjęcie ${selectedIndex + 1}`}
               />
+
+              <AnimatePresence>
+                {lightboxHeartBurst > 0 && (
+                  <motion.div
+                    key={`${selectedPhoto.id}-${lightboxHeartBurst}`}
+                    initial={{ opacity: 0, scale: 0.42, y: 10 }}
+                    animate={{
+                      opacity: [0, 1, 1, 0],
+                      scale: [0.42, 1.12, 1, 0.92],
+                      y: [10, 0, 0, -10],
+                    }}
+                    exit={{ opacity: 0, scale: 0.88 }}
+                    transition={{ duration: 0.58, ease: 'easeOut', times: [0, 0.22, 0.62, 1] }}
+                    onAnimationComplete={() => setLightboxHeartBurst(0)}
+                    className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <Heart
+                      size={72}
+                      fill="currentColor"
+                      strokeWidth={1.4}
+                      className="text-white drop-shadow-[0_5px_18px_rgba(0,0,0,0.55)]"
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {navigationPhotos.length > 1 && (
                 <>
