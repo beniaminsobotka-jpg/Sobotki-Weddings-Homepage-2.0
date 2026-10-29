@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+  useTransform,
+} from 'framer-motion';
 import {
   Camera,
   Check,
@@ -243,8 +249,6 @@ export const GalleryPage: React.FC = () => {
   const [favoriteError, setFavoriteError] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [coverLoaded, setCoverLoaded] = useState(false);
-  const [lightboxOffsetY, setLightboxOffsetY] = useState(0);
-  const [lightboxDismissDirection, setLightboxDismissDirection] = useState<-1 | 0 | 1>(0);
   const [favoriteVisitorId] = useState(() => {
     if (typeof window === 'undefined') {
       return '';
@@ -271,18 +275,20 @@ export const GalleryPage: React.FC = () => {
   });
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
-  const lightboxDismissTimeout = useRef<number | null>(null);
+  const lightboxIsDismissing = useRef(false);
   const requestInProgress = useRef(false);
   const preloadedLargePhotos = useRef<Set<string>>(new Set());
   const favoriteMutationQueue = useRef<Promise<void>>(Promise.resolve());
-
-  useEffect(
-    () => () => {
-      if (lightboxDismissTimeout.current) {
-        window.clearTimeout(lightboxDismissTimeout.current);
-      }
-    },
-    []
+  const lightboxDismissDistance =
+    typeof window === 'undefined' ? 1000 : Math.max(700, window.innerHeight * 1.08);
+  const lightboxY = useMotionValue(0);
+  const lightboxOpacity = useTransform(
+    lightboxY,
+    (value) => Math.max(0, 1 - Math.abs(value) / (lightboxDismissDistance * 0.58))
+  );
+  const lightboxScale = useTransform(
+    lightboxY,
+    (value) => Math.max(0.975, 1 - Math.abs(value) / 9000)
   );
 
   const preloadLargePhoto = useCallback((photo: GalleryPhoto) => {
@@ -713,9 +719,9 @@ export const GalleryPage: React.FC = () => {
   }, [navigationPhotos, preloadLargePhoto, selectedIndex, selectedNavigationIndex]);
 
   useEffect(() => {
-    setLightboxOffsetY(0);
-    setLightboxDismissDirection(0);
-  }, [selectedPhoto?.id]);
+    lightboxIsDismissing.current = false;
+    lightboxY.set(0);
+  }, [lightboxY, selectedPhoto?.id]);
 
   useEffect(() => {
     if (!selectedPhoto) {
@@ -775,9 +781,6 @@ export const GalleryPage: React.FC = () => {
 
     return `${photos.length} portretów w galerii`;
   }, [data, isWeddingGallery, photos.length]);
-  const lightboxDismissDistance =
-    typeof window === 'undefined' ? 1000 : Math.max(700, window.innerHeight * 1.08);
-
   return (
     <div className="min-h-screen bg-[#f3f2ed] text-brand-black">
       <header
@@ -1266,39 +1269,20 @@ export const GalleryPage: React.FC = () => {
             aria-modal="true"
             aria-label={`Zdjęcie ${selectedNavigationIndex + 1} z ${navigationPhotos.length}`}
             initial={{ opacity: 0 }}
-            animate={
-              lightboxDismissDirection
-                ? {
-                    y: [
-                      lightboxOffsetY,
-                      lightboxOffsetY + lightboxDismissDirection * 24,
-                      lightboxDismissDirection * lightboxDismissDistance,
-                    ],
-                    opacity: [1, 0.97, 0],
-                    scale: [1, 0.997, 0.985],
-                  }
-                : {
-                    y: lightboxOffsetY,
-                    opacity: Math.max(0.72, 1 - Math.abs(lightboxOffsetY) / 620),
-                    scale: Math.max(0.985, 1 - Math.abs(lightboxOffsetY) / 9000),
-                  }
-            }
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={
-              lightboxDismissDirection
-                ? { duration: 0.32, ease: 'easeInOut', times: [0, 0.18, 1] }
-                : {
-                    duration: lightboxOffsetY === 0 ? 0.22 : 0.04,
-                    ease: lightboxOffsetY === 0 ? 'easeInOut' : 'linear',
-                  }
-            }
-            className="fixed inset-0 z-[10000] flex touch-none flex-col bg-black text-white"
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="fixed inset-0 z-[10000] touch-none bg-black text-white"
             onClick={(event) => {
               if (event.target === event.currentTarget) {
                 setSelectedIndex(null);
               }
             }}
             onTouchStart={(event) => {
+              if (lightboxIsDismissing.current) {
+                return;
+              }
+
               touchStartX.current = event.touches[0]?.clientX ?? null;
               touchStartY.current = event.touches[0]?.clientY ?? null;
             }}
@@ -1311,7 +1295,7 @@ export const GalleryPage: React.FC = () => {
                 startX === null ||
                 startY === null ||
                 !currentTouch ||
-                lightboxDismissDirection
+                lightboxIsDismissing.current
               ) {
                 return;
               }
@@ -1321,7 +1305,7 @@ export const GalleryPage: React.FC = () => {
 
               if (Math.abs(distanceY) > Math.abs(distanceX)) {
                 event.preventDefault();
-                setLightboxOffsetY(distanceY * 0.82);
+                lightboxY.set(distanceY * 0.9);
               }
             }}
             onTouchEnd={(event) => {
@@ -1338,7 +1322,12 @@ export const GalleryPage: React.FC = () => {
                 endX === undefined ||
                 endY === undefined
               ) {
-                setLightboxOffsetY(0);
+                void animate(lightboxY, 0, {
+                  type: 'spring',
+                  stiffness: 430,
+                  damping: 38,
+                  mass: 0.65,
+                });
                 return;
               }
 
@@ -1350,15 +1339,31 @@ export const GalleryPage: React.FC = () => {
                 Math.abs(distanceY) > Math.abs(distanceX) * 1.08
               ) {
                 const direction = distanceY > 0 ? 1 : -1;
-                setLightboxDismissDirection(direction);
-                lightboxDismissTimeout.current = window.setTimeout(() => {
-                  setSelectedIndex(null);
-                  lightboxDismissTimeout.current = null;
-                }, 330);
+                const currentOffset = lightboxY.get();
+                lightboxIsDismissing.current = true;
+
+                void animate(
+                  lightboxY,
+                  [
+                    currentOffset,
+                    currentOffset + direction * 18,
+                    direction * lightboxDismissDistance,
+                  ],
+                  {
+                    duration: 0.3,
+                    ease: 'easeInOut',
+                    times: [0, 0.14, 1],
+                  }
+                ).then(() => setSelectedIndex(null));
                 return;
               }
 
-              setLightboxOffsetY(0);
+              void animate(lightboxY, 0, {
+                type: 'spring',
+                stiffness: 430,
+                damping: 38,
+                mass: 0.65,
+              });
 
               if (Math.abs(distanceX) > 55 && Math.abs(distanceX) > Math.abs(distanceY)) {
                 if (distanceX > 0) {
@@ -1371,14 +1376,28 @@ export const GalleryPage: React.FC = () => {
             onTouchCancel={() => {
               touchStartX.current = null;
               touchStartY.current = null;
-              setLightboxOffsetY(0);
+              void animate(lightboxY, 0, {
+                type: 'spring',
+                stiffness: 430,
+                damping: 38,
+                mass: 0.65,
+              });
             }}
           >
-            <div className="flex min-h-16 items-center justify-between border-b border-white/10 px-3 sm:px-5">
-              <span className="px-2 font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-white/52">
-                {selectedNavigationIndex + 1} / {navigationPhotos.length}
-              </span>
-              <div className="flex items-center gap-1">
+            <motion.div
+              className="absolute inset-0 flex flex-col bg-black text-white will-change-transform"
+              style={{ y: lightboxY, opacity: lightboxOpacity, scale: lightboxScale }}
+              onClick={(event) => {
+                if (event.target === event.currentTarget) {
+                  setSelectedIndex(null);
+                }
+              }}
+            >
+              <div className="flex min-h-16 items-center justify-between border-b border-white/10 px-3 sm:px-5">
+                <span className="px-2 font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-white/52">
+                  {selectedNavigationIndex + 1} / {navigationPhotos.length}
+                </span>
+                <div className="flex items-center gap-1">
                 <button
                   type="button"
                   onClick={() => void toggleFavorite(selectedPhoto)}
@@ -1442,10 +1461,10 @@ export const GalleryPage: React.FC = () => {
                 >
                   <X size={21} aria-hidden="true" />
                 </button>
+                </div>
               </div>
-            </div>
 
-            <div className="relative flex min-h-0 flex-1 items-center justify-center p-2 sm:p-6">
+              <div className="relative flex min-h-0 flex-1 items-center justify-center p-2 sm:p-6">
               <ProgressiveLightboxImage
                 key={selectedPhoto.id}
                 photo={selectedPhoto}
@@ -1472,11 +1491,12 @@ export const GalleryPage: React.FC = () => {
                   </button>
                 </>
               )}
-            </div>
+              </div>
 
-            <div className="border-t border-white/10 px-5 py-3 text-center font-sans text-[9px] uppercase tracking-[0.16em] text-white/35 sm:hidden">
-              W bok: kolejne zdjęcie · w górę lub dół: zamknij
-            </div>
+              <div className="border-t border-white/10 px-5 py-3 text-center font-sans text-[9px] uppercase tracking-[0.16em] text-white/35 sm:hidden">
+                W bok: kolejne zdjęcie · w górę lub dół: zamknij
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
