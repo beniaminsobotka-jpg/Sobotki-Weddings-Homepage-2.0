@@ -27,6 +27,14 @@ export default async function handler(request, response) {
           size: 'large',
         })
       : null;
+    const coverPreviewQuery = coverPhoto
+      ? new URLSearchParams({
+          slug: gallery.slug,
+          name: coverPhoto.name,
+          rev: coverPhoto.rev,
+          size: 'preview',
+        })
+      : null;
 
     response.setHeader(
       'Cache-Control',
@@ -39,6 +47,9 @@ export default async function handler(request, response) {
         title: gallery.title,
         date: gallery.date,
         kind: gallery.kind || 'portraits',
+        coverPreviewUrl: coverPreviewQuery
+          ? `/api/gallery-photo?${coverPreviewQuery.toString()}`
+          : '',
         coverUrl: coverQuery ? `/api/gallery-photo?${coverQuery.toString()}` : '',
       },
       photos: photos.map((photo) => {
@@ -50,6 +61,7 @@ export default async function handler(request, response) {
 
         return {
           ...photo,
+          previewUrl: `/api/gallery-photo?${query.toString()}&size=preview`,
           thumbnailUrl: `/api/gallery-photo?${query.toString()}`,
           largeUrl: `/api/gallery-photo?${query.toString()}&size=large`,
           downloadUrl: `/api/gallery-download?${query.toString()}`,

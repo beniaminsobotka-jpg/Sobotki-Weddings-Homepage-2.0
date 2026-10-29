@@ -743,7 +743,12 @@ export const listGalleryPhotos = async (gallery) => {
 
 export const getPhotoThumbnail = async (path, requestedSize) => {
   const accessToken = await getAccessToken();
-  const size = requestedSize === 'large' ? 'w2048h1536' : 'w960h640';
+  const size =
+    requestedSize === 'large'
+      ? 'w2048h1536'
+      : requestedSize === 'preview'
+        ? 'w256h256'
+        : 'w960h640';
   const dropboxResponse = await fetch(`${DROPBOX_CONTENT_URL}/files/get_thumbnail_v2`, {
     method: 'POST',
     headers: {

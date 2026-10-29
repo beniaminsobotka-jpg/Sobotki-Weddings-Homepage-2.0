@@ -113,6 +113,14 @@ export default async function handler(request, response) {
           size: 'large',
         }).toString()}`
       : '';
+    const coverPreviewUrl = selectedCoverPhoto
+      ? `${PUBLIC_ORIGIN}/api/gallery-photo?${new URLSearchParams({
+          slug: gallery.slug,
+          name: selectedCoverPhoto.name,
+          rev: selectedCoverPhoto.rev,
+          size: 'preview',
+        }).toString()}`
+      : '';
 
     html = html.replace(/<title>[\s\S]*?<\/title>/i, () => `<title>${escapeHtml(title)}</title>`);
     html = replaceMeta(html, 'name', 'description', description);
@@ -135,9 +143,10 @@ export default async function handler(request, response) {
       title: gallery.title,
       date: gallery.date,
       kind: gallery.kind || 'portraits',
+      coverPreviewUrl,
       coverUrl,
     });
-    html = injectImagePreload(html, coverUrl);
+    html = injectImagePreload(html, coverPreviewUrl || coverUrl);
   } catch {
     // The client application will render its normal error state for missing galleries.
   }

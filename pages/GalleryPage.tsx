@@ -19,6 +19,7 @@ type GalleryPhoto = {
   rev: string;
   modifiedAt: string;
   size: number;
+  previewUrl: string;
   thumbnailUrl: string;
   largeUrl: string;
   downloadUrl: string;
@@ -30,6 +31,7 @@ type GalleryData = {
     title: string;
     date: string;
     kind: 'portraits' | 'weddings';
+    coverPreviewUrl: string;
     coverUrl: string;
   };
   photos: GalleryPhoto[];
@@ -138,6 +140,93 @@ const GalleryBrand = ({
   </Link>
 );
 
+const ProgressiveThumbnail = ({
+  photo,
+  alt,
+  eager,
+  selected,
+}: {
+  photo: GalleryPhoto;
+  alt: string;
+  eager: boolean;
+  selected: boolean;
+}) => {
+  const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
+
+  return (
+    <span className="relative block w-full overflow-hidden bg-black/[0.06]">
+      <img
+        src={photo.previewUrl || photo.thumbnailUrl}
+        alt={alt}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        className={`h-auto w-full scale-[1.025] blur-[6px] transition duration-700 ease-out group-hover:scale-[1.04] ${
+          selected ? 'opacity-65' : 'opacity-90 group-hover:opacity-80'
+        }`}
+      />
+      {!thumbnailLoaded && (
+        <span
+          className="pointer-events-none absolute inset-0 animate-pulse bg-gradient-to-br from-white/15 via-transparent to-black/[0.06]"
+          aria-hidden="true"
+        />
+      )}
+      <img
+        src={photo.thumbnailUrl}
+        alt=""
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        onLoad={() => setThumbnailLoaded(true)}
+        className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out group-hover:scale-[1.015] ${
+          thumbnailLoaded ? 'opacity-100' : 'opacity-0'
+        } ${selected ? '!opacity-75' : 'group-hover:opacity-90'}`}
+        aria-hidden="true"
+      />
+    </span>
+  );
+};
+
+const ProgressiveLightboxImage = ({ photo, alt }: { photo: GalleryPhoto; alt: string }) => {
+  const [largeLoaded, setLargeLoaded] = useState(false);
+
+  return (
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+      <motion.img
+        initial={{ opacity: 0, scale: 0.99 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.22 }}
+        src={photo.thumbnailUrl}
+        alt={alt}
+        className={`max-h-full max-w-full select-none object-contain transition duration-500 ${
+          largeLoaded ? 'scale-[1.006] opacity-0 blur-sm' : 'opacity-100'
+        }`}
+        draggable={false}
+      />
+      <img
+        src={photo.largeUrl}
+        alt=""
+        onLoad={() => setLargeLoaded(true)}
+        className={`pointer-events-none absolute max-h-full max-w-full select-none object-contain transition-[opacity,transform] duration-500 ease-out ${
+          largeLoaded ? 'scale-100 opacity-100' : 'scale-[0.995] opacity-0'
+        }`}
+        draggable={false}
+        aria-hidden="true"
+      />
+      {!largeLoaded && (
+        <span
+          className="pointer-events-none absolute bottom-5 left-1/2 h-1 w-20 -translate-x-1/2 overflow-hidden rounded-full bg-white/15"
+          aria-hidden="true"
+        >
+          <motion.span
+            className="block h-full w-1/2 rounded-full bg-white/65"
+            animate={{ x: ['-110%', '210%'] }}
+            transition={{ duration: 1.1, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        </span>
+      )}
+    </div>
+  );
+};
+
 export const GalleryPage: React.FC = () => {
   const { slug = '' } = useParams();
   const bootstrapGallery = getGalleryBootstrap(slug);
@@ -158,6 +247,7 @@ export const GalleryPage: React.FC = () => {
   const [favoritePhotoNames, setFavoritePhotoNames] = useState<Set<string>>(() => new Set());
   const [pendingFavoritePhoto, setPendingFavoritePhoto] = useState('');
   const [favoriteError, setFavoriteError] = useState('');
+  const [coverLoaded, setCoverLoaded] = useState(false);
   const [favoriteVisitorId] = useState(() => {
     if (typeof window === 'undefined') {
       return '';
@@ -184,6 +274,17 @@ export const GalleryPage: React.FC = () => {
   });
   const touchStartX = useRef<number | null>(null);
   const requestInProgress = useRef(false);
+  const preloadedLargePhotos = useRef<Set<string>>(new Set());
+
+  const preloadLargePhoto = useCallback((photo: GalleryPhoto) => {
+    if (preloadedLargePhotos.current.has(photo.largeUrl)) {
+      return;
+    }
+
+    preloadedLargePhotos.current.add(photo.largeUrl);
+    const image = new window.Image();
+    image.src = photo.largeUrl;
+  }, []);
 
   const loadGallery = useCallback(
     async (silent = false) => {
@@ -319,6 +420,10 @@ export const GalleryPage: React.FC = () => {
   useEffect(() => {
     setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
   }, [slug]);
+
+  useEffect(() => {
+    setCoverLoaded(false);
+  }, [displayedGallery?.coverUrl, slug]);
 
   useEffect(() => {
     if (!slug || !favoriteVisitorId) {
@@ -542,6 +647,15 @@ export const GalleryPage: React.FC = () => {
   }, [photos.length]);
 
   useEffect(() => {
+    if (selectedIndex === null || photos.length < 2) {
+      return;
+    }
+
+    preloadLargePhoto(photos[(selectedIndex + 1) % photos.length]);
+    preloadLargePhoto(photos[(selectedIndex - 1 + photos.length) % photos.length]);
+  }, [photos, preloadLargePhoto, selectedIndex]);
+
+  useEffect(() => {
     if (!selectedPhoto) {
       return;
     }
@@ -612,9 +726,20 @@ export const GalleryPage: React.FC = () => {
         {displayedGallery?.coverUrl && (
           <>
             <img
+              src={displayedGallery.coverPreviewUrl || displayedGallery.coverUrl}
+              alt=""
+              className={`pointer-events-none absolute inset-0 h-full w-full scale-[1.025] object-cover blur-[8px] transition-opacity duration-700 ${
+                coverLoaded ? 'opacity-0' : 'opacity-100'
+              }`}
+              aria-hidden="true"
+            />
+            <img
               src={displayedGallery.coverUrl}
               alt=""
-              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              onLoad={() => setCoverLoaded(true)}
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out ${
+                coverLoaded ? 'scale-100 opacity-100' : 'scale-[1.01] opacity-0'
+              }`}
               aria-hidden="true"
             />
             <div
@@ -821,9 +946,12 @@ export const GalleryPage: React.FC = () => {
                       if (isSelectionMode) {
                         togglePhotoSelection(photo.id);
                       } else {
+                        preloadLargePhoto(photo);
                         setSelectedIndex(index);
                       }
                     }}
+                    onPointerEnter={() => preloadLargePhoto(photo)}
+                    onFocus={() => preloadLargePhoto(photo)}
                     className="block w-full text-left"
                     aria-label={
                       isSelectionMode
@@ -832,14 +960,11 @@ export const GalleryPage: React.FC = () => {
                     }
                     aria-pressed={isSelectionMode ? isSelected : undefined}
                   >
-                    <img
-                      src={photo.thumbnailUrl}
+                    <ProgressiveThumbnail
+                      photo={photo}
                       alt={`Zdjęcie ${index + 1}`}
-                      loading={index < 6 ? 'eager' : 'lazy'}
-                      decoding="async"
-                      className={`h-auto w-full transition duration-700 ease-out group-hover:scale-[1.015] ${
-                        isSelected ? 'opacity-75' : 'group-hover:opacity-90'
-                      }`}
+                      eager={index < 6}
+                      selected={isSelected}
                     />
                     {isSelectionMode && (
                       <span
@@ -1091,15 +1216,10 @@ export const GalleryPage: React.FC = () => {
             </div>
 
             <div className="relative flex min-h-0 flex-1 items-center justify-center p-2 sm:p-6">
-              <motion.img
+              <ProgressiveLightboxImage
                 key={selectedPhoto.id}
-                initial={{ opacity: 0, scale: 0.985 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.25 }}
-                src={selectedPhoto.largeUrl}
-                alt={`Portret ${selectedIndex + 1}`}
-                className="max-h-full max-w-full select-none object-contain"
-                draggable={false}
+                photo={selectedPhoto}
+                alt={`Zdjęcie ${selectedIndex + 1}`}
               />
 
               {photos.length > 1 && (
