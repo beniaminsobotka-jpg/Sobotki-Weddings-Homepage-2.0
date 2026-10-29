@@ -1,7 +1,9 @@
 import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import QRCode from 'qrcode';
+import { Link } from 'react-router-dom';
 import {
   Archive,
+  Camera,
   Check,
   Copy,
   Download,
@@ -30,6 +32,7 @@ type GalleryRecord = {
   title: string;
   date: string;
   folder: string;
+  kind: 'portraits' | 'weddings';
   coverPhoto: string;
   photoCount: number | null;
   publicationConsent: 'granted' | 'denied' | 'unknown';
@@ -38,6 +41,8 @@ type GalleryRecord = {
   createdAt: string;
   updatedAt: string;
 };
+
+type GalleryAdminMode = 'chooser' | 'portraits' | 'weddings';
 
 type AdminGalleryPhoto = {
   id: string;
@@ -107,6 +112,12 @@ const formatPhotoCount = (count: number | null) => {
   }
 
   return `${count} zdjęć`;
+};
+
+const getFolderKind = (folder: string): GalleryRecord['kind'] => {
+  const folderParts = folder.split('/').filter(Boolean);
+  const folderName = folderParts[folderParts.length - 1] || '';
+  return /weddings/i.test(folderName) ? 'weddings' : 'portraits';
 };
 
 const loadCanvasImage = (source: string) =>
@@ -364,7 +375,9 @@ const LoginView = ({
   );
 };
 
-export const GalleryAdminPage: React.FC = () => {
+export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
+  mode = 'chooser',
+}) => {
   const [authState, setAuthState] = useState<'checking' | 'login' | 'ready'>('checking');
   const [configured, setConfigured] = useState(true);
   const [data, setData] = useState<AdminData | null>(null);
@@ -447,7 +460,12 @@ export const GalleryAdminPage: React.FC = () => {
   useEffect(() => {
     const restoreRobots = setNoIndex();
     const previousTitle = document.title;
-    document.title = 'Panel galerii — Sobotki Portraits';
+    document.title =
+      mode === 'weddings'
+        ? 'Panel galerii — Sobotki Weddings'
+        : mode === 'portraits'
+          ? 'Panel galerii — Sobotki Portraits'
+          : 'Panel galerii — Sobotki';
 
     const checkSession = async () => {
       try {
@@ -472,7 +490,7 @@ export const GalleryAdminPage: React.FC = () => {
       document.title = previousTitle;
       restoreRobots();
     };
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     if (!showForm || form.originalSlug || slugTouched) {
@@ -481,15 +499,26 @@ export const GalleryAdminPage: React.FC = () => {
 
     setForm((current) => ({
       ...current,
-      slug: `portrety-${suffixRef.current}`,
+      slug: `${mode === 'weddings' ? 'slub' : 'portrety'}-${suffixRef.current}`,
     }));
-  }, [form.title, form.originalSlug, showForm, slugTouched]);
+  }, [form.title, form.originalSlug, mode, showForm, slugTouched]);
 
   const origin = typeof window === 'undefined' ? 'https://www.sobotkiweddings.pl' : window.location.origin;
   const bestOfUrl = `${origin}/panel/galerie/best-of`;
+  const visibleGalleries = useMemo(
+    () =>
+      data?.galleries.filter(
+        (gallery) => (gallery.kind || getFolderKind(gallery.folder)) === mode
+      ) || [],
+    [data, mode]
+  );
+  const visibleFolders = useMemo(
+    () => data?.folders.filter((folder) => getFolderKind(folder.path) === mode) || [],
+    [data, mode]
+  );
   const activeGalleries = useMemo(
-    () => data?.galleries.filter((gallery) => gallery.active).length || 0,
-    [data]
+    () => visibleGalleries.filter((gallery) => gallery.active).length,
+    [visibleGalleries]
   );
 
   const openCreateForm = () => {
@@ -497,7 +526,7 @@ export const GalleryAdminPage: React.FC = () => {
     setSlugTouched(false);
     setForm({
       ...emptyForm(),
-      folder: data?.folders[0]?.path || '',
+      folder: visibleFolders[0]?.path || '',
     });
     setShowForm(true);
     setError('');
@@ -1039,26 +1068,128 @@ export const GalleryAdminPage: React.FC = () => {
     );
   }
 
+  if (mode === 'chooser') {
+    const portraitGalleries =
+      data?.galleries.filter(
+        (gallery) => (gallery.kind || getFolderKind(gallery.folder)) === 'portraits'
+      ) || [];
+    const weddingGalleries =
+      data?.galleries.filter(
+        (gallery) => (gallery.kind || getFolderKind(gallery.folder)) === 'weddings'
+      ) || [];
+
+    return (
+      <div className="min-h-screen bg-[#f3f2ed] text-brand-black">
+        <header className="bg-[#111111] px-5 py-7 text-white sm:px-8 sm:py-9">
+          <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4">
+            <div>
+              <p className="font-sans text-[9px] font-bold uppercase tracking-[0.28em] text-white/40">
+                Sobotki
+              </p>
+              <h1 className="mt-1 font-serif text-2xl font-black uppercase tracking-[-0.04em] sm:text-3xl">
+                Wybierz panel galerii
+              </h1>
+            </div>
+            <button
+              type="button"
+              onClick={logout}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-4 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white/70 transition-colors hover:border-white/35 hover:text-white"
+            >
+              <LogOut size={15} aria-hidden="true" />
+              <span className="hidden sm:inline">Wyloguj</span>
+            </button>
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-[1180px] px-4 py-10 sm:px-8 sm:py-16">
+          <div className="max-w-2xl">
+            <p className="font-sans text-[9px] font-bold uppercase tracking-[0.24em] text-black/38">
+              Jeden login, dwa workflow
+            </p>
+            <h2 className="mt-3 font-serif text-4xl font-black uppercase tracking-[-0.05em] sm:text-6xl">
+              Nad czym dziś pracujesz?
+            </h2>
+            <p className="mt-5 font-sans text-sm leading-6 text-black/52">
+              Foldery zawierające w nazwie słowo WEDDINGS pojawiają się w panelu reportaży.
+              Pozostałe działają bez zmian jako galerie portretowe.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            <Link
+              to="/panel/galerie/portraits"
+              className="group relative min-h-[300px] overflow-hidden rounded-3xl bg-[#111111] p-7 text-white transition-transform hover:-translate-y-1 sm:p-9"
+            >
+              <div className="pointer-events-none absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'url(/noise.svg)' }} />
+              <div className="relative flex h-full flex-col">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/[0.06]">
+                  <Camera size={20} aria-hidden="true" />
+                </span>
+                <p className="mt-auto font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-white/42">
+                  {portraitGalleries.length} {portraitGalleries.length === 1 ? 'galeria' : 'galerii'}
+                </p>
+                <h3 className="mt-2 font-serif text-5xl font-black uppercase tracking-[-0.055em]">
+                  Portraits
+                </h3>
+                <p className="mt-3 max-w-md font-sans text-sm leading-6 text-white/52">
+                  Galerie tworzone na żywo, kody QR, karty A4 i biblioteka Best Of.
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              to="/panel/galerie/weddings"
+              className="group min-h-[300px] rounded-3xl border border-black/10 bg-white/55 p-7 transition-transform hover:-translate-y-1 sm:p-9"
+            >
+              <div className="flex h-full flex-col">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-black/10 bg-black/[0.03]">
+                  <Image size={20} aria-hidden="true" />
+                </span>
+                <p className="mt-auto font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-black/38">
+                  {weddingGalleries.length} {weddingGalleries.length === 1 ? 'galeria' : 'galerii'}
+                </p>
+                <h3 className="mt-2 font-serif text-5xl font-black uppercase tracking-[-0.055em]">
+                  Weddings
+                </h3>
+                <p className="mt-3 max-w-md font-sans text-sm leading-6 text-black/50">
+                  Pełne reportaże ślubne, okładki, wybieranie i pobieranie wielu zdjęć.
+                </p>
+              </div>
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f3f2ed] text-brand-black">
       <header className="bg-[#111111] px-5 py-6 text-white sm:px-8 sm:py-8">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4">
           <div>
             <p className="font-sans text-[9px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Sobotki Portraits
+              {mode === 'weddings' ? 'Sobotki Weddings' : 'Sobotki Portraits'}
             </p>
             <h1 className="mt-1 font-serif text-2xl font-black uppercase tracking-[-0.04em] sm:text-3xl">
-              Panel galerii
+              Panel {mode === 'weddings' ? 'Weddings' : 'Portraits'}
             </h1>
           </div>
-          <button
-            type="button"
-            onClick={logout}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-4 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white/70 transition-colors hover:border-white/35 hover:text-white"
-          >
-            <LogOut size={15} aria-hidden="true" />
-            <span className="hidden sm:inline">Wyloguj</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/panel/galerie"
+              className="inline-flex min-h-11 items-center rounded-full border border-white/15 px-4 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white/70 transition-colors hover:border-white/35 hover:text-white"
+            >
+              Zmień panel
+            </Link>
+            <button
+              type="button"
+              onClick={logout}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-white/35 hover:text-white"
+              aria-label="Wyloguj"
+            >
+              <LogOut size={15} aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -1066,7 +1197,7 @@ export const GalleryAdminPage: React.FC = () => {
         <section className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-black/[0.08] bg-white/[0.45] p-5">
             <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-black/[0.38]">Galerie</p>
-            <p className="mt-2 font-serif text-4xl font-black">{data?.galleries.length || 0}</p>
+            <p className="mt-2 font-serif text-4xl font-black">{visibleGalleries.length}</p>
           </div>
           <div className="rounded-2xl border border-black/[0.08] bg-white/[0.45] p-5">
             <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-black/[0.38]">Aktywne</p>
@@ -1074,7 +1205,7 @@ export const GalleryAdminPage: React.FC = () => {
           </div>
           <div className="rounded-2xl border border-black/[0.08] bg-white/[0.45] p-5">
             <p className="font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-black/[0.38]">Foldery Dropbox</p>
-            <p className="mt-2 font-serif text-4xl font-black">{data?.folders.length || 0}</p>
+            <p className="mt-2 font-serif text-4xl font-black">{visibleFolders.length}</p>
           </div>
         </section>
 
@@ -1098,7 +1229,7 @@ export const GalleryAdminPage: React.FC = () => {
             <button
               type="button"
               onClick={openCreateForm}
-              disabled={!data?.folders.length}
+              disabled={!visibleFolders.length}
               className="inline-flex min-h-11 items-center gap-2 rounded-full bg-black px-5 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-30"
             >
               <Plus size={16} aria-hidden="true" />
@@ -1119,7 +1250,7 @@ export const GalleryAdminPage: React.FC = () => {
           </div>
         )}
 
-        {data?.bestOf && (
+        {mode === 'portraits' && data?.bestOf && (
           <section className="relative mt-7 overflow-hidden rounded-3xl bg-[#111111] p-6 text-white sm:p-8">
             <div
               className="pointer-events-none absolute inset-0 opacity-[0.06]"
@@ -1263,29 +1394,33 @@ export const GalleryAdminPage: React.FC = () => {
           </section>
         )}
 
-        {data?.folders.length === 0 && (
+        {data && visibleFolders.length === 0 && (
           <div className="mt-7 rounded-2xl border border-dashed border-black/15 p-8 text-center sm:p-12">
             <Folder size={30} strokeWidth={1.4} className="mx-auto text-black/28" aria-hidden="true" />
             <h3 className="mt-5 font-serif text-2xl font-black uppercase">Najpierw dodaj folder na Dropboxie</h3>
             <p className="mx-auto mt-3 max-w-md font-sans text-sm leading-6 text-black/50">
-              Utwórz podfolder w {data.galleryRoot}, a następnie kliknij przycisk odświeżania.
+              {mode === 'weddings'
+                ? `Utwórz podfolder w ${data.galleryRoot} i dodaj słowo WEDDINGS do jego nazwy, a następnie odśwież panel.`
+                : `Utwórz podfolder w ${data.galleryRoot} bez słowa WEDDINGS w nazwie, a następnie odśwież panel.`}
             </p>
           </div>
         )}
 
-        {data && data.galleries.length === 0 && data.folders.length > 0 && (
+        {data && visibleGalleries.length === 0 && visibleFolders.length > 0 && (
           <div className="mt-7 rounded-2xl border border-dashed border-black/15 p-8 text-center sm:p-12">
             <Image size={30} strokeWidth={1.4} className="mx-auto text-black/28" aria-hidden="true" />
             <h3 className="mt-5 font-serif text-2xl font-black uppercase">Utwórz pierwszą galerię</h3>
             <p className="mx-auto mt-3 max-w-md font-sans text-sm leading-6 text-black/50">
-              Wybierzesz folder, nazwę i adres. Panel przygotuje resztę oraz kod QR.
+              {mode === 'weddings'
+                ? 'Wybierzesz folder reportażu, nazwę, datę i adres galerii dla pary młodej.'
+                : 'Wybierzesz folder, nazwę i adres. Panel przygotuje resztę oraz kod QR.'}
             </p>
           </div>
         )}
 
-        {data && data.galleries.length > 0 && (
+        {data && visibleGalleries.length > 0 && (
           <div className="mt-7 grid gap-4 xl:grid-cols-2">
-            {data.galleries.map((gallery) => {
+            {visibleGalleries.map((gallery) => {
               const publicUrl = `${origin}/galeria/${gallery.slug}`;
 
               return (
@@ -1298,9 +1433,11 @@ export const GalleryAdminPage: React.FC = () => {
                   }`}
                 >
                   <div className="flex gap-4">
-                    <div className="hidden shrink-0 sm:block">
-                      <GalleryQrPreview url={publicUrl} />
-                    </div>
+                    {mode === 'portraits' && (
+                      <div className="hidden shrink-0 sm:block">
+                        <GalleryQrPreview url={publicUrl} />
+                      </div>
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -1373,27 +1510,31 @@ export const GalleryAdminPage: React.FC = () => {
                       {copiedSlug === gallery.slug ? <Check size={14} /> : <Copy size={14} />}
                       {copiedSlug === gallery.slug ? 'Skopiowano' : 'Kopiuj adres'}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => void downloadQr(gallery)}
-                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white"
-                    >
-                      <QrCode size={14} aria-hidden="true" />
-                      Pobierz QR
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => void downloadGalleryCard(gallery)}
-                      disabled={cardGeneratingSlug === gallery.slug}
-                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-40"
-                    >
-                      {cardGeneratingSlug === gallery.slug ? (
-                        <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-                      ) : (
-                        <Download size={14} aria-hidden="true" />
-                      )}
-                      Pobierz kartę A4
-                    </button>
+                    {mode === 'portraits' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => void downloadQr(gallery)}
+                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white"
+                        >
+                          <QrCode size={14} aria-hidden="true" />
+                          Pobierz QR
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void downloadGalleryCard(gallery)}
+                          disabled={cardGeneratingSlug === gallery.slug}
+                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white disabled:cursor-wait disabled:opacity-40"
+                        >
+                          {cardGeneratingSlug === gallery.slug ? (
+                            <Loader2 size={14} className="animate-spin" aria-hidden="true" />
+                          ) : (
+                            <Download size={14} aria-hidden="true" />
+                          )}
+                          Pobierz kartę A4
+                        </button>
+                      </>
+                    )}
                     {gallery.active && (
                       <a
                         href={publicUrl}
@@ -1930,7 +2071,7 @@ export const GalleryAdminPage: React.FC = () => {
                   className="mt-2 min-h-[52px] w-full rounded-xl border border-black/12 bg-white/50 px-4 font-sans text-sm font-normal normal-case tracking-normal outline-none focus:border-black/40"
                 >
                   <option value="" disabled>Wybierz folder</option>
-                  {data?.folders.map((folder) => (
+                  {visibleFolders.map((folder) => (
                     <option key={folder.path} value={folder.path}>{folder.name}</option>
                   ))}
                 </select>

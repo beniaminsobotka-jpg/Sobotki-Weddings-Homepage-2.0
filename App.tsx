@@ -142,7 +142,9 @@ const AppShell: React.FC<{
                 <Route path="/editorial-home" element={<EditorialHomepage />} />
                 <Route path="/galeria/:slug" element={<GalleryPage />} />
                 <Route path="/panel/galerie/best-of" element={<BestOfGalleryPage />} />
-                <Route path="/panel/galerie" element={<GalleryAdminPage />} />
+                <Route path="/panel/galerie/portraits" element={<GalleryAdminPage mode="portraits" />} />
+                <Route path="/panel/galerie/weddings" element={<GalleryAdminPage mode="weddings" />} />
+                <Route path="/panel/galerie" element={<GalleryAdminPage mode="chooser" />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>

@@ -5,6 +5,7 @@ import {
   ensureDropboxFolder,
   GalleryError,
   getBestOfGallery,
+  getGalleryKind,
   getGalleryRegistry,
   getGalleryRoot,
   listGalleryFolders,
@@ -368,6 +369,7 @@ export default async function handler(request, response) {
       title,
       date,
       folder,
+      kind: getGalleryKind({ folder }),
       coverPhoto:
         existingIndex >= 0 ? String(registry.galleries[existingIndex].coverPhoto || '') : '',
       publicationConsent,

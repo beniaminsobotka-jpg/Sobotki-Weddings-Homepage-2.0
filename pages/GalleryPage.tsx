@@ -28,6 +28,7 @@ type GalleryData = {
     slug: string;
     title: string;
     date: string;
+    kind: 'portraits' | 'weddings';
     coverUrl: string;
   };
   photos: GalleryPhoto[];
@@ -42,6 +43,7 @@ declare global {
 }
 
 const DEFAULT_REFRESH_INTERVAL = 10_000;
+const WEDDING_GALLERY_BATCH_SIZE = 80;
 const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
 const MAX_ZIP_PART_PHOTOS = 80;
 
@@ -107,10 +109,16 @@ const getGalleryBootstrap = (slug: string) => {
   return gallery?.slug === slug ? gallery : null;
 };
 
-const GalleryBrand = ({ light = true }: { light?: boolean }) => (
+const GalleryBrand = ({
+  light = true,
+  kind = 'portraits',
+}: {
+  light?: boolean;
+  kind?: 'portraits' | 'weddings';
+}) => (
   <Link
-    to="/portraits"
-    aria-label="Sobotki Portraits"
+    to={kind === 'weddings' ? '/' : '/portraits'}
+    aria-label={kind === 'weddings' ? 'Sobotki Weddings' : 'Sobotki Portraits'}
     className={`inline-flex flex-col items-center leading-none transition-opacity hover:opacity-75 ${
       light ? 'text-white' : 'text-brand-black'
     }`}
@@ -123,7 +131,7 @@ const GalleryBrand = ({ light = true }: { light?: boolean }) => (
         light ? 'text-white/70' : 'text-black/48'
       }`}
     >
-      portraits
+      {kind === 'weddings' ? 'weddings' : 'portraits'}
     </span>
   </Link>
 );
@@ -143,6 +151,7 @@ export const GalleryPage: React.FC = () => {
   const [isDownloadingSelection, setIsDownloadingSelection] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState('');
   const [selectionError, setSelectionError] = useState('');
+  const [visiblePhotoCount, setVisiblePhotoCount] = useState(WEDDING_GALLERY_BATCH_SIZE);
   const touchStartX = useRef<number | null>(null);
   const requestInProgress = useRef(false);
 
@@ -233,9 +242,13 @@ export const GalleryPage: React.FC = () => {
 
     const displayedTitle = data?.gallery.title || bootstrapGallery?.title;
 
+    const galleryBrand = (data?.gallery.kind || bootstrapGallery?.kind) === 'weddings'
+      ? 'Sobotki Weddings'
+      : 'Sobotki Portraits';
+
     document.title = displayedTitle
-      ? `${displayedTitle} — galeria Sobotki Portraits`
-      : 'Galeria — Sobotki Portraits';
+      ? `${displayedTitle} — galeria ${galleryBrand}`
+      : `Galeria — ${galleryBrand}`;
 
     return () => {
       document.title = previousTitle;
@@ -246,10 +259,12 @@ export const GalleryPage: React.FC = () => {
         activeRobotsMeta.remove();
       }
     };
-  }, [bootstrapGallery?.title, data?.gallery.title]);
+  }, [bootstrapGallery?.kind, bootstrapGallery?.title, data?.gallery.kind, data?.gallery.title]);
 
   const photos = data?.photos || [];
   const displayedGallery = data?.gallery || bootstrapGallery;
+  const isWeddingGallery = displayedGallery?.kind === 'weddings';
+  const visiblePhotos = isWeddingGallery ? photos.slice(0, visiblePhotoCount) : photos;
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
   const selectedZipPartCount = useMemo(
     () =>
@@ -270,6 +285,10 @@ export const GalleryPage: React.FC = () => {
       return next.size === current.size ? current : next;
     });
   }, [photos]);
+
+  useEffect(() => {
+    setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
+  }, [slug]);
 
   const togglePhotoSelection = useCallback((photoId: string) => {
     setSelectionError('');
@@ -418,7 +437,20 @@ export const GalleryPage: React.FC = () => {
     }
 
     if (photos.length === 0) {
-      return 'Czekamy na pierwsze zdjęcie';
+      return isWeddingGallery ? 'Galeria czeka na zdjęcia' : 'Czekamy na pierwsze zdjęcie';
+    }
+
+    if (isWeddingGallery) {
+      const modulo100 = photos.length % 100;
+      const modulo10 = photos.length % 10;
+      const label =
+        photos.length === 1
+          ? 'zdjęcie'
+          : (modulo100 < 12 || modulo100 > 14) && modulo10 >= 2 && modulo10 <= 4
+            ? 'zdjęcia'
+            : 'zdjęć';
+
+      return `${photos.length} ${label} w galerii`;
     }
 
     if (photos.length === 1) {
@@ -430,7 +462,7 @@ export const GalleryPage: React.FC = () => {
     }
 
     return `${photos.length} portretów w galerii`;
-  }, [data, photos.length]);
+  }, [data, isWeddingGallery, photos.length]);
 
   return (
     <div className="min-h-screen bg-[#f3f2ed] text-brand-black">
@@ -463,7 +495,7 @@ export const GalleryPage: React.FC = () => {
           aria-hidden="true"
         />
         <div className="relative mx-auto flex max-w-[1500px] justify-center">
-          <GalleryBrand />
+          <GalleryBrand kind={displayedGallery?.kind} />
         </div>
 
         <div
@@ -472,7 +504,7 @@ export const GalleryPage: React.FC = () => {
           }`}
         >
           <p className="font-sans text-[10px] font-bold uppercase tracking-[0.32em] text-white/45 sm:text-xs">
-            Wasza galeria
+            {isWeddingGallery ? 'Wasza galeria ślubna' : 'Wasza galeria'}
           </p>
           <h1 className="mt-5 text-balance font-serif text-[clamp(2.7rem,11vw,6.5rem)] font-black uppercase leading-[0.86] tracking-[-0.055em]">
             {displayedGallery?.title || '\u00a0'}
@@ -483,8 +515,9 @@ export const GalleryPage: React.FC = () => {
             </p>
           )}
           <p className="mx-auto mt-7 max-w-xl font-sans text-sm font-light leading-6 text-white/66 sm:text-base sm:leading-7">
-            Znajdźcie swój kadr. Nowe zdjęcia pojawiają się tutaj automatycznie,
-            chwilę po wykonaniu portretu.
+            {isWeddingGallery
+              ? 'Wasza historia w kadrach. Oglądajcie, wybierajcie i pobierajcie zdjęcia z dnia ślubu.'
+              : 'Znajdźcie swój kadr. Nowe zdjęcia pojawiają się tutaj automatycznie, chwilę po wykonaniu portretu.'}
           </p>
         </div>
       </header>
@@ -505,7 +538,7 @@ export const GalleryPage: React.FC = () => {
             </span>
             <div className="min-w-0">
               <p className="truncate font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-black/55 sm:text-xs">
-                {galleryStatus || 'Galeria portretów'}
+                {galleryStatus || (isWeddingGallery ? 'Galeria ślubna' : 'Galeria portretów')}
               </p>
               <p className="mt-0.5 font-sans text-[10px] text-black/35">
                 Odświeżanie automatyczne
@@ -614,7 +647,7 @@ export const GalleryPage: React.FC = () => {
               <Camera size={26} strokeWidth={1.4} aria-hidden="true" />
             </span>
             <h2 className="mt-6 font-serif text-3xl font-black uppercase tracking-[-0.04em]">
-              Pierwszy portret pojawi się za chwilę
+              {isWeddingGallery ? 'Zdjęcia pojawią się tutaj' : 'Pierwszy portret pojawi się za chwilę'}
             </h2>
             <p className="mt-4 font-sans text-sm leading-6 text-black/52">
               Nie musicie nic robić — galeria odświeży się sama.
@@ -624,7 +657,7 @@ export const GalleryPage: React.FC = () => {
 
         {photos.length > 0 && (
           <div className="columns-2 gap-2 sm:columns-3 sm:gap-4 lg:columns-4">
-            {photos.map((photo, index) => {
+            {visiblePhotos.map((photo, index) => {
               const isSelected = selectedPhotoIds.has(photo.id);
 
               return (
@@ -646,14 +679,14 @@ export const GalleryPage: React.FC = () => {
                   }`}
                   aria-label={
                     isSelectionMode
-                      ? `${isSelected ? 'Odznacz' : 'Zaznacz'} portret ${index + 1}`
-                      : `Otwórz portret ${index + 1} z ${photos.length}`
+                      ? `${isSelected ? 'Odznacz' : 'Zaznacz'} zdjęcie ${index + 1}`
+                      : `Otwórz zdjęcie ${index + 1} z ${photos.length}`
                   }
                   aria-pressed={isSelectionMode ? isSelected : undefined}
                 >
                   <img
                     src={photo.thumbnailUrl}
-                    alt={`Portret ${index + 1}`}
+                    alt={`Zdjęcie ${index + 1}`}
                     loading={index < 6 ? 'eager' : 'lazy'}
                     decoding="async"
                     className={`h-auto w-full transition duration-700 ease-out group-hover:scale-[1.015] ${
@@ -684,12 +717,24 @@ export const GalleryPage: React.FC = () => {
             })}
           </div>
         )}
+
+        {isWeddingGallery && visiblePhotos.length < photos.length && (
+          <div className="mt-10 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setVisiblePhotoCount((current) => current + WEDDING_GALLERY_BATCH_SIZE)}
+              className="inline-flex min-h-12 items-center rounded-full border border-black/12 px-7 font-sans text-[10px] font-bold uppercase tracking-[0.17em] transition-colors hover:bg-black hover:text-white"
+            >
+              Pokaż kolejne {Math.min(WEDDING_GALLERY_BATCH_SIZE, photos.length - visiblePhotos.length)} zdjęć
+            </button>
+          </div>
+        )}
       </main>
 
       <footer className="border-t border-black/[0.08] px-6 py-9 text-center">
-        <GalleryBrand light={false} />
+        <GalleryBrand light={false} kind={displayedGallery?.kind} />
         <p className="mt-4 font-sans text-[9px] uppercase tracking-[0.2em] text-black/35">
-          Portrety tworzone na żywo
+          {isWeddingGallery ? 'Reportaż ślubny' : 'Portrety tworzone na żywo'}
         </p>
       </footer>
 

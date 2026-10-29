@@ -87,10 +87,16 @@ export default async function handler(request, response) {
       photos.find((photo) => photo.name === gallery.coverPhoto) || null;
     const sharePhoto = selectedCoverPhoto || photos[0] || null;
     const galleryUrl = `${PUBLIC_ORIGIN}/galeria/${encodeURIComponent(gallery.slug)}`;
-    const title = `${gallery.title} — galeria zdjęć | Sobotki Portraits`;
+    const isWeddingGallery = gallery.kind === 'weddings';
+    const brandName = isWeddingGallery ? 'Sobotki Weddings' : 'Sobotki Portraits';
+    const title = `${gallery.title} — galeria zdjęć | ${brandName}`;
     const description = gallery.date
-      ? `Galeria zdjęć: ${gallery.title}, ${gallery.date}. Portrety tworzone na żywo przez Sobotki Portraits.`
-      : `Galeria zdjęć: ${gallery.title}. Portrety tworzone na żywo przez Sobotki Portraits.`;
+      ? isWeddingGallery
+        ? `Galeria ślubna: ${gallery.title}, ${gallery.date}. Reportaż ślubny Sobotki Weddings.`
+        : `Galeria zdjęć: ${gallery.title}, ${gallery.date}. Portrety tworzone na żywo przez Sobotki Portraits.`
+      : isWeddingGallery
+        ? `Galeria ślubna: ${gallery.title}. Reportaż ślubny Sobotki Weddings.`
+        : `Galeria zdjęć: ${gallery.title}. Portrety tworzone na żywo przez Sobotki Portraits.`;
     const imageUrl = sharePhoto
       ? `${PUBLIC_ORIGIN}/api/gallery-photo?${new URLSearchParams({
           slug: gallery.slug,
@@ -112,7 +118,7 @@ export default async function handler(request, response) {
     html = replaceMeta(html, 'name', 'description', description);
     html = replaceMeta(html, 'name', 'robots', 'noindex,nofollow,noarchive');
     html = replaceMeta(html, 'property', 'og:locale', 'pl_PL');
-    html = replaceMeta(html, 'property', 'og:site_name', 'Sobotki Portraits');
+    html = replaceMeta(html, 'property', 'og:site_name', brandName);
     html = replaceMeta(html, 'property', 'og:title', title);
     html = replaceMeta(html, 'property', 'og:description', description);
     html = replaceMeta(html, 'property', 'og:image', imageUrl);
@@ -128,6 +134,7 @@ export default async function handler(request, response) {
       slug: gallery.slug,
       title: gallery.title,
       date: gallery.date,
+      kind: gallery.kind || 'portraits',
       coverUrl,
     });
     html = injectImagePreload(html, coverUrl);

@@ -38,6 +38,7 @@ export default async function handler(request, response) {
         slug: gallery.slug,
         title: gallery.title,
         date: gallery.date,
+        kind: gallery.kind || 'portraits',
         coverUrl: coverQuery ? `/api/gallery-photo?${coverQuery.toString()}` : '',
       },
       photos: photos.map((photo) => {
@@ -54,7 +55,7 @@ export default async function handler(request, response) {
           downloadUrl: `/api/gallery-download?${query.toString()}`,
         };
       }),
-      refreshAfterMs: 10_000,
+      refreshAfterMs: gallery.kind === 'weddings' ? 60_000 : 10_000,
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {

@@ -44,6 +44,21 @@ const normalizeDropboxPath = (value) => {
   return normalized;
 };
 
+export const getGalleryKind = (gallery) => {
+  if (gallery?.kind === 'weddings') {
+    return 'weddings';
+  }
+
+  const folderName = String(gallery?.folder || '')
+    .split('/')
+    .filter(Boolean)
+    .at(-1) || '';
+
+  return /weddings/i.test(folderName)
+    ? 'weddings'
+    : 'portraits';
+};
+
 export const validateGallerySlug = (slug) => {
   const normalized = String(slug || '').trim().toLowerCase();
 
@@ -111,6 +126,7 @@ export const resolveGallery = async (rawSlug) => {
       date: registeredGallery.date || '',
       folder: normalizeDropboxPath(registeredGallery.folder),
       coverPhoto: String(registeredGallery.coverPhoto || '').trim(),
+      kind: getGalleryKind(registeredGallery),
     };
   }
 
@@ -140,6 +156,7 @@ export const resolveGallery = async (rawSlug) => {
       date: String(event.date || '').trim(),
       folder: normalizeDropboxPath(event.folder || `${galleryRoot}/${slug}`),
       coverPhoto: String(event.coverPhoto || '').trim(),
+      kind: getGalleryKind(event),
     };
   }
 
@@ -153,6 +170,7 @@ export const resolveGallery = async (rawSlug) => {
     date: '',
     folder: normalizeDropboxPath(`${galleryRoot}/${slug}`),
     coverPhoto: '',
+    kind: 'portraits',
   };
 };
 
@@ -305,20 +323,25 @@ const normalizeRegistry = (payload) => {
 
   const galleries = payload.galleries
     .filter((gallery) => gallery && typeof gallery === 'object')
-    .map((gallery) => ({
-      slug: validateGallerySlug(gallery.slug),
-      title: String(gallery.title || '').trim(),
-      date: String(gallery.date || '').trim(),
-      folder: normalizeDropboxPath(gallery.folder),
-      coverPhoto: String(gallery.coverPhoto || '').trim(),
-      publicationConsent:
-        gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
-          ? gallery.publicationConsent
-          : 'unknown',
-      active: gallery.active !== false,
-      createdAt: String(gallery.createdAt || ''),
-      updatedAt: String(gallery.updatedAt || ''),
-    }))
+    .map((gallery) => {
+      const folder = normalizeDropboxPath(gallery.folder);
+
+      return {
+        slug: validateGallerySlug(gallery.slug),
+        title: String(gallery.title || '').trim(),
+        date: String(gallery.date || '').trim(),
+        folder,
+        kind: getGalleryKind({ ...gallery, folder }),
+        coverPhoto: String(gallery.coverPhoto || '').trim(),
+        publicationConsent:
+          gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
+            ? gallery.publicationConsent
+            : 'unknown',
+        active: gallery.active !== false,
+        createdAt: String(gallery.createdAt || ''),
+        updatedAt: String(gallery.updatedAt || ''),
+      };
+    })
     .filter((gallery) => gallery.title && gallery.folder);
 
   return {
@@ -431,6 +454,7 @@ export const getBestOfGallery = () => ({
   title: 'Best Of',
   date: '',
   folder: `${getGalleryRoot()}/${BEST_OF_FOLDER_NAME}`,
+  kind: 'portraits',
   coverPhoto: '',
   publicationConsent: 'granted',
   active: false,
