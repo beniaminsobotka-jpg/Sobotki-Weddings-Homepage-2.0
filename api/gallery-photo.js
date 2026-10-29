@@ -20,6 +20,12 @@ export default async function handler(request, response) {
   try {
     const gallery = await resolveGallery(request.query?.slug);
     const photoPath = buildPhotoPath(gallery, request.query?.name);
+
+    if (request.query?.size === 'original') {
+      response.setHeader('Cache-Control', 'public, max-age=0, s-maxage=7200');
+      return response.redirect(302, await getTemporaryPhotoLink(photoPath));
+    }
+
     const requestedSize =
       request.query?.size === 'large'
         ? 'large'

@@ -24,7 +24,7 @@ export default async function handler(request, response) {
           slug: gallery.slug,
           name: coverPhoto.name,
           rev: coverPhoto.rev,
-          size: 'large',
+          size: 'original',
         })
       : null;
     const coverPreviewQuery = coverPhoto

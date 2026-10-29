@@ -110,7 +110,7 @@ export default async function handler(request, response) {
           slug: gallery.slug,
           name: selectedCoverPhoto.name,
           rev: selectedCoverPhoto.rev,
-          size: 'large',
+          size: 'original',
         }).toString()}`
       : '';
     const coverPreviewUrl = selectedCoverPhoto
