@@ -11,8 +11,7 @@ import {
 import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
 
 const MAX_ARCHIVE_PHOTOS = 100;
-const MAX_ARCHIVE_BYTES = 50 * 1024 * 1024;
-const DOWNLOAD_CONCURRENCY = 8;
+const MAX_ARCHIVE_BYTES = 2 * 1024 * 1024 * 1024;
 
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -28,11 +27,28 @@ const parseBody = (request) => {
     try {
       return JSON.parse(request.body);
     } catch {
-      return {};
+      return Object.fromEntries(new URLSearchParams(request.body));
     }
   }
 
   return {};
+};
+
+const parseRequestedNames = (value) => {
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  if (typeof value !== 'string') {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [value];
+  }
 };
 
 const crcTable = Array.from({ length: 256 }, (_, index) => {
@@ -45,14 +61,12 @@ const crcTable = Array.from({ length: 256 }, (_, index) => {
   return value >>> 0;
 });
 
-const crc32 = (buffer) => {
-  let value = 0xffffffff;
-
+const updateCrc32 = (value, buffer) => {
   for (const byte of buffer) {
     value = crcTable[(value ^ byte) & 0xff] ^ (value >>> 8);
   }
 
-  return (value ^ 0xffffffff) >>> 0;
+  return value >>> 0;
 };
 
 const toDosDateTime = (value) => {
@@ -72,20 +86,20 @@ const toDosDateTime = (value) => {
   };
 };
 
-const createLocalHeader = ({ name, size, checksum, modifiedAt }) => {
+const createLocalHeader = ({ name, modifiedAt }) => {
   const encodedName = Buffer.from(name, 'utf8');
   const { date, time } = toDosDateTime(modifiedAt);
   const header = Buffer.alloc(30);
 
   header.writeUInt32LE(0x04034b50, 0);
   header.writeUInt16LE(20, 4);
-  header.writeUInt16LE(0x0800, 6);
+  header.writeUInt16LE(0x0808, 6);
   header.writeUInt16LE(0, 8);
   header.writeUInt16LE(time, 10);
   header.writeUInt16LE(date, 12);
-  header.writeUInt32LE(checksum, 14);
-  header.writeUInt32LE(size, 18);
-  header.writeUInt32LE(size, 22);
+  header.writeUInt32LE(0, 14);
+  header.writeUInt32LE(0, 18);
+  header.writeUInt32LE(0, 22);
   header.writeUInt16LE(encodedName.length, 26);
   header.writeUInt16LE(0, 28);
 
@@ -100,7 +114,7 @@ const createCentralHeader = ({ name, size, checksum, modifiedAt, offset }) => {
   header.writeUInt32LE(0x02014b50, 0);
   header.writeUInt16LE(20, 4);
   header.writeUInt16LE(20, 6);
-  header.writeUInt16LE(0x0800, 8);
+  header.writeUInt16LE(0x0808, 8);
   header.writeUInt16LE(0, 10);
   header.writeUInt16LE(time, 12);
   header.writeUInt16LE(date, 14);
@@ -118,6 +132,17 @@ const createCentralHeader = ({ name, size, checksum, modifiedAt, offset }) => {
   return Buffer.concat([header, encodedName]);
 };
 
+const createDataDescriptor = ({ size, checksum }) => {
+  const descriptor = Buffer.alloc(16);
+
+  descriptor.writeUInt32LE(0x08074b50, 0);
+  descriptor.writeUInt32LE(checksum, 4);
+  descriptor.writeUInt32LE(size, 8);
+  descriptor.writeUInt32LE(size, 12);
+
+  return descriptor;
+};
+
 const createEndRecord = ({ count, centralSize, centralOffset }) => {
   const record = Buffer.alloc(22);
 
@@ -133,18 +158,10 @@ const createEndRecord = ({ count, centralSize, centralOffset }) => {
   return record;
 };
 
-const downloadPhoto = async (gallery, photo, useFullResolution) => {
-  const path = useFullResolution
-    ? buildFullResolutionPhotoPath(gallery, photo.name)
-    : buildPhotoPath(gallery, photo.name);
-  const fileResponse = await getPhotoFile(path);
-  const contents = Buffer.from(await fileResponse.arrayBuffer());
-
-  return {
-    ...photo,
-    contents,
-    checksum: crc32(contents),
-  };
+const writeChunk = async (response, chunk) => {
+  if (!response.write(chunk)) {
+    await new Promise((resolve) => response.once('drain', resolve));
+  }
 };
 
 export default async function handler(request, response) {
@@ -155,9 +172,13 @@ export default async function handler(request, response) {
 
   try {
     const body = parseBody(request);
-    const requestedNames = Array.isArray(body.names)
-      ? [...new Set(body.names.map((name) => String(name || '').trim()).filter(Boolean))]
-      : [];
+    const requestedNames = [
+      ...new Set(
+        parseRequestedNames(body.names)
+          .map((name) => String(name || '').trim())
+          .filter(Boolean)
+      ),
+    ];
 
     if (requestedNames.length === 0) {
       throw new GalleryError(
@@ -175,7 +196,8 @@ export default async function handler(request, response) {
       );
     }
 
-    const useAdminGallery = body.admin === true && isGalleryAdmin(request);
+    const useAdminGallery =
+      (body.admin === true || body.admin === 'true') && isGalleryAdmin(request);
     const gallery = useAdminGallery
       ? (await getGalleryRegistry({ fresh: true }))?.galleries.find(
           (item) => item.slug === body.slug
@@ -212,7 +234,7 @@ export default async function handler(request, response) {
 
     if (declaredSize > MAX_ARCHIVE_BYTES) {
       throw new GalleryError(
-        'Ta paczka jest zbyt duża. Odśwież galerię i spróbuj ponownie — zdjęcia zostaną automatycznie podzielone na mniejsze paczki.',
+        'Wybrane zdjęcia przekraczają limit 2 GB dla jednej paczki ZIP.',
         413,
         'archive_too_large'
       );
@@ -225,42 +247,70 @@ export default async function handler(request, response) {
     response.setHeader('Content-Type', 'application/zip');
     response.setHeader('Content-Disposition', `attachment; filename="${archiveName}"`);
     response.setHeader('Cache-Control', 'private, no-store');
+    response.setHeader('X-Accel-Buffering', 'no');
 
     const centralRecords = [];
     let offset = 0;
 
-    for (let index = 0; index < selectedPhotos.length; index += DOWNLOAD_CONCURRENCY) {
-      const batch = selectedPhotos.slice(index, index + DOWNLOAD_CONCURRENCY);
-      const downloadedPhotos = await Promise.all(
-        batch.map((photo) => downloadPhoto(gallery, photo, useFullResolution))
-      );
+    for (const photo of selectedPhotos) {
+      const path = useFullResolution
+        ? buildFullResolutionPhotoPath(gallery, photo.name)
+        : buildPhotoPath(gallery, photo.name);
+      const fileResponse = await getPhotoFile(path);
 
-      for (const photo of downloadedPhotos) {
-        const localHeader = createLocalHeader({
-          name: photo.name,
-          size: photo.contents.length,
-          checksum: photo.checksum,
-          modifiedAt: photo.modifiedAt,
-        });
-
-        response.write(localHeader);
-        response.write(photo.contents);
-        centralRecords.push(
-          createCentralHeader({
-            name: photo.name,
-            size: photo.contents.length,
-            checksum: photo.checksum,
-            modifiedAt: photo.modifiedAt,
-            offset,
-          })
+      if (!fileResponse.body) {
+        throw new GalleryError(
+          `Dropbox nie zwrócił pliku ${photo.name}.`,
+          502,
+          'photo_download_empty'
         );
-        offset += localHeader.length + photo.contents.length;
       }
+
+      const localHeader = createLocalHeader({
+        name: photo.name,
+        modifiedAt: photo.modifiedAt,
+      });
+      const localOffset = offset;
+      let checksum = 0xffffffff;
+      let streamedSize = 0;
+
+      await writeChunk(response, localHeader);
+      offset += localHeader.length;
+
+      const reader = fileResponse.body.getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        const chunk = Buffer.from(value);
+        checksum = updateCrc32(checksum, chunk);
+        streamedSize += chunk.length;
+        await writeChunk(response, chunk);
+      }
+
+      checksum = (checksum ^ 0xffffffff) >>> 0;
+      const descriptor = createDataDescriptor({ size: streamedSize, checksum });
+      await writeChunk(response, descriptor);
+      offset += streamedSize + descriptor.length;
+      centralRecords.push(
+        createCentralHeader({
+          name: photo.name,
+          size: streamedSize,
+          checksum,
+          modifiedAt: photo.modifiedAt,
+          offset: localOffset,
+        })
+      );
     }
 
     const centralDirectory = Buffer.concat(centralRecords);
-    response.write(centralDirectory);
-    response.write(
+    await writeChunk(response, centralDirectory);
+    await writeChunk(
+      response,
       createEndRecord({
         count: centralRecords.length,
         centralSize: centralDirectory.length,

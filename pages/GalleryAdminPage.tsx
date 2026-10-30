@@ -95,59 +95,7 @@ const emptyForm = (): FormState => ({
   active: true,
 });
 
-const MAX_FULL_RESOLUTION_ZIP_BYTES = 40 * 1024 * 1024;
-const MAX_FULL_RESOLUTION_ZIP_PHOTOS = 80;
-
-const splitFullResolutionPhotos = (photos: AdminGalleryPhoto[]) => {
-  const parts: AdminGalleryPhoto[][] = [];
-  let currentPart: AdminGalleryPhoto[] = [];
-  let currentSize = 0;
-
-  photos.forEach((photo) => {
-    const size = Math.max(0, Number(photo.fullResolutionSize) || 0);
-
-    if (
-      currentPart.length >= MAX_FULL_RESOLUTION_ZIP_PHOTOS ||
-      (currentPart.length > 0 && currentSize + size > MAX_FULL_RESOLUTION_ZIP_BYTES)
-    ) {
-      parts.push(currentPart);
-      currentPart = [];
-      currentSize = 0;
-    }
-
-    currentPart.push(photo);
-    currentSize += size;
-  });
-
-  if (currentPart.length) {
-    parts.push(currentPart);
-  }
-
-  return parts;
-};
-
-const hasCompleteZipEndRecord = async (archive: Blob) => {
-  if (archive.size < 22) {
-    return false;
-  }
-
-  const tail = new Uint8Array(
-    await archive.slice(Math.max(0, archive.size - 65_557)).arrayBuffer()
-  );
-
-  for (let index = tail.length - 22; index >= 0; index -= 1) {
-    if (
-      tail[index] === 0x50 &&
-      tail[index + 1] === 0x4b &&
-      tail[index + 2] === 0x05 &&
-      tail[index + 3] === 0x06
-    ) {
-      return true;
-    }
-  }
-
-  return false;
-};
+const MAX_FULL_RESOLUTION_ZIP_BYTES = 2 * 1024 * 1024 * 1024;
 
 const slugify = (value: string) =>
   value
@@ -819,63 +767,47 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
     setBrowserError('');
 
     try {
-      const zipParts = splitFullResolutionPhotos(favoriteOriginals);
+      const totalBytes = favoriteOriginals.reduce(
+        (total, photo) => total + Math.max(0, Number(photo.fullResolutionSize) || 0),
+        0
+      );
 
-      for (let partIndex = 0; partIndex < zipParts.length; partIndex += 1) {
-        const part = zipParts[partIndex];
-        const names = part.map((photo) => photo.name);
-
-        setBrowserDownloadProgress(
-          zipParts.length > 1
-            ? `Pobieram paczkę ${partIndex + 1} z ${zipParts.length}…`
-            : 'Przygotowuję ZIP…'
-        );
-
-        const response = await fetchWithTimeout(
-          '/api/gallery-batch-download',
-          {
-            method: 'POST',
-            headers: {
-              Accept: 'application/zip, application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              slug: browserGallery.slug,
-              names,
-              source: 'full',
-              admin: true,
-            }),
-          },
-          60_000
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            await getErrorMessage(
-              response,
-              'Nie udało się przygotować oryginałów do pobrania.'
-            )
-          );
-        }
-
-        const archive = await response.blob();
-
-        if (!(await hasCompleteZipEndRecord(archive))) {
-          throw new Error('Pobieranie paczki zostało przerwane. Spróbuj ponownie.');
-        }
-
-        const downloadUrl = URL.createObjectURL(archive);
-        const link = document.createElement('a');
-        const partSuffix =
-          zipParts.length > 1 ? `-czesc-${partIndex + 1}-z-${zipParts.length}` : '';
-
-        link.href = downloadUrl;
-        link.download = `sobotki-${browserGallery.slug}-wybrane-do-druku${partSuffix}.zip`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 5_000);
+      if (totalBytes > MAX_FULL_RESOLUTION_ZIP_BYTES) {
+        throw new Error('Wybrane zdjęcia przekraczają limit 2 GB jednej paczki ZIP.');
       }
+
+      setBrowserDownloadProgress('Przygotowuję jedną paczkę ZIP…');
+      const frameName = `gallery-download-${Date.now()}`;
+      const frame = document.createElement('iframe');
+      frame.name = frameName;
+      frame.hidden = true;
+      document.body.appendChild(frame);
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/api/gallery-batch-download';
+      form.target = frameName;
+      form.hidden = true;
+
+      const fields: Record<string, string> = {
+        slug: browserGallery.slug,
+        names: JSON.stringify(favoriteOriginals.map((photo) => photo.name)),
+        source: 'full',
+        admin: 'true',
+      };
+
+      Object.entries(fields).forEach(([name, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+      form.remove();
+      window.setTimeout(() => frame.remove(), 10 * 60 * 1000);
     } catch (downloadError) {
       setBrowserError(
         getRequestErrorMessage(
