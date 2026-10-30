@@ -870,6 +870,47 @@ export const getPhotoFile = async (path) => {
   return dropboxResponse;
 };
 
+export const getDropboxFolderZip = async (path) => {
+  const normalizedPath = normalizeDropboxPath(path);
+  const accessToken = await getAccessToken();
+  const dropboxResponse = await fetch(`${DROPBOX_CONTENT_URL}/files/download_zip`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Dropbox-API-Arg': stringifyDropboxHeader({ path: normalizedPath }),
+    },
+  });
+
+  if (!dropboxResponse.ok) {
+    const errorSummary = await readDropboxError(dropboxResponse);
+    throwDropboxAuthError(dropboxResponse, errorSummary);
+
+    if (errorSummary.includes('too_large')) {
+      throw new GalleryError(
+        'Folder zdjęć jest zbyt duży, aby Dropbox przygotował jedną paczkę ZIP.',
+        413,
+        'dropbox_zip_too_large'
+      );
+    }
+
+    if (errorSummary.includes('too_many_files')) {
+      throw new GalleryError(
+        'Folder zawiera zbyt wiele plików, aby utworzyć jedną paczkę ZIP.',
+        413,
+        'dropbox_zip_too_many_files'
+      );
+    }
+
+    throw new GalleryError(
+      'Dropbox nie mógł przygotować paczki ZIP. Spróbuj ponownie za chwilę.',
+      502,
+      'dropbox_zip_failed'
+    );
+  }
+
+  return dropboxResponse;
+};
+
 const wait = (milliseconds) =>
   new Promise((resolve) => {
     setTimeout(resolve, milliseconds);

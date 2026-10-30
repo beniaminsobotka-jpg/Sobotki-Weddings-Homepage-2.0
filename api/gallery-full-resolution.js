@@ -37,6 +37,10 @@ export default async function handler(request, response) {
       galleryPhotoCount: galleryPhotos.length,
       matchedPhotoCount: photos.length,
       missingPhotoCount: Math.max(0, galleryPhotos.length - photos.length),
+      totalBytes: photos.reduce(
+        (total, photo) => total + Math.max(0, Number(photo.size) || 0),
+        0
+      ),
       photos: photos.map((photo) => ({
         id: photo.id,
         name: photo.name,

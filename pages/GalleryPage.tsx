@@ -46,11 +46,6 @@ type GalleryData = {
   generatedAt: string;
 };
 
-type ArchivePhoto = {
-  name: string;
-  size: number;
-};
-
 declare global {
   interface Window {
     __SOBOTKI_GALLERY_BOOTSTRAP__?: GalleryData['gallery'];
@@ -63,7 +58,9 @@ const FAVORITE_VISITOR_STORAGE_KEY = 'sobotki-gallery-favorite-visitor';
 const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
 const MAX_ZIP_PART_PHOTOS = 80;
 
-const splitPhotosIntoZipParts = <Photo extends ArchivePhoto>(photos: Photo[]) => {
+const splitPhotosIntoZipParts = <Photo extends { name: string; size: number }>(
+  photos: Photo[]
+) => {
   const parts: Photo[][] = [];
   let currentPart: Photo[] = [];
   let currentSize = 0;
@@ -796,62 +793,25 @@ export const GalleryPage: React.FC = () => {
         );
       }
 
-      const fullResolutionPhotos = Array.isArray(manifest?.photos)
-        ? (manifest.photos as ArchivePhoto[])
-        : [];
-
-      if (!fullResolutionPhotos.length) {
+      if (!Number(manifest?.matchedPhotoCount || 0)) {
         throw new Error('Zdjęcia w pełnej rozdzielczości nie są jeszcze dostępne.');
       }
 
-      const zipParts = splitPhotosIntoZipParts(fullResolutionPhotos);
-
-      for (let partIndex = 0; partIndex < zipParts.length; partIndex += 1) {
-        const part = zipParts[partIndex];
-        const names = part.map((photo) => photo.name);
-
-        setFullResolutionDownloadProgress(
-          zipParts.length > 1
-            ? `Pobieram paczkę ${partIndex + 1} z ${zipParts.length}…`
-            : 'Przygotowuję zdjęcia…'
+      if (Number(manifest?.totalBytes || 0) > 2 * 1024 * 1024 * 1024) {
+        throw new Error(
+          'Galeria przekracza 2 GB i nie może zostać pobrana jako jedna paczka ZIP.'
         );
-
-        const response = await fetch('/api/gallery-batch-download', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/zip, application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ slug, names, source: 'full' }),
-        });
-
-        if (!response.ok) {
-          const payload = await response.json().catch(() => null);
-          throw new Error(
-            payload?.error || 'Nie udało się przygotować zdjęć w pełnej rozdzielczości.'
-          );
-        }
-
-        const archive = await response.blob();
-
-        if (!(await hasCompleteZipEndRecord(archive))) {
-          throw new Error(
-            'Pobieranie paczki zostało przerwane. Spróbuj ponownie za chwilę.'
-          );
-        }
-
-        const downloadUrl = window.URL.createObjectURL(archive);
-        const downloadLink = document.createElement('a');
-        const partSuffix =
-          zipParts.length > 1 ? `-czesc-${partIndex + 1}-z-${zipParts.length}` : '';
-
-        downloadLink.href = downloadUrl;
-        downloadLink.download = `sobotki-${slug}-pelna-rozdzielczosc${partSuffix}.zip`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        downloadLink.remove();
-        window.setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 5_000);
       }
+
+      setFullResolutionDownloadProgress('Dropbox przygotowuje jedną paczkę…');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = `/api/gallery-full-resolution-download?slug=${encodeURIComponent(
+        slug
+      )}`;
+      downloadLink.download = `sobotki-${slug}-pelna-rozdzielczosc.zip`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
     } catch (downloadError) {
       setFullResolutionDownloadError(
         downloadError instanceof Error
@@ -1360,8 +1320,8 @@ export const GalleryPage: React.FC = () => {
               Pełna rozdzielczość
             </h2>
             <p className="mx-auto mt-3 max-w-lg font-sans text-sm leading-6 text-black/50">
-              Pobierz wszystkie zdjęcia w jakości przygotowanej do druku. Duży reportaż może
-              zostać automatycznie podzielony na kilka bezpiecznych paczek ZIP.
+              Pobierz wszystkie zdjęcia w jakości przygotowanej do druku jako jedną paczkę ZIP
+              do 2 GB.
             </p>
             <button
               type="button"

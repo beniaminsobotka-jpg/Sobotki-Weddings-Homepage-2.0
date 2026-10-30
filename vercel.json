@@ -6,6 +6,9 @@
     },
     "api/gallery-batch-download.js": {
       "maxDuration": 60
+    },
+    "api/gallery-full-resolution-download.js": {
+      "maxDuration": 300
     }
   },
   "rewrites": [
