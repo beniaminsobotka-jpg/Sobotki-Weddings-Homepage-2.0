@@ -46,6 +46,19 @@ type GalleryData = {
   generatedAt: string;
 };
 
+type NativeFaceDetector = {
+  detect: (source: HTMLImageElement) => Promise<
+    Array<{
+      boundingBox: { x: number; y: number; width: number; height: number };
+    }>
+  >;
+};
+
+type NativeFaceDetectorConstructor = new (options?: {
+  fastMode?: boolean;
+  maxDetectedFaces?: number;
+}) => NativeFaceDetector;
+
 declare global {
   interface Window {
     __SOBOTKI_GALLERY_BOOTSTRAP__?: GalleryData['gallery'];
@@ -57,6 +70,10 @@ const WEDDING_GALLERY_BATCH_SIZE = 80;
 const FAVORITE_VISITOR_STORAGE_KEY = 'sobotki-gallery-favorite-visitor';
 const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
 const MAX_ZIP_PART_PHOTOS = 80;
+const DEFAULT_COVER_FOCUS = { x: 50, y: 24 };
+
+const clampCoverFocus = (value: number, minimum: number, maximum: number) =>
+  Math.min(maximum, Math.max(minimum, value));
 
 const splitPhotosIntoZipParts = <Photo extends { name: string; size: number }>(
   photos: Photo[]
@@ -262,6 +279,7 @@ export const GalleryPage: React.FC = () => {
   const [favoriteError, setFavoriteError] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverFocus, setCoverFocus] = useState(DEFAULT_COVER_FOCUS);
   const [lightboxHeartBurst, setLightboxHeartBurst] = useState(0);
   const [favoriteVisitorId] = useState(() => {
     if (typeof window === 'undefined') {
@@ -519,6 +537,71 @@ export const GalleryPage: React.FC = () => {
   useEffect(() => {
     setCoverLoaded(false);
   }, [displayedGallery?.coverUrl, slug]);
+
+  useEffect(() => {
+    setCoverFocus(DEFAULT_COVER_FOCUS);
+
+    if (!displayedGallery?.coverPreviewUrl || typeof window === 'undefined') {
+      return;
+    }
+
+    const FaceDetector = (
+      window as Window & { FaceDetector?: NativeFaceDetectorConstructor }
+    ).FaceDetector;
+
+    if (!FaceDetector) {
+      return;
+    }
+
+    let cancelled = false;
+    const image = new window.Image();
+    image.decoding = 'async';
+
+    image.onload = async () => {
+      try {
+        const detector = new FaceDetector({ fastMode: true, maxDetectedFaces: 6 });
+        const detectedFaces = await detector.detect(image);
+
+        if (cancelled || detectedFaces.length === 0) {
+          return;
+        }
+
+        const mainFaces = [...detectedFaces]
+          .sort(
+            (first, second) =>
+              second.boundingBox.width * second.boundingBox.height -
+              first.boundingBox.width * first.boundingBox.height
+          )
+          .slice(0, 2);
+        const left = Math.min(...mainFaces.map((face) => face.boundingBox.x));
+        const right = Math.max(
+          ...mainFaces.map((face) => face.boundingBox.x + face.boundingBox.width)
+        );
+        const top = Math.min(...mainFaces.map((face) => face.boundingBox.y));
+        const bottom = Math.max(
+          ...mainFaces.map((face) => face.boundingBox.y + face.boundingBox.height)
+        );
+
+        setCoverFocus({
+          x: clampCoverFocus(((left + right) / 2 / image.naturalWidth) * 100, 18, 82),
+          y: clampCoverFocus(
+            ((top + bottom) / 2 / image.naturalHeight) * 100 - 10,
+            12,
+            42
+          ),
+        });
+      } catch {
+        // The upper-center fallback keeps faces away from the title when native detection is unavailable.
+      }
+    };
+
+    image.src = displayedGallery.coverPreviewUrl;
+
+    return () => {
+      cancelled = true;
+      image.onload = null;
+    };
+  }, [displayedGallery?.coverPreviewUrl, slug]);
 
   useEffect(() => {
     if (!slug || !favoriteVisitorId) {
@@ -943,16 +1026,18 @@ export const GalleryPage: React.FC = () => {
             <img
               src={displayedGallery.coverPreviewUrl || displayedGallery.coverUrl}
               alt=""
-              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover transition-[object-position] duration-500 ease-in-out"
+              style={{ objectPosition: `${coverFocus.x}% ${coverFocus.y}%` }}
               aria-hidden="true"
             />
             <img
               src={displayedGallery.coverUrl}
               alt=""
               onLoad={() => setCoverLoaded(true)}
-              className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ease-out ${
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-[opacity,object-position] duration-500 ease-in-out ${
                 coverLoaded ? 'opacity-100' : 'opacity-0'
               }`}
+              style={{ objectPosition: `${coverFocus.x}% ${coverFocus.y}%` }}
               aria-hidden="true"
             />
             <div
