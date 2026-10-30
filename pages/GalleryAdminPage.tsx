@@ -1982,7 +1982,7 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
           aria-modal="true"
           aria-label={`Ustaw okładkę galerii ${coverGallery.title}`}
         >
-          <div className="flex max-h-[95dvh] w-full max-w-5xl flex-col rounded-t-3xl bg-[#f3f2ed] sm:rounded-3xl">
+          <div className="flex max-h-[95dvh] w-full max-w-7xl flex-col rounded-t-3xl bg-[#f3f2ed] sm:rounded-3xl">
             <div className="flex shrink-0 items-center justify-between gap-4 border-b border-black/[0.08] p-5 sm:p-7">
               <div>
                 <p className="font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-black/38">
@@ -2026,65 +2026,134 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
               )}
 
               {coverPhotos.length > 0 && (
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-                  {coverPhotos.map((photo, index) => {
-                    const selected = selectedCoverPhoto === photo.name;
-                    const orientation = coverPhotoOrientations[photo.name] || 'loading';
-                    const isLandscape = orientation === 'landscape';
-                    const isHidden = orientation === 'portrait' || orientation === 'error';
+                <div className="grid items-start gap-6 lg:grid-cols-[minmax(360px,0.95fr)_minmax(0,1.25fr)] lg:gap-7">
+                  <div className="lg:sticky lg:top-0">
+                    <p className="mb-3 font-sans text-[9px] font-bold uppercase tracking-[0.2em] text-black/40">
+                      Podgląd gotowej okładki
+                    </p>
+                    <div className="relative aspect-video overflow-hidden rounded-2xl bg-[#111] text-white shadow-xl shadow-black/10">
+                      {selectedCoverPhoto ? (
+                        <>
+                          <img
+                            src={
+                              coverPhotos.find((photo) => photo.name === selectedCoverPhoto)
+                                ?.thumbnailUrl
+                            }
+                            alt="Podgląd wybranej okładki"
+                            className="absolute inset-0 h-full w-full object-cover"
+                            style={{ objectPosition: '50% 24%' }}
+                          />
+                          <div
+                            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-[#111111]"
+                            aria-hidden="true"
+                          />
+                          <div
+                            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+                            style={{ backgroundImage: 'url(/noise.svg)' }}
+                            aria-hidden="true"
+                          />
+                        </>
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center px-8 text-center font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-white/38">
+                          Kliknij zdjęcie, aby zobaczyć podgląd
+                        </div>
+                      )}
 
-                    return (
-                      <button
-                        key={photo.id}
-                        type="button"
-                        onClick={() => setSelectedCoverPhoto(photo.name)}
-                        disabled={!isLandscape}
-                        className={`group relative aspect-video overflow-hidden rounded-xl border-2 bg-black/[0.06] transition ${
-                          isHidden ? 'hidden' : ''
-                        } ${
-                          selected ? 'border-black' : 'border-transparent hover:border-black/30'
-                        }`}
-                        aria-label={`Wybierz zdjęcie ${index + 1} jako okładkę`}
-                        aria-pressed={selected}
-                      >
-                        <img
-                          src={photo.thumbnailUrl}
-                          alt={`Zdjęcie ${index + 1}`}
-                          loading={index < 8 ? 'eager' : 'lazy'}
-                          onLoad={(event) =>
-                            registerCoverPhotoOrientation(
-                              photo.name,
-                              event.currentTarget.naturalWidth,
-                              event.currentTarget.naturalHeight
-                            )
-                          }
-                          onError={() =>
-                            setCoverPhotoOrientations((current) => ({
-                              ...current,
-                              [photo.name]: 'error',
-                            }))
-                          }
-                          className={`h-full w-full object-contain transition duration-300 ${
-                            isLandscape ? 'opacity-100' : 'opacity-0'
+                      <div className="absolute inset-x-0 top-5 z-10 flex flex-col items-center leading-none sm:top-6">
+                        <span className="font-serif text-xl font-black uppercase tracking-[-0.04em] sm:text-2xl">
+                          Sobotki
+                        </span>
+                        <span className="-mt-0.5 font-playfair text-xs italic lowercase text-white/70 sm:text-sm">
+                          {coverGallery.kind === 'weddings' ? 'weddings' : 'portraits'}
+                        </span>
+                      </div>
+
+                      <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-5 text-center sm:px-8 sm:pb-7">
+                        <p className="font-sans text-[7px] font-bold uppercase tracking-[0.28em] text-white/48 sm:text-[8px]">
+                          {coverGallery.kind === 'weddings'
+                            ? 'Wasza galeria ślubna'
+                            : 'Wasza galeria'}
+                        </p>
+                        <p className="mt-2 text-balance font-serif text-[clamp(1.55rem,4vw,3rem)] font-black uppercase leading-[0.88] tracking-[-0.055em]">
+                          {coverGallery.title}
+                        </p>
+                        {coverGallery.date && (
+                          <p className="mt-3 font-playfair text-xs italic text-white/62 sm:text-sm">
+                            {coverGallery.date}
+                          </p>
+                        )}
+                        <p className="mx-auto mt-3 hidden max-w-sm font-sans text-[9px] leading-4 text-white/68 sm:block">
+                          {coverGallery.kind === 'weddings'
+                            ? 'Wasza historia w kadrach. Oglądajcie, wybierajcie i pobierajcie zdjęcia z dnia ślubu.'
+                            : 'Znajdźcie swój kadr. Nowe zdjęcia pojawiają się tutaj automatycznie.'}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="mt-3 font-sans text-[10px] leading-4 text-black/42">
+                      Podgląd pokazuje zdjęcie razem z gradientem, logo i tekstami widocznymi w galerii.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                    {coverPhotos.map((photo, index) => {
+                      const selected = selectedCoverPhoto === photo.name;
+                      const orientation = coverPhotoOrientations[photo.name] || 'loading';
+                      const isLandscape = orientation === 'landscape';
+                      const isHidden = orientation === 'portrait' || orientation === 'error';
+
+                      return (
+                        <button
+                          key={photo.id}
+                          type="button"
+                          onClick={() => setSelectedCoverPhoto(photo.name)}
+                          disabled={!isLandscape}
+                          className={`group relative aspect-video overflow-hidden rounded-xl border-2 bg-black/[0.06] transition ${
+                            isHidden ? 'hidden' : ''
+                          } ${
+                            selected ? 'border-black' : 'border-transparent hover:border-black/30'
                           }`}
-                        />
-                        {orientation === 'loading' && (
-                          <span className="absolute inset-0 flex items-center justify-center">
-                            <Loader2
-                              size={20}
-                              className="animate-spin text-black/25"
-                              aria-hidden="true"
-                            />
-                          </span>
-                        )}
-                        {selected && (
-                          <span className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
-                            <Check size={16} aria-hidden="true" />
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
+                          aria-label={`Wybierz zdjęcie ${index + 1} jako okładkę`}
+                          aria-pressed={selected}
+                        >
+                          <img
+                            src={photo.thumbnailUrl}
+                            alt={`Zdjęcie ${index + 1}`}
+                            loading={index < 8 ? 'eager' : 'lazy'}
+                            onLoad={(event) =>
+                              registerCoverPhotoOrientation(
+                                photo.name,
+                                event.currentTarget.naturalWidth,
+                                event.currentTarget.naturalHeight
+                              )
+                            }
+                            onError={() =>
+                              setCoverPhotoOrientations((current) => ({
+                                ...current,
+                                [photo.name]: 'error',
+                              }))
+                            }
+                            className={`h-full w-full object-contain transition duration-300 ${
+                              isLandscape ? 'opacity-100' : 'opacity-0'
+                            }`}
+                          />
+                          {orientation === 'loading' && (
+                            <span className="absolute inset-0 flex items-center justify-center">
+                              <Loader2
+                                size={20}
+                                className="animate-spin text-black/25"
+                                aria-hidden="true"
+                              />
+                            </span>
+                          )}
+                          {selected && (
+                            <span className="absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black text-white">
+                              <Check size={16} aria-hidden="true" />
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
