@@ -241,6 +241,13 @@ export const GalleryPage: React.FC = () => {
   const [downloadProgress, setDownloadProgress] = useState('');
   const [selectionError, setSelectionError] = useState('');
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(WEDDING_GALLERY_BATCH_SIZE);
+  const [galleryColumnCount, setGalleryColumnCount] = useState(() => {
+    if (typeof window === 'undefined') {
+      return 2;
+    }
+
+    return window.innerWidth >= 1024 ? 4 : window.innerWidth >= 640 ? 3 : 2;
+  });
   const [favoriteCounts, setFavoriteCounts] = useState<Record<string, number>>({});
   const [favoritePhotoNames, setFavoritePhotoNames] = useState<Set<string>>(() => new Set());
   const [pendingFavoritePhotos, setPendingFavoritePhotos] = useState<Set<string>>(
@@ -278,6 +285,7 @@ export const GalleryPage: React.FC = () => {
   const touchStartY = useRef<number | null>(null);
   const lastLightboxTap = useRef<{ photoId: string; at: number } | null>(null);
   const lightboxIsDismissing = useRef(false);
+  const galleryLoadMoreTrigger = useRef<HTMLDivElement | null>(null);
   const requestInProgress = useRef(false);
   const preloadedLargePhotos = useRef<Set<string>>(new Set());
   const favoriteMutationQueue = useRef<Promise<void>>(Promise.resolve());
@@ -418,6 +426,18 @@ export const GalleryPage: React.FC = () => {
     [favoritePhotoNames, photos]
   );
   const displayedPhotos = showFavoritesOnly ? favoritePhotos : visiblePhotos;
+  const displayedPhotoColumns = useMemo(() => {
+    const columns = Array.from(
+      { length: galleryColumnCount },
+      () => [] as Array<{ photo: GalleryPhoto; index: number }>
+    );
+
+    displayedPhotos.forEach((photo, index) => {
+      columns[index % galleryColumnCount].push({ photo, index });
+    });
+
+    return columns;
+  }, [displayedPhotos, galleryColumnCount]);
   const navigationPhotos = showFavoritesOnly ? favoritePhotos : photos;
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
   const selectedNavigationIndex = selectedPhoto
@@ -447,6 +467,48 @@ export const GalleryPage: React.FC = () => {
     setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
     setShowFavoritesOnly(false);
   }, [slug]);
+
+  useEffect(() => {
+    const updateColumnCount = () => {
+      setGalleryColumnCount(
+        window.innerWidth >= 1024 ? 4 : window.innerWidth >= 640 ? 3 : 2
+      );
+    };
+
+    updateColumnCount();
+    window.addEventListener('resize', updateColumnCount, { passive: true });
+
+    return () => window.removeEventListener('resize', updateColumnCount);
+  }, []);
+
+  useEffect(() => {
+    const trigger = galleryLoadMoreTrigger.current;
+
+    if (
+      !trigger ||
+      !isWeddingGallery ||
+      showFavoritesOnly ||
+      visiblePhotos.length >= photos.length
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) {
+          return;
+        }
+
+        setVisiblePhotoCount((current) =>
+          Math.min(photos.length, current + WEDDING_GALLERY_BATCH_SIZE)
+        );
+      },
+      { rootMargin: '1200px 0px' }
+    );
+
+    observer.observe(trigger);
+    return () => observer.disconnect();
+  }, [isWeddingGallery, photos.length, showFavoritesOnly, visiblePhotos.length]);
 
   useEffect(() => {
     setCoverLoaded(false);
@@ -1052,8 +1114,10 @@ export const GalleryPage: React.FC = () => {
         )}
 
         {photos.length > 0 && displayedPhotos.length > 0 && (
-          <div className="columns-2 gap-2 sm:columns-3 sm:gap-4 lg:columns-4">
-            {displayedPhotos.map((photo, index) => {
+          <div className="grid grid-cols-2 items-start gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {displayedPhotoColumns.map((column, columnIndex) => (
+              <div key={columnIndex} className="flex min-w-0 flex-col">
+              {column.map(({ photo, index }) => {
               const isSelected = selectedPhotoIds.has(photo.id);
               const photoIndex = photos.findIndex((item) => item.id === photo.id);
 
@@ -1167,19 +1231,17 @@ export const GalleryPage: React.FC = () => {
                 </motion.div>
               );
             })}
+              </div>
+            ))}
           </div>
         )}
 
         {!showFavoritesOnly && isWeddingGallery && visiblePhotos.length < photos.length && (
-          <div className="mt-10 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setVisiblePhotoCount((current) => current + WEDDING_GALLERY_BATCH_SIZE)}
-              className="inline-flex min-h-12 items-center rounded-full border border-black/12 px-7 font-sans text-[10px] font-bold uppercase tracking-[0.17em] transition-colors hover:bg-black hover:text-white"
-            >
-              Pokaż kolejne {Math.min(WEDDING_GALLERY_BATCH_SIZE, photos.length - visiblePhotos.length)} zdjęć
-            </button>
-          </div>
+          <div
+            ref={galleryLoadMoreTrigger}
+            className="h-px w-full"
+            aria-hidden="true"
+          />
         )}
       </main>
 
