@@ -126,6 +126,13 @@ export const resolveGallery = async (rawSlug) => {
       title: registeredGallery.title,
       date: registeredGallery.date || '',
       folder: normalizeDropboxPath(registeredGallery.folder),
+      ...(registeredGallery.fullResolutionFolder
+        ? {
+            fullResolutionFolder: normalizeDropboxPath(
+              registeredGallery.fullResolutionFolder
+            ),
+          }
+        : {}),
       coverPhoto: String(registeredGallery.coverPhoto || '').trim(),
       kind: getGalleryKind(registeredGallery),
     };
@@ -156,6 +163,9 @@ export const resolveGallery = async (rawSlug) => {
       title: String(event.title || titleFromSlug(slug)).trim(),
       date: String(event.date || '').trim(),
       folder: normalizeDropboxPath(event.folder || `${galleryRoot}/${slug}`),
+      ...(event.fullResolutionFolder
+        ? { fullResolutionFolder: normalizeDropboxPath(event.fullResolutionFolder) }
+        : {}),
       coverPhoto: String(event.coverPhoto || '').trim(),
       kind: getGalleryKind(event),
     };
@@ -332,6 +342,9 @@ const normalizeRegistry = (payload) => {
         title: String(gallery.title || '').trim(),
         date: String(gallery.date || '').trim(),
         folder,
+        fullResolutionFolder: gallery.fullResolutionFolder
+          ? normalizeDropboxPath(gallery.fullResolutionFolder)
+          : '',
         kind: getGalleryKind({ ...gallery, folder }),
         coverPhoto: String(gallery.coverPhoto || '').trim(),
         publicationConsent:
@@ -701,9 +714,21 @@ export const validatePhotoName = (rawName) => {
 export const buildPhotoPath = (gallery, rawName) =>
   `${gallery.folder}/${validatePhotoName(rawName)}`;
 
-export const listGalleryPhotos = async (gallery) => {
+export const buildFullResolutionPhotoPath = (gallery, rawName) => {
+  if (!gallery.fullResolutionFolder) {
+    throw new GalleryError(
+      'Folder zdjęć w pełnej rozdzielczości nie został ustawiony.',
+      404,
+      'full_resolution_folder_missing'
+    );
+  }
+
+  return `${gallery.fullResolutionFolder}/${validatePhotoName(rawName)}`;
+};
+
+const listPhotosInFolder = async (folder, gallery) => {
   let result = await dropboxRpc('files/list_folder', {
-    path: gallery.folder,
+    path: folder,
     recursive: false,
     include_deleted: false,
     include_non_downloadable_files: false,
@@ -739,6 +764,36 @@ export const listGalleryPhotos = async (gallery) => {
       modifiedAt: entry.client_modified || entry.server_modified,
       size: entry.size,
     }));
+};
+
+export const listGalleryPhotos = async (gallery) =>
+  listPhotosInFolder(gallery.folder, gallery);
+
+export const listGalleryFullResolutionPhotos = async (gallery) => {
+  if (!gallery.fullResolutionFolder) {
+    return [];
+  }
+
+  return listPhotosInFolder(gallery.fullResolutionFolder, gallery);
+};
+
+export const listMatchedFullResolutionPhotos = async (gallery) => {
+  if (!gallery.fullResolutionFolder) {
+    return [];
+  }
+
+  const [galleryPhotos, fullResolutionPhotos] = await Promise.all([
+    listGalleryPhotos(gallery),
+    listGalleryFullResolutionPhotos(gallery),
+  ]);
+  const originalsByName = new Map(
+    fullResolutionPhotos.map((photo) => [photo.name.toLocaleLowerCase('pl-PL'), photo])
+  );
+
+  return galleryPhotos.flatMap((photo) => {
+    const original = originalsByName.get(photo.name.toLocaleLowerCase('pl-PL'));
+    return original ? [{ ...original, galleryPhotoName: photo.name }] : [];
+  });
 };
 
 export const getPhotoThumbnail = async (path, requestedSize) => {

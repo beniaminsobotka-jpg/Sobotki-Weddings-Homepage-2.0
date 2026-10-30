@@ -37,12 +37,18 @@ type GalleryData = {
     title: string;
     date: string;
     kind: 'portraits' | 'weddings';
+    fullResolutionAvailable: boolean;
     coverPreviewUrl: string;
     coverUrl: string;
   };
   photos: GalleryPhoto[];
   refreshAfterMs: number;
   generatedAt: string;
+};
+
+type ArchivePhoto = {
+  name: string;
+  size: number;
 };
 
 declare global {
@@ -57,9 +63,9 @@ const FAVORITE_VISITOR_STORAGE_KEY = 'sobotki-gallery-favorite-visitor';
 const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
 const MAX_ZIP_PART_PHOTOS = 80;
 
-const splitPhotosIntoZipParts = (photos: GalleryPhoto[]) => {
-  const parts: GalleryPhoto[][] = [];
-  let currentPart: GalleryPhoto[] = [];
+const splitPhotosIntoZipParts = <Photo extends ArchivePhoto>(photos: Photo[]) => {
+  const parts: Photo[][] = [];
+  let currentPart: Photo[] = [];
   let currentSize = 0;
 
   photos.forEach((photo) => {
@@ -238,8 +244,11 @@ export const GalleryPage: React.FC = () => {
     () => new Set()
   );
   const [isDownloadingSelection, setIsDownloadingSelection] = useState(false);
+  const [isDownloadingFullResolution, setIsDownloadingFullResolution] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState('');
   const [selectionError, setSelectionError] = useState('');
+  const [fullResolutionDownloadError, setFullResolutionDownloadError] = useState('');
+  const [fullResolutionDownloadProgress, setFullResolutionDownloadProgress] = useState('');
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(WEDDING_GALLERY_BATCH_SIZE);
   const [galleryColumnCount, setGalleryColumnCount] = useState(() => {
     if (typeof window === 'undefined') {
@@ -757,6 +766,104 @@ export const GalleryPage: React.FC = () => {
     }
   }, [closeSelectionMode, isDownloadingSelection, photos, selectedPhotoIds, slug]);
 
+  const downloadAllFullResolutionPhotos = useCallback(async () => {
+    if (isDownloadingFullResolution) {
+      return;
+    }
+
+    setIsDownloadingFullResolution(true);
+    setFullResolutionDownloadError('');
+    setFullResolutionDownloadProgress('Sprawdzam oryginały…');
+
+    try {
+      const manifestResponse = await fetch(
+        `/api/gallery-full-resolution?slug=${encodeURIComponent(slug)}`,
+        { headers: { Accept: 'application/json' } }
+      );
+      const manifest = await manifestResponse.json().catch(() => null);
+
+      if (!manifestResponse.ok) {
+        throw new Error(
+          manifest?.error || 'Nie udało się wczytać zdjęć w pełnej rozdzielczości.'
+        );
+      }
+
+      if (Number(manifest?.missingPhotoCount || 0) > 0) {
+        throw new Error(
+          `Pełna galeria jest jeszcze przygotowywana — brakuje ${Number(
+            manifest.missingPhotoCount
+          )} oryginalnych plików.`
+        );
+      }
+
+      const fullResolutionPhotos = Array.isArray(manifest?.photos)
+        ? (manifest.photos as ArchivePhoto[])
+        : [];
+
+      if (!fullResolutionPhotos.length) {
+        throw new Error('Zdjęcia w pełnej rozdzielczości nie są jeszcze dostępne.');
+      }
+
+      const zipParts = splitPhotosIntoZipParts(fullResolutionPhotos);
+
+      for (let partIndex = 0; partIndex < zipParts.length; partIndex += 1) {
+        const part = zipParts[partIndex];
+        const names = part.map((photo) => photo.name);
+
+        setFullResolutionDownloadProgress(
+          zipParts.length > 1
+            ? `Pobieram paczkę ${partIndex + 1} z ${zipParts.length}…`
+            : 'Przygotowuję zdjęcia…'
+        );
+
+        const response = await fetch('/api/gallery-batch-download', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/zip, application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ slug, names, source: 'full' }),
+        });
+
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null);
+          throw new Error(
+            payload?.error || 'Nie udało się przygotować zdjęć w pełnej rozdzielczości.'
+          );
+        }
+
+        const archive = await response.blob();
+
+        if (!(await hasCompleteZipEndRecord(archive))) {
+          throw new Error(
+            'Pobieranie paczki zostało przerwane. Spróbuj ponownie za chwilę.'
+          );
+        }
+
+        const downloadUrl = window.URL.createObjectURL(archive);
+        const downloadLink = document.createElement('a');
+        const partSuffix =
+          zipParts.length > 1 ? `-czesc-${partIndex + 1}-z-${zipParts.length}` : '';
+
+        downloadLink.href = downloadUrl;
+        downloadLink.download = `sobotki-${slug}-pelna-rozdzielczosc${partSuffix}.zip`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+        window.setTimeout(() => window.URL.revokeObjectURL(downloadUrl), 5_000);
+      }
+    } catch (downloadError) {
+      setFullResolutionDownloadError(
+        downloadError instanceof Error
+          ? downloadError.message
+          : 'Nie udało się pobrać zdjęć w pełnej rozdzielczości.'
+      );
+    } finally {
+      setIsDownloadingFullResolution(false);
+      setFullResolutionDownloadProgress('');
+    }
+  }, [isDownloadingFullResolution, slug]);
+
   const showPrevious = useCallback(() => {
     if (!navigationPhotos.length) {
       return;
@@ -1242,6 +1349,41 @@ export const GalleryPage: React.FC = () => {
             className="h-px w-full"
             aria-hidden="true"
           />
+        )}
+
+        {displayedGallery?.fullResolutionAvailable && photos.length > 0 && (
+          <section className="mx-auto mt-14 max-w-2xl border-t border-black/10 px-4 pt-10 text-center sm:mt-20 sm:pt-14">
+            <p className="font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-black/38">
+              Oryginalne pliki
+            </p>
+            <h2 className="mt-3 font-serif text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
+              Pełna rozdzielczość
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg font-sans text-sm leading-6 text-black/50">
+              Pobierz wszystkie zdjęcia w jakości przygotowanej do druku. Duży reportaż może
+              zostać automatycznie podzielony na kilka bezpiecznych paczek ZIP.
+            </p>
+            <button
+              type="button"
+              onClick={() => void downloadAllFullResolutionPhotos()}
+              disabled={isDownloadingFullResolution}
+              className="mt-6 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-black px-7 py-4 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white transition-opacity hover:opacity-85 disabled:cursor-wait disabled:opacity-45"
+            >
+              {isDownloadingFullResolution ? (
+                <RefreshCw size={15} className="animate-spin" aria-hidden="true" />
+              ) : (
+                <Download size={15} aria-hidden="true" />
+              )}
+              {isDownloadingFullResolution
+                ? fullResolutionDownloadProgress || 'Przygotowuję…'
+                : 'Pobierz wszystkie w pełnej rozdzielczości'}
+            </button>
+            {fullResolutionDownloadError && (
+              <p className="mt-4 font-sans text-xs text-red-800" role="alert">
+                {fullResolutionDownloadError}
+              </p>
+            )}
+          </section>
         )}
       </main>
 

@@ -33,9 +33,12 @@ type GalleryRecord = {
   title: string;
   date: string;
   folder: string;
+  fullResolutionFolder: string;
   kind: 'portraits' | 'weddings';
   coverPhoto: string;
   photoCount: number | null;
+  fullResolutionPhotoCount: number | null;
+  matchedFullResolutionCount: number | null;
   publicationConsent: 'granted' | 'denied' | 'unknown';
   active: boolean;
   isBestOf?: boolean;
@@ -48,7 +51,10 @@ type GalleryAdminMode = 'chooser' | 'portraits' | 'weddings';
 type AdminGalleryPhoto = {
   id: string;
   name: string;
+  size: number;
   favoriteCount: number;
+  hasFullResolution: boolean;
+  fullResolutionSize: number;
   thumbnailUrl: string;
   downloadUrl: string;
 };
@@ -72,6 +78,7 @@ type FormState = {
   title: string;
   date: string;
   folder: string;
+  fullResolutionFolder: string;
   slug: string;
   publicationConsent: 'granted' | 'denied' | '';
   active: boolean;
@@ -82,10 +89,65 @@ const emptyForm = (): FormState => ({
   title: '',
   date: '',
   folder: '',
+  fullResolutionFolder: '',
   slug: '',
   publicationConsent: '',
   active: true,
 });
+
+const MAX_FULL_RESOLUTION_ZIP_BYTES = 40 * 1024 * 1024;
+const MAX_FULL_RESOLUTION_ZIP_PHOTOS = 80;
+
+const splitFullResolutionPhotos = (photos: AdminGalleryPhoto[]) => {
+  const parts: AdminGalleryPhoto[][] = [];
+  let currentPart: AdminGalleryPhoto[] = [];
+  let currentSize = 0;
+
+  photos.forEach((photo) => {
+    const size = Math.max(0, Number(photo.fullResolutionSize) || 0);
+
+    if (
+      currentPart.length >= MAX_FULL_RESOLUTION_ZIP_PHOTOS ||
+      (currentPart.length > 0 && currentSize + size > MAX_FULL_RESOLUTION_ZIP_BYTES)
+    ) {
+      parts.push(currentPart);
+      currentPart = [];
+      currentSize = 0;
+    }
+
+    currentPart.push(photo);
+    currentSize += size;
+  });
+
+  if (currentPart.length) {
+    parts.push(currentPart);
+  }
+
+  return parts;
+};
+
+const hasCompleteZipEndRecord = async (archive: Blob) => {
+  if (archive.size < 22) {
+    return false;
+  }
+
+  const tail = new Uint8Array(
+    await archive.slice(Math.max(0, archive.size - 65_557)).arrayBuffer()
+  );
+
+  for (let index = tail.length - 22; index >= 0; index -= 1) {
+    if (
+      tail[index] === 0x50 &&
+      tail[index + 1] === 0x4b &&
+      tail[index + 2] === 0x05 &&
+      tail[index + 3] === 0x06
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+};
 
 const slugify = (value: string) =>
   value
@@ -411,6 +473,10 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
   );
   const [browserError, setBrowserError] = useState('');
   const [isBrowserLoading, setIsBrowserLoading] = useState(false);
+  const [showBrowserFavoritesOnly, setShowBrowserFavoritesOnly] = useState(false);
+  const [isDownloadingBrowserFullResolution, setIsDownloadingBrowserFullResolution] =
+    useState(false);
+  const [browserDownloadProgress, setBrowserDownloadProgress] = useState('');
   const [cardGeneratingSlug, setCardGeneratingSlug] = useState('');
   const suffixRef = useRef('');
 
@@ -521,6 +587,24 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
   const activeGalleries = useMemo(
     () => visibleGalleries.filter((gallery) => gallery.active).length,
     [visibleGalleries]
+  );
+  const displayedBrowserPhotos = useMemo(
+    () =>
+      showBrowserFavoritesOnly
+        ? browserPhotos.filter((photo) => photo.favoriteCount > 0)
+        : browserPhotos,
+    [browserPhotos, showBrowserFavoritesOnly]
+  );
+  const favoriteOriginalCount = useMemo(
+    () =>
+      browserPhotos.filter(
+        (photo) => photo.favoriteCount > 0 && photo.hasFullResolution
+      ).length,
+    [browserPhotos]
+  );
+  const favoritePhotoCount = useMemo(
+    () => browserPhotos.filter((photo) => photo.favoriteCount > 0).length,
+    [browserPhotos]
   );
 
   const openCreateForm = () => {
@@ -688,10 +772,12 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
     }
   };
 
-  const openAdminBrowser = async (gallery: GalleryRecord) => {
+  const openAdminBrowser = async (gallery: GalleryRecord, favoritesOnly = false) => {
     setBrowserGallery(gallery);
     setBrowserPhotos([]);
     setSelectedBrowserPhotos(new Set());
+    setShowBrowserFavoritesOnly(favoritesOnly);
+    setBrowserDownloadProgress('');
     setBrowserError('');
     setIsBrowserLoading(true);
 
@@ -712,6 +798,94 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
       setBrowserError(getRequestErrorMessage(photoError, 'Nie udało się wczytać zdjęć.'));
     } finally {
       setIsBrowserLoading(false);
+    }
+  };
+
+  const downloadFavoriteFullResolutionPhotos = async () => {
+    if (!browserGallery || isDownloadingBrowserFullResolution) {
+      return;
+    }
+
+    const favoriteOriginals = browserPhotos.filter(
+      (photo) => photo.favoriteCount > 0 && photo.hasFullResolution
+    );
+
+    if (!favoriteOriginals.length) {
+      setBrowserError('Brakuje oryginałów odpowiadających wybranym zdjęciom.');
+      return;
+    }
+
+    setIsDownloadingBrowserFullResolution(true);
+    setBrowserError('');
+
+    try {
+      const zipParts = splitFullResolutionPhotos(favoriteOriginals);
+
+      for (let partIndex = 0; partIndex < zipParts.length; partIndex += 1) {
+        const part = zipParts[partIndex];
+        const names = part.map((photo) => photo.name);
+
+        setBrowserDownloadProgress(
+          zipParts.length > 1
+            ? `Pobieram paczkę ${partIndex + 1} z ${zipParts.length}…`
+            : 'Przygotowuję ZIP…'
+        );
+
+        const response = await fetchWithTimeout(
+          '/api/gallery-batch-download',
+          {
+            method: 'POST',
+            headers: {
+              Accept: 'application/zip, application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              slug: browserGallery.slug,
+              names,
+              source: 'full',
+              admin: true,
+            }),
+          },
+          60_000
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            await getErrorMessage(
+              response,
+              'Nie udało się przygotować oryginałów do pobrania.'
+            )
+          );
+        }
+
+        const archive = await response.blob();
+
+        if (!(await hasCompleteZipEndRecord(archive))) {
+          throw new Error('Pobieranie paczki zostało przerwane. Spróbuj ponownie.');
+        }
+
+        const downloadUrl = URL.createObjectURL(archive);
+        const link = document.createElement('a');
+        const partSuffix =
+          zipParts.length > 1 ? `-czesc-${partIndex + 1}-z-${zipParts.length}` : '';
+
+        link.href = downloadUrl;
+        link.download = `sobotki-${browserGallery.slug}-wybrane-do-druku${partSuffix}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 5_000);
+      }
+    } catch (downloadError) {
+      setBrowserError(
+        getRequestErrorMessage(
+          downloadError,
+          'Nie udało się pobrać zdjęć w pełnej rozdzielczości.'
+        )
+      );
+    } finally {
+      setIsDownloadingBrowserFullResolution(false);
+      setBrowserDownloadProgress('');
     }
   };
 
@@ -794,6 +968,7 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
       title: gallery.title,
       date: gallery.date,
       folder: gallery.folder,
+      fullResolutionFolder: gallery.fullResolutionFolder || '',
       slug: gallery.slug,
       publicationConsent:
         gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
@@ -1490,6 +1665,23 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                       </div>
 
                       <p className="mt-4 truncate font-sans text-[10px] text-black/42">{gallery.folder}</p>
+                      {mode === 'weddings' && gallery.fullResolutionFolder && (
+                        <p className="mt-1 truncate font-sans text-[10px] text-black/42">
+                          Oryginały: {gallery.fullResolutionFolder}
+                        </p>
+                      )}
+                      {mode === 'weddings' && !gallery.fullResolutionFolder && (
+                        <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-700/15 bg-amber-500/[0.09] px-3 py-2.5 font-sans text-[10px] leading-4 text-amber-900">
+                          <Folder size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+                          Dodaj folder zdjęć w pełnej rozdzielczości.
+                        </div>
+                      )}
+                      {mode === 'weddings' && gallery.fullResolutionFolder && (
+                        <p className="mt-2 font-sans text-[10px] text-black/48">
+                          Dopasowane oryginały: {gallery.matchedFullResolutionCount ?? '—'} z{' '}
+                          {gallery.photoCount ?? '—'}
+                        </p>
+                      )}
                       <p className="mt-1 truncate font-sans text-[10px] font-medium text-black/65">{publicUrl}</p>
                     </div>
                   </div>
@@ -1504,6 +1696,17 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                       <Eye size={14} aria-hidden="true" />
                       Przeglądaj galerię jako administrator
                     </button>
+                    {mode === 'weddings' && (
+                      <button
+                        type="button"
+                        onClick={() => void openAdminBrowser(gallery, true)}
+                        disabled={isLoading}
+                        className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white disabled:opacity-40 sm:col-span-1"
+                      >
+                        <Heart size={14} fill="currentColor" aria-hidden="true" />
+                        Przeglądaj zaznaczone zdjęcia
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => void copyGalleryUrl(gallery)}
@@ -1606,23 +1809,37 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                   {browserGallery.isBestOf ? 'Best Of' : 'Przeglądaj galerię'}
                 </h2>
                 {!browserGallery.isBestOf && (
-                  <div
-                    className={`mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-sans text-[8px] font-bold uppercase tracking-[0.14em] ${
-                      browserGallery.publicationConsent === 'granted'
-                        ? 'bg-emerald-700/10 text-emerald-800'
-                        : 'bg-red-700/10 text-red-800'
-                    }`}
-                  >
-                    {browserGallery.publicationConsent === 'granted' ? (
-                      <ShieldCheck size={13} aria-hidden="true" />
-                    ) : (
-                      <ShieldX size={13} aria-hidden="true" />
-                    )}
-                    {browserGallery.publicationConsent === 'granted'
-                      ? 'Możesz dodawać zdjęcia do Best Of'
-                      : browserGallery.publicationConsent === 'denied'
-                        ? 'Brak zgody — dodawanie do Best Of zablokowane'
-                        : 'Zgoda nieustawiona — dodawanie do Best Of zablokowane'}
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <div
+                      className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-sans text-[8px] font-bold uppercase tracking-[0.14em] ${
+                        browserGallery.publicationConsent === 'granted'
+                          ? 'bg-emerald-700/10 text-emerald-800'
+                          : 'bg-red-700/10 text-red-800'
+                      }`}
+                    >
+                      {browserGallery.publicationConsent === 'granted' ? (
+                        <ShieldCheck size={13} aria-hidden="true" />
+                      ) : (
+                        <ShieldX size={13} aria-hidden="true" />
+                      )}
+                      {browserGallery.publicationConsent === 'granted'
+                        ? 'Możesz dodawać zdjęcia do Best Of'
+                        : browserGallery.publicationConsent === 'denied'
+                          ? 'Brak zgody — dodawanie do Best Of zablokowane'
+                          : 'Zgoda nieustawiona — dodawanie do Best Of zablokowane'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowBrowserFavoritesOnly((current) => !current)}
+                      className={`inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 font-sans text-[8px] font-bold uppercase tracking-[0.13em] ${
+                        showBrowserFavoritesOnly
+                          ? 'bg-black text-white'
+                          : 'border border-black/10 text-black/60'
+                      }`}
+                    >
+                      {showBrowserFavoritesOnly ? <Image size={12} /> : <Heart size={12} />}
+                      {showBrowserFavoritesOnly ? 'Pokaż wszystkie' : 'Tylko zaznaczone'}
+                    </button>
                   </div>
                 )}
               </div>
@@ -1648,20 +1865,22 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                 </div>
               )}
 
-              {!isBrowserLoading && browserPhotos.length === 0 && !browserError && (
+              {!isBrowserLoading && displayedBrowserPhotos.length === 0 && !browserError && (
                 <div className="flex min-h-56 flex-col items-center justify-center text-center">
                   <Image size={30} className="text-black/25" aria-hidden="true" />
                   <p className="mt-4 font-serif text-2xl font-black uppercase">
                     {browserGallery.isBestOf
                       ? 'Best Of jest jeszcze puste'
-                      : 'W galerii nie ma jeszcze zdjęć'}
+                      : showBrowserFavoritesOnly
+                        ? 'Klienci nie zaznaczyli jeszcze zdjęć'
+                        : 'W galerii nie ma jeszcze zdjęć'}
                   </p>
                 </div>
               )}
 
-              {browserPhotos.length > 0 && (
+              {displayedBrowserPhotos.length > 0 && (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-                  {browserPhotos.map((photo, index) => {
+                  {displayedBrowserPhotos.map((photo, index) => {
                     const selected = selectedBrowserPhotos.has(photo.name);
                     const canSelect =
                       !browserGallery.isBestOf &&
@@ -1731,6 +1950,14 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                   {browserError}
                 </p>
               )}
+              {!browserError &&
+                browserGallery.fullResolutionFolder &&
+                favoritePhotoCount > favoriteOriginalCount && (
+                  <p className="mt-4 rounded-xl border border-amber-700/15 bg-amber-500/[0.08] p-4 font-sans text-xs leading-5 text-amber-900">
+                    Brakuje {favoritePhotoCount - favoriteOriginalCount} oryginalnych plików dla
+                    zdjęć wybranych przez klientów. Sprawdź nazwy w obu folderach.
+                  </p>
+                )}
             </div>
 
             <div className="shrink-0 border-t border-black/[0.08] p-4 sm:p-6">
@@ -1771,23 +1998,44 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                       </button>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => void addSelectedToBestOf()}
-                    disabled={
-                      isBrowserLoading ||
-                      !selectedBrowserPhotos.size ||
-                      browserGallery.publicationConsent !== 'granted'
-                    }
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-black px-6 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white disabled:cursor-not-allowed disabled:opacity-30"
-                  >
-                    {isBrowserLoading ? (
-                      <Loader2 size={15} className="animate-spin" aria-hidden="true" />
-                    ) : (
-                      <Sparkles size={15} aria-hidden="true" />
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    {browserGallery.fullResolutionFolder && (
+                      <button
+                        type="button"
+                        onClick={() => void downloadFavoriteFullResolutionPhotos()}
+                        disabled={
+                          isDownloadingBrowserFullResolution || !favoriteOriginalCount
+                        }
+                        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-black/15 px-5 font-sans text-[8px] font-bold uppercase tracking-[0.14em] disabled:cursor-not-allowed disabled:opacity-30"
+                      >
+                        {isDownloadingBrowserFullResolution ? (
+                          <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+                        ) : (
+                          <Download size={15} aria-hidden="true" />
+                        )}
+                        {isDownloadingBrowserFullResolution
+                          ? browserDownloadProgress || 'Przygotowuję…'
+                          : `Pobierz zaznaczone w pełnej (${favoriteOriginalCount})`}
+                      </button>
                     )}
-                    Dodaj wybrane do Best Of
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => void addSelectedToBestOf()}
+                      disabled={
+                        isBrowserLoading ||
+                        !selectedBrowserPhotos.size ||
+                        browserGallery.publicationConsent !== 'granted'
+                      }
+                      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-black px-6 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white disabled:cursor-not-allowed disabled:opacity-30"
+                    >
+                      {isBrowserLoading ? (
+                        <Loader2 size={15} className="animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Sparkles size={15} aria-hidden="true" />
+                      )}
+                      Dodaj wybrane do Best Of
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -2074,10 +2322,19 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
               </fieldset>
 
               <label className="block font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">
-                Folder na Dropboxie
+                Folder zdjęć do galerii
                 <select
                   value={form.folder}
-                  onChange={(event) => setForm((current) => ({ ...current, folder: event.target.value }))}
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      folder: event.target.value,
+                      fullResolutionFolder:
+                        current.fullResolutionFolder === event.target.value
+                          ? ''
+                          : current.fullResolutionFolder,
+                    }))
+                  }
                   required
                   className="mt-2 min-h-[52px] w-full rounded-xl border border-black/12 bg-white/50 px-4 font-sans text-sm font-normal normal-case tracking-normal outline-none focus:border-black/40"
                 >
@@ -2087,6 +2344,35 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                   ))}
                 </select>
               </label>
+
+              {mode === 'weddings' && (
+                <label className="block font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">
+                  Folder zdjęć w pełnej rozdzielczości
+                  <select
+                    value={form.fullResolutionFolder}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        fullResolutionFolder: event.target.value,
+                      }))
+                    }
+                    className="mt-2 min-h-[52px] w-full rounded-xl border border-black/12 bg-white/50 px-4 font-sans text-sm font-normal normal-case tracking-normal outline-none focus:border-black/40"
+                  >
+                    <option value="">Dodam później</option>
+                    {visibleFolders
+                      .filter((folder) => folder.path !== form.folder)
+                      .map((folder) => (
+                        <option key={folder.path} value={folder.path}>
+                          {folder.name}
+                        </option>
+                      ))}
+                  </select>
+                  <span className="mt-2 block font-sans text-[10px] font-normal normal-case tracking-normal text-black/38">
+                    Pliki zostaną automatycznie połączone po identycznych nazwach. Jeśli pominiesz
+                    ten folder, panel przypomni o jego dodaniu.
+                  </span>
+                </label>
+              )}
 
               <label className="block font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">
                 Adres galerii

@@ -47,6 +47,7 @@ export default async function handler(request, response) {
         title: gallery.title,
         date: gallery.date,
         kind: gallery.kind || 'portraits',
+        fullResolutionAvailable: Boolean(gallery.fullResolutionFolder),
         coverPreviewUrl: coverPreviewQuery
           ? `/api/gallery-photo?${coverPreviewQuery.toString()}`
           : '',

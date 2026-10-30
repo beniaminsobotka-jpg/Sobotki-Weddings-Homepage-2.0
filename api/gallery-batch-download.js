@@ -1,10 +1,14 @@
 import {
   GalleryError,
   buildPhotoPath,
+  buildFullResolutionPhotoPath,
   getPhotoFile,
+  getGalleryRegistry,
+  listGalleryFullResolutionPhotos,
   listGalleryPhotos,
   resolveGallery,
 } from '../server/dropbox-gallery.js';
+import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
 
 const MAX_ARCHIVE_PHOTOS = 100;
 const MAX_ARCHIVE_BYTES = 50 * 1024 * 1024;
@@ -129,8 +133,11 @@ const createEndRecord = ({ count, centralSize, centralOffset }) => {
   return record;
 };
 
-const downloadPhoto = async (gallery, photo) => {
-  const fileResponse = await getPhotoFile(buildPhotoPath(gallery, photo.name));
+const downloadPhoto = async (gallery, photo, useFullResolution) => {
+  const path = useFullResolution
+    ? buildFullResolutionPhotoPath(gallery, photo.name)
+    : buildPhotoPath(gallery, photo.name);
+  const fileResponse = await getPhotoFile(path);
   const contents = Buffer.from(await fileResponse.arrayBuffer());
 
   return {
@@ -168,10 +175,27 @@ export default async function handler(request, response) {
       );
     }
 
-    const gallery = await resolveGallery(body.slug);
-    const photos = await listGalleryPhotos(gallery);
-    const photosByName = new Map(photos.map((photo) => [photo.name, photo]));
-    const selectedPhotos = requestedNames.map((name) => photosByName.get(name));
+    const useAdminGallery = body.admin === true && isGalleryAdmin(request);
+    const gallery = useAdminGallery
+      ? (await getGalleryRegistry({ fresh: true }))?.galleries.find(
+          (item) => item.slug === body.slug
+        )
+      : await resolveGallery(body.slug);
+
+    if (!gallery) {
+      throw new GalleryError('Nie znaleziono takiej galerii.', 404, 'gallery_not_found');
+    }
+
+    const useFullResolution = body.source === 'full';
+    const photos = useFullResolution
+      ? await listGalleryFullResolutionPhotos(gallery)
+      : await listGalleryPhotos(gallery);
+    const photosByName = new Map(
+      photos.map((photo) => [photo.name.toLocaleLowerCase('pl-PL'), photo])
+    );
+    const selectedPhotos = requestedNames.map((name) =>
+      photosByName.get(name.toLocaleLowerCase('pl-PL'))
+    );
 
     if (selectedPhotos.some((photo) => !photo)) {
       throw new GalleryError(
@@ -194,7 +218,9 @@ export default async function handler(request, response) {
       );
     }
 
-    const archiveName = `sobotki-${gallery.slug}-${selectedPhotos.length}-zdjec.zip`;
+    const archiveName = `sobotki-${gallery.slug}-${
+      useFullResolution ? 'pelna-rozdzielczosc-' : ''
+    }${selectedPhotos.length}-zdjec.zip`;
     response.status(200);
     response.setHeader('Content-Type', 'application/zip');
     response.setHeader('Content-Disposition', `attachment; filename="${archiveName}"`);
@@ -206,7 +232,7 @@ export default async function handler(request, response) {
     for (let index = 0; index < selectedPhotos.length; index += DOWNLOAD_CONCURRENCY) {
       const batch = selectedPhotos.slice(index, index + DOWNLOAD_CONCURRENCY);
       const downloadedPhotos = await Promise.all(
-        batch.map((photo) => downloadPhoto(gallery, photo))
+        batch.map((photo) => downloadPhoto(gallery, photo, useFullResolution))
       );
 
       for (const photo of downloadedPhotos) {

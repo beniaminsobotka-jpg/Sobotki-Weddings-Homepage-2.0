@@ -9,6 +9,7 @@ import {
   getGalleryKind,
   getGalleryRegistry,
   getGalleryRoot,
+  listGalleryFullResolutionPhotos,
   listGalleryFolders,
   listGalleryPhotos,
   saveGalleryRegistry,
@@ -101,10 +102,30 @@ const getAdminData = async () => {
   const galleries = await Promise.all(
     (registry?.galleries || []).map(async (gallery) => {
       try {
-        const photos = await listGalleryPhotos(gallery);
-        return { ...gallery, photoCount: photos.length };
+        const [photos, fullResolutionPhotos] = await Promise.all([
+          listGalleryPhotos(gallery),
+          listGalleryFullResolutionPhotos(gallery),
+        ]);
+        const fullResolutionNames = new Set(
+          fullResolutionPhotos.map((photo) => photo.name.toLocaleLowerCase('pl-PL'))
+        );
+        const matchedFullResolutionCount = photos.filter((photo) =>
+          fullResolutionNames.has(photo.name.toLocaleLowerCase('pl-PL'))
+        ).length;
+
+        return {
+          ...gallery,
+          photoCount: photos.length,
+          fullResolutionPhotoCount: fullResolutionPhotos.length,
+          matchedFullResolutionCount,
+        };
       } catch {
-        return { ...gallery, photoCount: null };
+        return {
+          ...gallery,
+          photoCount: null,
+          fullResolutionPhotoCount: gallery.fullResolutionFolder ? null : 0,
+          matchedFullResolutionCount: null,
+        };
       }
     })
   );
@@ -140,10 +161,14 @@ export default async function handler(request, response) {
           return sendJson(response, 404, { error: 'Nie znaleziono galerii.' });
         }
 
-        const [photos, favorites] = await Promise.all([
+        const [photos, fullResolutionPhotos, favorites] = await Promise.all([
           listPhotosOrEmpty(gallery),
+          listGalleryFullResolutionPhotos(gallery).catch(() => []),
           getGalleryFavoriteSummary(gallery).catch(() => ({ counts: {}, selected: [] })),
         ]);
+        const fullResolutionByName = new Map(
+          fullResolutionPhotos.map((photo) => [photo.name.toLocaleLowerCase('pl-PL'), photo])
+        );
 
         return sendJson(response, 200, {
           gallery: {
@@ -162,7 +187,13 @@ export default async function handler(request, response) {
             return {
               id: photo.id,
               name: photo.name,
+              size: photo.size,
               favoriteCount: favorites.counts[photo.name] || 0,
+              hasFullResolution: fullResolutionByName.has(
+                photo.name.toLocaleLowerCase('pl-PL')
+              ),
+              fullResolutionSize:
+                fullResolutionByName.get(photo.name.toLocaleLowerCase('pl-PL'))?.size || 0,
               thumbnailUrl: `/api/admin-gallery-photo?${query.toString()}`,
               largeUrl: `/api/admin-gallery-photo?${query.toString()}&size=large`,
               downloadUrl: `/api/admin-gallery-photo?${query.toString()}&download=1`,
@@ -327,6 +358,7 @@ export default async function handler(request, response) {
     const title = normalizeText(body.gallery?.title, 100);
     const date = normalizeText(body.gallery?.date, 100);
     const folder = normalizeText(body.gallery?.folder, 512);
+    const fullResolutionFolder = normalizeText(body.gallery?.fullResolutionFolder, 512);
     const originalSlug = normalizeText(body.gallery?.originalSlug, 96).toLowerCase();
     const publicationConsent = normalizeText(body.gallery?.publicationConsent, 16);
     let slug;
@@ -357,6 +389,23 @@ export default async function handler(request, response) {
       });
     }
 
+    if (
+      fullResolutionFolder &&
+      !availableFolders.some(
+        (availableFolder) => availableFolder.path === fullResolutionFolder
+      )
+    ) {
+      return sendJson(response, 400, {
+        error: `Wybierz folder pełnej rozdzielczości znajdujący się w ${getGalleryRoot()}.`,
+      });
+    }
+
+    if (fullResolutionFolder && fullResolutionFolder === folder) {
+      return sendJson(response, 400, {
+        error: 'Folder galerii i folder pełnej rozdzielczości muszą być różne.',
+      });
+    }
+
     const existingIndex = originalSlug
       ? registry.galleries.findIndex((gallery) => gallery.slug === originalSlug)
       : -1;
@@ -374,6 +423,7 @@ export default async function handler(request, response) {
       title,
       date,
       folder,
+      fullResolutionFolder,
       kind: getGalleryKind({ folder }),
       coverPhoto:
         existingIndex >= 0 ? String(registry.galleries[existingIndex].coverPhoto || '') : '',
