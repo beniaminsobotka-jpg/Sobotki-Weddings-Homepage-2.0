@@ -2074,7 +2074,15 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                             ? 'Wasza galeria ślubna'
                             : 'Wasza galeria'}
                         </p>
-                        <p className="mt-2 text-balance font-serif text-[clamp(1.55rem,4vw,3rem)] font-black uppercase leading-[0.88] tracking-[-0.055em]">
+                        <p
+                          className="mt-2 whitespace-nowrap font-serif font-black uppercase leading-none tracking-[-0.06em]"
+                          style={{
+                            fontSize: `clamp(0.7rem, ${Math.min(
+                              2.7,
+                              36 / Math.max(coverGallery.title.length, 1)
+                            )}vw, 2.15rem)`,
+                          }}
+                        >
                           {coverGallery.title}
                         </p>
                         {coverGallery.date && (
