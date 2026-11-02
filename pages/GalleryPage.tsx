@@ -272,13 +272,6 @@ export const GalleryPage: React.FC = () => {
   const [fullResolutionDownloadError, setFullResolutionDownloadError] = useState('');
   const [fullResolutionDownloadProgress, setFullResolutionDownloadProgress] = useState('');
   const [visiblePhotoCount, setVisiblePhotoCount] = useState(WEDDING_GALLERY_BATCH_SIZE);
-  const [galleryColumnCount, setGalleryColumnCount] = useState(() => {
-    if (typeof window === 'undefined') {
-      return 2;
-    }
-
-    return window.innerWidth >= 1024 ? 4 : window.innerWidth >= 640 ? 3 : 2;
-  });
   const [favoriteCounts, setFavoriteCounts] = useState<Record<string, number>>({});
   const [favoritePhotoNames, setFavoritePhotoNames] = useState<Set<string>>(() => new Set());
   const [pendingFavoritePhotos, setPendingFavoritePhotos] = useState<Set<string>>(
@@ -478,20 +471,14 @@ export const GalleryPage: React.FC = () => {
       const groupPhotos = isWeddingGallery
         ? displayedPhotos.filter((photo) => photo.segmentKey === segment.key)
         : displayedPhotos;
-      const columns = Array.from(
-        { length: galleryColumnCount },
-        () => [] as Array<{ photo: GalleryPhoto; index: number }>
-      );
+      const indexedPhotos = groupPhotos.map((photo) => ({
+        photo,
+        index: globalIndex++,
+      }));
 
-      groupPhotos.forEach((photo, groupIndex) => {
-        const index = globalIndex;
-        columns[groupIndex % galleryColumnCount].push({ photo, index });
-        globalIndex += 1;
-      });
-
-      return { ...segment, columns };
+      return { ...segment, photos: indexedPhotos };
     });
-  }, [displayedPhotos, galleryColumnCount, gallerySegments, isWeddingGallery]);
+  }, [displayedPhotos, gallerySegments, isWeddingGallery]);
   const navigationPhotos = showFavoritesOnly ? favoritePhotos : segmentFilteredPhotos;
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
   const selectedNavigationIndex = selectedPhoto
@@ -531,19 +518,6 @@ export const GalleryPage: React.FC = () => {
       setActiveSegmentKey('all');
     }
   }, [activeSegmentKey, gallerySegments]);
-
-  useEffect(() => {
-    const updateColumnCount = () => {
-      setGalleryColumnCount(
-        window.innerWidth >= 1024 ? 4 : window.innerWidth >= 640 ? 3 : 2
-      );
-    };
-
-    updateColumnCount();
-    window.addEventListener('resize', updateColumnCount, { passive: true });
-
-    return () => window.removeEventListener('resize', updateColumnCount);
-  }, []);
 
   useEffect(() => {
     const trigger = galleryLoadMoreTrigger.current;
@@ -1366,10 +1340,8 @@ export const GalleryPage: React.FC = () => {
                     </span>
                   </div>
                 )}
-                <div className="grid grid-cols-2 items-start gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-            {group.columns.map((column, columnIndex) => (
-              <div key={columnIndex} className="flex min-w-0 flex-col">
-              {column.map(({ photo, index }) => {
+                <div className="columns-2 gap-2 sm:columns-3 sm:gap-4 lg:columns-4">
+              {group.photos.map(({ photo, index }) => {
               const isSelected = selectedPhotoIds.has(photo.id);
               const photoIndex = photos.findIndex((item) => item.id === photo.id);
 
@@ -1379,7 +1351,7 @@ export const GalleryPage: React.FC = () => {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.45, delay: Math.min(index * 0.025, 0.35) }}
-                  className={`group relative mb-2 block w-full break-inside-avoid overflow-hidden bg-black/[0.08] text-left sm:mb-4 ${
+                  className={`group relative mb-2 inline-block w-full break-inside-avoid overflow-hidden bg-black/[0.08] text-left align-top sm:mb-4 ${
                     isSelected ? 'ring-4 ring-black ring-offset-2 ring-offset-[#f3f2ed]' : ''
                   }`}
                 >
@@ -1483,8 +1455,6 @@ export const GalleryPage: React.FC = () => {
                 </motion.div>
               );
             })}
-              </div>
-            ))}
                 </div>
               </section>
             ))}
