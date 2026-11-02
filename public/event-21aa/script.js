@@ -31,6 +31,7 @@ function update() {
     byId('eventExtras').textContent = money(quote.extras);
     byId('eventPrintCost').textContent = money(quote.printCost);
     byId('eventHours').textContent = `${quote.hours} godziny pracy`;
+    byId('eventHourLabel').textContent = `Dodatkowa godzina · łącznie ${quote.baseHours + 1}h`;
     byId('eventTeam').textContent = `${quote.photographers} fotografów na miejscu`;
     byId('eventHourSuggestion').hidden = !quote.recommendHour || hour.checked;
     const tierIndex = EVENT_TIERS.findIndex((tier) => quote.guests <= tier.max);

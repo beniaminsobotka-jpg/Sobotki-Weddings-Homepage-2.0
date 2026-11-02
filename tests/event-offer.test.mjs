@@ -6,14 +6,14 @@ import handler from '../api/offer-lead.js';
 
 test('event prices, recommendations and team size at every boundary', () => {
   for (const [guests, price, photographers, recommendation] of [
-    [20,3200,2,false],[60,3200,2,false],[61,3500,2,false],[150,3500,2,false],
+    [20,2800,2,false],[44,2800,2,false],[45,2800,2,false],[46,3200,2,false],[60,3200,2,false],[61,3500,2,false],[150,3500,2,false],
     [151,3800,2,false],[250,3800,2,false],[251,4100,2,true],[400,4100,2,true],
     [401,5000,3,true],[1000,5000,3,true],[100000,5000,3,true],
   ]) {
     const quote = getEventQuote(guests);
     assert.equal(quote.base, price);
     assert.equal(quote.total, price, 'recommended hour is never silently charged');
-    assert.equal(quote.hours, 3);
+    assert.equal(quote.hours, guests <= 45 ? 2 : 3);
     assert.equal(quote.photographers, photographers);
     assert.equal(quote.recommendHour, recommendation);
   }
@@ -23,7 +23,12 @@ test('extras and prints add up, transport stays separate', () => {
   assert.equal(quote.total, 6575);
   assert.equal(quote.hours, 4);
   assert.equal(quote.printCost, 175);
-  assert.equal(getEventQuote(20,{extraPrints:1}).total,3201.75);
+  assert.equal(getEventQuote(20,{extraPrints:1}).total,2801.75);
+  for (const guests of [20,45,46,60]) {
+    const extended = getEventQuote(guests,{hour:true});
+    assert.equal(extended.hours,guests<=45?3:4);
+    assert.equal(extended.total,guests<=45?3300:3700);
+  }
   for (const guests of [0,19,20.5,'',NaN,Infinity,100001]) assert.throws(() => getEventQuote(guests));
   for (const extraPrints of [-1,1.5,NaN,100001]) assert.throws(() => getEventQuote(20,{extraPrints}));
 });
