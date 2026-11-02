@@ -22,15 +22,21 @@ Boundary ranges were clarified to avoid overlapping endpoints:
 
 | Participants | Base price | Photographers |
 | --- | --- | --- |
-| 20–60 | PLN 3,200 | 2 |
+| 20–45 (2h) | PLN 2,800 | 2 |
+| 46–60 (3h) | PLN 3,200 | 2 |
 | 61–150 | PLN 3,500 | 2 |
 | 151–250 | PLN 3,800 | 2 |
 | 251–400 | PLN 4,100 | 2 |
 | 401+ | PLN 5,000 | 3 |
 
-All base prices include 3 hours, setup outside the working time, studio,
+Owner explicitly approved updating existing V1 on 2 November 2026: the 20–45
+participant tier now includes 2 hours for PLN 2,800. All other tiers stay unchanged.
+An optional additional hour still costs PLN 500: 3h total for the smallest tier,
+4h total for the other tiers. The public URL and V1 designation are unchanged.
+
+Base prices include 2 hours for 20–45 participants or 3 hours from 46, setup outside the working time, studio,
 200 prints (10×15 cm) and unlimited digital photos with QR gallery access.
-Extras: cinematic circle PLN 300; guestbook PLN 600; fourth hour PLN 500.
+Extras: cinematic circle PLN 300; guestbook PLN 600; additional hour PLN 500.
 Above 250 participants the fourth hour is recommended, never selected or charged
 automatically. Extra prints cost PLN 1.75 each. The calculator estimates these,
 but final settlement uses actual additional prints. Transport is separate at
@@ -41,7 +47,27 @@ count, extras, version and URL, and notify the owner via the existing email
 endpoint. They do not sync Brevo contacts or emit wedding automation events.
 No PDF is sent. Existing wedding API behaviour remains unchanged.
 
-## Verification
+## Three location variants — approved 2 November 2026
+
+All three are V1 offers, not changes to the six wedding offers. Existing base URL
+and its prices remain untouched. Only base package prices increase; transport
+is still additional at PLN 1/km from Gliwice, and extras keep the same prices.
+The variants do not add client-facing distance labels or automatically select a
+location band. The owner chooses which link to share, as with the wedding offers.
+
+| Variant | URL | Base price uplift | 20–45 participants / 2h |
+| --- | --- | --- | --- |
+| Base | `/event-21aa/` | PLN 0 | PLN 2,800 |
+| II | `/event-6f82/` | PLN 300 | PLN 3,100 |
+| III | `/event-5990/` | PLN 600 | PLN 3,400 |
+
+Each variant has independent HTML, calculator, form script and CSS copies, and
+its own snapshot ID/link in the owner's notification. The same frozen wedding
+media are reused. The public enquiry summary still hides version and snapshot ID.
+The one-time generator `scripts/generate-event-location-offers.mjs` refuses to
+overwrite any existing variant directory. Keep this URL mapping private.
+
+### Verification
 
 `node --test tests/event-offer.test.mjs tests/offer-versioning.test.mjs`
 checks every pricing boundary, extras, validation, unchanged wedding snapshots,

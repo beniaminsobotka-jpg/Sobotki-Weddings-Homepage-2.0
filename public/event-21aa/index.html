@@ -54,7 +54,7 @@
             Fotostacja to mobilne studio czarno-białych portretów na eventy firmowe, gale i spotkania zespołów. W centrum uwagi są uczestnicy Waszego wydarzenia. To elegancka i ponadczasowa alternatywa dla standardowej fotobudki.
           </p>
           <p>
-            W ciągu 3 godzin pracy tworzymy profesjonalne portrety na białym tle,
+            W ciągu 2 godzin (20–45 uczestników) lub 3 godzin (od 46 uczestników) tworzymy profesjonalne portrety na białym tle,
             korzystając ze studyjnego oświetlenia. Zdjęcia od razu obrabiamy,
             zapisujemy w chmurze i drukujemy na miejscu, więc każdy może wyjść z
             eventu z gotową pamiątką.
@@ -176,7 +176,7 @@
       </section>
 
       <section id="wycena" class="section pricing-section reveal is-visible" aria-labelledby="pricing-title">
-  <div class="section-heading"><p class="eyebrow">Przejrzysta wycena</p><h2 id="pricing-title">Ile osób, <span class="serif-accent">taki pakiet.</span></h2><p>Wybierzcie liczbę uczestników. Cena obejmuje 3 godziny pracy, studio, zespół fotografów, galerię online i 200 odbitek.</p></div>
+  <div class="section-heading"><p class="eyebrow">Przejrzysta wycena</p><h2 id="pricing-title">Ile osób, <span class="serif-accent">taki pakiet.</span></h2><p>Wybierzcie liczbę uczestników. Dla 20–45 osób: 2 godziny za 2800 zł. Od 46 osób: 3 godziny według wybranego progu. Każdy pakiet obejmuje studio, zespół fotografów, galerię online i 200 odbitek.</p></div>
   <div class="event-calculator">
     <div class="event-controls">
       <div class="event-guests-label"><label for="eventGuests">Liczba uczestników</label><input id="eventGuests" type="number" value="90" min="20" max="100000" step="1" inputmode="numeric"></div>
@@ -184,11 +184,11 @@
       <input id="eventGuestsSlider" class="event-range" type="range" min="20" max="500" step="1" value="90" aria-describedby="sliderHint">
       <p id="sliderHint" class="event-muted">20 osób <span>500 osób</span></p><p class="event-fine">Większy event? Liczbę powyżej 500 wpiszcie w polu obok suwaka.</p>
       <div class="event-mobile-total"><span>Razem bez transportu</span><strong id="eventMobileTotal">3 500 zł</strong></div>
-      <details class="event-tier-details"><summary>Zobacz progi cenowe</summary><div class="event-tier-list" aria-label="Progi cenowe"><div data-event-tier="0"><span>20–60 osób</span><strong>3200 zł</strong></div><div data-event-tier="1"><span>61–150 osób</span><strong>3500 zł</strong></div><div data-event-tier="2"><span>151–250 osób</span><strong>3800 zł</strong></div><div data-event-tier="3"><span>251–400 osób</span><strong>4100 zł</strong></div><div data-event-tier="4"><span>Powyżej 400 osób</span><strong>5000 zł</strong></div></div></details>
+      <details class="event-tier-details"><summary>Zobacz progi cenowe</summary><div class="event-tier-list" aria-label="Progi cenowe"><div data-event-tier="0"><span>20–45 osób · 2h</span><strong>2800 zł</strong></div><div data-event-tier="1"><span>46–60 osób · 3h</span><strong>3200 zł</strong></div><div data-event-tier="2"><span>61–150 osób · 3h</span><strong>3500 zł</strong></div><div data-event-tier="3"><span>151–250 osób · 3h</span><strong>3800 zł</strong></div><div data-event-tier="4"><span>251–400 osób · 3h</span><strong>4100 zł</strong></div><div data-event-tier="5"><span>Powyżej 400 osób · 3h</span><strong>5000 zł</strong></div></div></details>
       <fieldset class="event-options"><legend>Opcjonalne dodatki</legend>
         <label><input id="eventFilm" type="checkbox"><span>Filmowe kółko</span><strong>+300 zł</strong></label>
         <label><input id="eventBook" type="checkbox"><span>Drukowana księga gości</span><strong>+600 zł</strong></label>
-        <label><input id="eventHour" type="checkbox"><span>Dodatkowa godzina · łącznie 4h</span><strong>+500 zł</strong></label>
+        <label><input id="eventHour" type="checkbox"><span id="eventHourLabel">Dodatkowa godzina · łącznie 4h</span><strong>+500 zł</strong></label>
       </fieldset>
       <label class="event-print-input" for="eventPrints">Planowane dodatkowe odbitki ponad 200 <input id="eventPrints" type="number" min="0" max="100000" step="1" value="0" inputmode="numeric"></label>
       <p class="event-fine">Opcjonalna symulacja: 1,75 zł/szt. Ostateczne rozliczenie według faktycznej liczby dodatkowych odbitek.</p>
@@ -239,7 +239,7 @@
             wyrazistego charakteru.
           </p>
           <p>
-            Możemy wykonać je jako część podstawowych 3 godzin albo wydłużyć pracę
+            Możemy wykonać je w ramach wybranego pakietu (2 lub 3 godziny) albo wydłużyć pracę
             o dodatkową godzinę. Zmiana oświetlenia zajmuje około 10 minut.
           </p>
         </div>
@@ -255,7 +255,7 @@
           <div class="addons-list">
   <article><span>Filmowe kółko · opcja dodatkowa</span><strong>+300 zł</strong></article>
   <article><span>Drukowana księga gości 30×30 cm · opcja dodatkowa</span><strong>+600 zł</strong></article>
-  <article><span>Dodatkowa godzina pracy · pakiet 4h</span><strong>+500 zł</strong></article>
+  <article><span>Dodatkowa godzina pracy · 3h zamiast 2h lub 4h zamiast 3h</span><strong>+500 zł</strong></article>
   <article><span>Każda odbitka ponad 200 w pakiecie</span><strong>1,75 zł/szt.</strong></article>
   <article id="transport-rate"><span>Transport od Gliwic · poza ceną pakietu</span><strong>1 zł/km</strong></article></div>
         </div>
@@ -295,7 +295,7 @@
         <div class="faq-layout">
           <div class="faq-list">
   <details><summary>Czy Fotostacja zastępuje reportaż z eventu?</summary><p>Nie. To dodatkowa atrakcja portretowa w wydzielonym miejscu. Fotograf reportażowy może równolegle dokumentować przebieg wydarzenia.</p></details>
-  <details><summary>Co dokładnie obejmuje cena?</summary><p>3 godziny pracy (bez przygotowania stanowiska), mobilne studio i oświetlenie, 2 fotografów do 400 uczestników lub 3 powyżej 400, 200 odbitek 10×15 cm oraz zdjęcia cyfrowe w galerii online. Transport i wybrane dodatki rozliczamy osobno.</p></details>
+  <details><summary>Co dokładnie obejmuje cena?</summary><p>Dla 20–45 uczestników: 2 godziny pracy za 2800 zł. Od 46 uczestników: 3 godziny według progu cenowego. Przygotowanie stanowiska nie wlicza się w czas pakietu. W cenie mobilne studio i oświetlenie, 2 fotografów do 400 uczestników lub 3 powyżej 400, 200 odbitek 10×15 cm oraz zdjęcia cyfrowe w galerii online. Transport i wybrane dodatki rozliczamy osobno.</p></details>
   <details><summary>Jak rozliczacie odbitki?</summary><p>Pierwsze 200 odbitek jest w cenie. Każda kolejna to 1,75 zł/szt. Rozliczamy faktycznie wydrukowane dodatkowe odbitki, nie liczbę uczestników ani pobranych plików.</p></details>
   <details><summary>Kiedy warto wydłużyć pakiet do 4 godzin?</summary><p>Przy więcej niż 250 uczestnikach sugerujemy dodatkową godzinę za 500 zł. Pakiet podstawowy nadal trwa 3 godziny — wydłużenie jest opcjonalne i zależy od Waszej decyzji.</p></details>
   <details><summary>Czy filmowe kółko i księga gości są w cenie?</summary><p>Nie. Filmowe kółko kosztuje dodatkowo 300 zł, a drukowana księga gości 600 zł. Filmowe portrety wykonujemy w ramach wybranego czasu pracy; zmiana oświetlenia zajmuje około 10 minut.</p></details>
