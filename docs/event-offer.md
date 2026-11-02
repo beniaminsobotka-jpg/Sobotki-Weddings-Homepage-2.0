@@ -47,7 +47,27 @@ count, extras, version and URL, and notify the owner via the existing email
 endpoint. They do not sync Brevo contacts or emit wedding automation events.
 No PDF is sent. Existing wedding API behaviour remains unchanged.
 
-## Verification
+## Three location variants — approved 2 November 2026
+
+All three are V1 offers, not changes to the six wedding offers. Existing base URL
+and its prices remain untouched. Only base package prices increase; transport
+is still additional at PLN 1/km from Gliwice, and extras keep the same prices.
+The variants do not add client-facing distance labels or automatically select a
+location band. The owner chooses which link to share, as with the wedding offers.
+
+| Variant | URL | Base price uplift | 20–45 participants / 2h |
+| --- | --- | --- | --- |
+| Base | `/event-21aa/` | PLN 0 | PLN 2,800 |
+| II | `/event-6f82/` | PLN 300 | PLN 3,100 |
+| III | `/event-5990/` | PLN 600 | PLN 3,400 |
+
+Each variant has independent HTML, calculator, form script and CSS copies, and
+its own snapshot ID/link in the owner's notification. The same frozen wedding
+media are reused. The public enquiry summary still hides version and snapshot ID.
+The one-time generator `scripts/generate-event-location-offers.mjs` refuses to
+overwrite any existing variant directory. Keep this URL mapping private.
+
+### Verification
 
 `node --test tests/event-offer.test.mjs tests/offer-versioning.test.mjs`
 checks every pricing boundary, extras, validation, unchanged wedding snapshots,
