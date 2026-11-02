@@ -3,6 +3,7 @@ import {
   listGalleryPhotos,
   resolveGallery,
 } from '../server/dropbox-gallery.js';
+import { createHash } from 'node:crypto';
 
 const PUBLIC_ORIGIN = 'https://www.sobotkiweddings.pl';
 
@@ -94,21 +95,17 @@ export default async function handler(request, response) {
     const isWeddingGallery = gallery.kind === 'weddings';
     const brandName = isWeddingGallery ? 'Sobotki Weddings' : 'Sobotki Portraits';
     const title = `${gallery.title} — galeria zdjęć | ${brandName}`;
-    const description = gallery.date
-      ? isWeddingGallery
-        ? `Galeria ślubna: ${gallery.title}, ${gallery.date}. Reportaż ślubny Sobotki Weddings.`
-        : `Galeria zdjęć: ${gallery.title}, ${gallery.date}. Portrety tworzone na żywo przez Sobotki Portraits.`
-      : isWeddingGallery
-        ? `Galeria ślubna: ${gallery.title}. Reportaż ślubny Sobotki Weddings.`
-        : `Galeria zdjęć: ${gallery.title}. Portrety tworzone na żywo przez Sobotki Portraits.`;
-    const imageUrl = sharePhoto
-      ? `${PUBLIC_ORIGIN}/api/gallery-photo?${new URLSearchParams({
-          slug: gallery.slug,
-          name: sharePhoto.name,
-          rev: sharePhoto.rev,
-          size: 'large',
-        }).toString()}`
-      : `${PUBLIC_ORIGIN}/sobotki-portraits-logo.png`;
+    const description = `${gallery.date ? `${gallery.date} · ` : ''}${isWeddingGallery
+      ? 'To był dobry dzień. Rozgośćcie się i zobaczcie całą galerię zdjęć.'
+      : 'Wasze portrety są tutaj. Oglądajcie i pobierajcie swoje ulubione kadry.'}`;
+    const imageVersion = createHash('sha256').update(JSON.stringify([
+      gallery.title, gallery.date, gallery.kind, sharePhoto?.name, sharePhoto?.rev, 'share-v1',
+    ])).digest('hex').slice(0, 16);
+    const imageUrl = `${PUBLIC_ORIGIN}/api/gallery-photo?${new URLSearchParams({
+      slug: gallery.slug,
+      size: 'share',
+      v: imageVersion,
+    }).toString()}`;
     const coverUrl = selectedCoverPhoto
       ? `${PUBLIC_ORIGIN}/api/gallery-photo?${new URLSearchParams({
           slug: gallery.slug,
@@ -131,14 +128,18 @@ export default async function handler(request, response) {
     html = replaceMeta(html, 'name', 'robots', 'noindex,nofollow,noarchive');
     html = replaceMeta(html, 'property', 'og:locale', 'pl_PL');
     html = replaceMeta(html, 'property', 'og:site_name', brandName);
-    html = replaceMeta(html, 'property', 'og:title', title);
+    html = replaceMeta(html, 'property', 'og:title', `${gallery.title} — galeria zdjęć`);
     html = replaceMeta(html, 'property', 'og:description', description);
     html = replaceMeta(html, 'property', 'og:image', imageUrl);
+    html = replaceMeta(html, 'property', 'og:image:secure_url', imageUrl);
+    html = replaceMeta(html, 'property', 'og:image:type', 'image/jpeg');
+    html = replaceMeta(html, 'property', 'og:image:width', '1200');
+    html = replaceMeta(html, 'property', 'og:image:height', '630');
     html = replaceMeta(html, 'property', 'og:image:alt', `Okładka galerii ${gallery.title}`);
     html = replaceMeta(html, 'property', 'og:type', 'website');
     html = replaceMeta(html, 'property', 'og:url', galleryUrl);
     html = replaceMeta(html, 'name', 'twitter:card', 'summary_large_image');
-    html = replaceMeta(html, 'name', 'twitter:title', title);
+    html = replaceMeta(html, 'name', 'twitter:title', `${gallery.title} — galeria zdjęć`);
     html = replaceMeta(html, 'name', 'twitter:description', description);
     html = replaceMeta(html, 'name', 'twitter:image', imageUrl);
     html = replaceCanonical(html, galleryUrl);
@@ -153,8 +154,15 @@ export default async function handler(request, response) {
       segments: getGallerySegments(photos, gallery),
     });
     html = injectImagePreload(html, coverPreviewUrl || coverUrl);
-  } catch {
-    // The client application will render its normal error state for missing galleries.
+  } catch (error) {
+    // A crawler must not cache the home page's metadata for a gallery when
+    // Dropbox is temporarily unavailable. Let it retry instead.
+    console.error('[Gallery preview] Metadata unavailable', { code: error.code || 'metadata_error' });
+    html = html.replace(/<meta\s+[^>]*(?:property=["']og:|name=["']twitter:)[^>]*>/gi, '');
+    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    response.setHeader('Cache-Control', 'private, no-store');
+    response.setHeader('Retry-After', '30');
+    return response.status(error.statusCode === 404 ? 404 : 503).end(request.method === 'HEAD' ? '' : html);
   }
 
   response.setHeader('Content-Type', 'text/html; charset=utf-8');

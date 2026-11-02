@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
+    "api/gallery-photo.js": {
+      "includeFiles": ["server/gallery-fonts.conf", "public/uploads/2024/01/*.ttf", "public/uploads/2024/11/InstrumentSerif-*.ttf"]
+    },
     "api/admin-galleries.js": {
       "maxDuration": 60
     },

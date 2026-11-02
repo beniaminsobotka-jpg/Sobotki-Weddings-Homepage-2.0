@@ -2,9 +2,11 @@ import {
   GalleryError,
   buildPhotoPath,
   getPhotoThumbnail,
+  listGalleryPhotos,
   getTemporaryPhotoLink,
   resolveGallery,
 } from '../server/dropbox-gallery.js';
+import { createGalleryShareImage } from '../server/gallery-share-image.js';
 
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -12,13 +14,28 @@ const sendJson = (response, status, body) => {
 };
 
 export default async function handler(request, response) {
-  if (request.method !== 'GET') {
-    response.setHeader('Allow', 'GET');
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    response.setHeader('Allow', 'GET, HEAD');
     return sendJson(response, 405, { error: 'Method not allowed' });
   }
 
   try {
     const gallery = await resolveGallery(request.query?.slug);
+    if (request.query?.size === 'share') {
+      const photos = await listGalleryPhotos(gallery);
+      const cover = photos.find((photo) => photo.name === gallery.coverPhoto) || photos[0];
+      let source = null;
+      if (cover) {
+        const thumbnail = await getPhotoThumbnail(buildPhotoPath(gallery, cover.name), 'large');
+        if (!thumbnail) throw new GalleryError('Okładka jest chwilowo niedostępna.', 502, 'share_cover_unavailable');
+        source = Buffer.from(await thumbnail.arrayBuffer());
+      }
+      const output = await createGalleryShareImage(source, gallery);
+      response.setHeader('Content-Type', 'image/jpeg');
+      response.setHeader('Cache-Control', 'public, max-age=300, s-maxage=86400');
+      response.setHeader('Content-Length', String(output.length));
+      return response.status(200).end(request.method === 'HEAD' ? undefined : output);
+    }
     const photoPath = buildPhotoPath(gallery, request.query?.name);
 
     if (request.query?.size === 'original') {
@@ -47,7 +64,7 @@ export default async function handler(request, response) {
       'public, max-age=31536000, s-maxage=31536000, immutable'
     );
     response.setHeader('Content-Length', String(imageBuffer.byteLength));
-    return response.status(200).end(imageBuffer);
+    return response.status(200).end(request.method === 'HEAD' ? undefined : imageBuffer);
   } catch (error) {
     const galleryError =
       error instanceof GalleryError
