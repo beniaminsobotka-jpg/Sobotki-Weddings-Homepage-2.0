@@ -1,3 +1,5 @@
+import { openDownloadStream, readDownloadError } from './download-stream.js';
+
 const DROPBOX_API_URL = 'https://api.dropboxapi.com/2';
 const DROPBOX_CONTENT_URL = 'https://content.dropboxapi.com/2';
 const IMAGE_EXTENSIONS = new Set([
@@ -1075,6 +1077,30 @@ export const getDropboxFolderZip = async (path) => {
   }
 
   return dropboxResponse;
+};
+
+export const getDropboxBinaryStream = async (path, { zip = false, signal } = {}) => {
+  const accessToken = await getAccessToken();
+  const stream = await openDownloadStream(
+    `${DROPBOX_CONTENT_URL}/files/${zip ? 'download_zip' : 'download'}`,
+    {
+      signal,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Dropbox-API-Arg': stringifyDropboxHeader({ path: normalizeDropboxPath(path) }),
+      },
+    }
+  );
+  if (stream.statusCode !== 200) {
+    const summary = await readDownloadError(stream);
+    throwDropboxAuthError({ status: stream.statusCode }, summary);
+    throw new GalleryError(
+      zip ? 'Dropbox nie mógł przygotować paczki ZIP.' : 'Nie udało się pobrać zdjęcia z Dropboxa.',
+      502,
+      'dropbox_stream_failed'
+    );
+  }
+  return stream;
 };
 
 const wait = (milliseconds) =>

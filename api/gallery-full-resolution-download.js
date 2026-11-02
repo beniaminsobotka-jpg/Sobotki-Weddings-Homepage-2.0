@@ -1,16 +1,15 @@
 import {
   GalleryError,
   buildPhotoPath,
-  getPhotoFile,
-  getDropboxFolderZip,
+  getDropboxBinaryStream,
   listGalleryFullResolutionPhotos,
   listGalleryPhotos,
   resolveGallery,
 } from '../server/dropbox-gallery.js';
 import { hasCoupleSession } from '../server/gallery-couple-auth.js';
 import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
-import { getPhotoZipSize, streamPhotoZip } from '../server/stream-photo-zip.js';
-import { Readable } from 'node:stream';
+import { streamPhotoZip } from '../server/stream-photo-zip.js';
+import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 
 const MAX_SINGLE_ZIP_BYTES = 20_000_000_000;
@@ -27,6 +26,10 @@ export default async function handler(request, response) {
     return sendJson(response, 405, { error: 'Method not allowed' });
   }
 
+  const controller = new AbortController();
+  const onClose = () => { if (!response.writableFinished) controller.abort(); };
+  response.once?.('close', onClose);
+  const startedAt = Date.now();
   try {
     const gallery = await resolveGallery(request.query?.slug);
     if (gallery.kind === 'weddings' && !hasCoupleSession(request, gallery) && !isGalleryAdmin(request)) {
@@ -82,8 +85,7 @@ export default async function handler(request, response) {
       return sendJson(response, 200, { photoCount: archivePhotos.length, totalBytes });
     }
 
-    const dropboxZip = social ? null : await getDropboxFolderZip(gallery.fullResolutionFolder);
-    if (!social && !dropboxZip?.body) throw new GalleryError('Dropbox nie zwrócił paczki ZIP.', 502, 'dropbox_zip_empty');
+    const dropboxZip = social ? null : await getDropboxBinaryStream(gallery.fullResolutionFolder, { zip: true, signal: controller.signal });
 
     response.status(200);
     response.setHeader('Content-Type', 'application/zip');
@@ -93,16 +95,32 @@ export default async function handler(request, response) {
     );
     response.setHeader('Cache-Control', 'private, no-store');
     response.setHeader('X-Accel-Buffering', 'no');
-    const contentLength = social
-      ? getPhotoZipSize(galleryPhotos).toString()
-      : dropboxZip.headers.get('content-length');
-    if (contentLength) response.setHeader('Content-Length', contentLength);
+    // Start a chunked response immediately instead of allowing a response adapter
+    // to collect a multi-gigabyte body using the declared Content-Length.
+    response.flushHeaders?.();
+    console.info('[Gallery ZIP] Started', { source: social ? 'social' : 'full', rssMB: Math.round(process.memoryUsage().rss / 1048576) });
 
     if (social) {
-      return await streamPhotoZip(galleryPhotos, (photo) => getPhotoFile(buildPhotoPath(gallery, photo.name)), response);
+      await streamPhotoZip(galleryPhotos, async (photo) => ({ body: await getDropboxBinaryStream(buildPhotoPath(gallery, photo.name), { signal: controller.signal }) }), response);
+    } else {
+      let bytes = 0;
+      let nextReport = 512 * 1024 * 1024;
+      const monitor = new Transform({
+        highWaterMark: 64 * 1024,
+        transform(chunk, _encoding, callback) {
+          bytes += chunk.length;
+          if (bytes >= nextReport) {
+            console.info('[Gallery ZIP] Progress', { bytes, rssMB: Math.round(process.memoryUsage().rss / 1048576) });
+            nextReport = bytes + 512 * 1024 * 1024;
+          }
+          callback(null, chunk);
+        },
+      });
+      await pipeline(dropboxZip, monitor, response, { signal: controller.signal });
     }
-    await pipeline(Readable.fromWeb(dropboxZip.body), response);
+    console.info('[Gallery ZIP] Completed', { durationMs: Date.now() - startedAt, rssMB: Math.round(process.memoryUsage().rss / 1048576) });
   } catch (error) {
+    console.error('[Gallery ZIP] Interrupted', { code: error.code || 'stream_error', durationMs: Date.now() - startedAt, rssMB: Math.round(process.memoryUsage().rss / 1048576) });
     const galleryError =
       error instanceof GalleryError
         ? error
@@ -125,5 +143,8 @@ export default async function handler(request, response) {
       error: galleryError.message,
       code: galleryError.code,
     });
+  } finally {
+    response.removeListener?.('close', onClose);
+    controller.abort();
   }
 }
