@@ -37,6 +37,7 @@ type GalleryRecord = {
   kind: 'portraits' | 'weddings';
   coverPhoto: string;
   segmentLabels: Record<string, string>;
+  selectionPinConfigured: boolean;
   segments: GallerySegment[];
   photoCount: number | null;
   fullResolutionPhotoCount: number | null;
@@ -82,6 +83,7 @@ type AdminData = {
 };
 
 type FormState = {
+  selectionPin: string;
   originalSlug: string;
   title: string;
   date: string;
@@ -94,6 +96,7 @@ type FormState = {
 };
 
 const emptyForm = (): FormState => ({
+  selectionPin: '',
   originalSlug: '',
   title: '',
   date: '',
@@ -914,6 +917,7 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
     setSlugTouched(true);
     setForm({
       originalSlug: gallery.slug,
+      selectionPin: '',
       title: gallery.title,
       date: gallery.date,
       folder: gallery.folder,
@@ -2402,6 +2406,29 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                   <span className="mt-2 block font-sans text-[10px] font-normal normal-case tracking-normal text-black/38">
                     Pliki zostaną automatycznie połączone po identycznych nazwach. Jeśli pominiesz
                     ten folder, panel przypomni o jego dodaniu.
+                  </span>
+                </label>
+              )}
+
+              {mode === 'weddings' && (
+                <label className="block rounded-2xl border border-black/10 bg-white/35 p-4 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">
+                  PIN pary młodej — wybór do druku
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    value={form.selectionPin}
+                    onChange={(event) => setForm((current) => ({ ...current, selectionPin: event.target.value.replace(/\D/g, '') }))}
+                    placeholder="Wpisz 6 cyfr"
+                    className="mt-3 min-h-12 w-full rounded-xl border border-black/12 bg-white/60 px-4 font-sans text-base tracking-[0.3em] outline-none focus:border-black/40"
+                  />
+                  <span className="mt-2 block text-[11px] font-normal normal-case leading-5 tracking-normal">
+                    Przekaż PIN tylko parze. Po odblokowaniu oboje korzystają ze wspólnej listy zdjęć.
+                    {data?.galleries.find((gallery) => gallery.slug === form.originalSlug)?.selectionPinConfigured
+                      ? ' PIN jest już ustawiony. Puste pole zachowuje obecny kod; nowy kod wyloguje poprzednie sesje.'
+                      : ' Ustaw PIN, aby uruchomić wybieranie zdjęć. Goście mogą oglądać i pobierać zdjęcia bez kodu.'}
                   </span>
                 </label>
               )}

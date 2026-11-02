@@ -1,4 +1,5 @@
 import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
+import { hashSelectionPin } from '../server/gallery-couple-auth.js';
 import {
   buildPhotoPath,
   copyPhotosBatch,
@@ -134,7 +135,9 @@ const getAdminData = async () => {
   );
 
   return {
-    galleries: galleries.sort(
+    galleries: galleries.map(({ selectionPinHash, ...gallery }) => ({
+      ...gallery, selectionPinConfigured: Boolean(selectionPinHash),
+    })).sort(
       (first, second) =>
         Number(second.active) - Number(first.active) ||
         second.createdAt.localeCompare(first.createdAt)
@@ -421,6 +424,10 @@ export default async function handler(request, response) {
     }
 
     const now = new Date().toISOString();
+    const selectionPin = String(body.gallery?.selectionPin || '').trim();
+    if (selectionPin && !/^\d{6}$/.test(selectionPin)) {
+      return sendJson(response, 400, { error: 'PIN do wyboru zdjęć musi mieć 6 cyfr.' });
+    }
     const savedGallery = {
       slug,
       title,
@@ -428,6 +435,9 @@ export default async function handler(request, response) {
       folder,
       fullResolutionFolder,
       kind: getGalleryKind({ folder }),
+      selectionPinHash: selectionPin
+        ? hashSelectionPin(selectionPin)
+        : existingIndex >= 0 ? registry.galleries[existingIndex].selectionPinHash || '' : '',
       coverPhoto:
         existingIndex >= 0 ? String(registry.galleries[existingIndex].coverPhoto || '') : '',
       segmentLabels:

@@ -258,6 +258,7 @@ export const resolveGallery = async (rawSlug) => {
           }
         : {}),
       coverPhoto: String(registeredGallery.coverPhoto || '').trim(),
+      ...(registeredGallery.selectionPinHash ? { selectionPinHash: registeredGallery.selectionPinHash } : {}),
       ...(getGalleryKind(registeredGallery) === 'weddings'
         ? { segmentLabels: normalizeSegmentLabels(registeredGallery.segmentLabels) }
         : {}),
@@ -478,6 +479,7 @@ const normalizeRegistry = (payload) => {
         kind: getGalleryKind({ ...gallery, folder }),
         coverPhoto: String(gallery.coverPhoto || '').trim(),
         segmentLabels: normalizeSegmentLabels(gallery.segmentLabels),
+        selectionPinHash: String(gallery.selectionPinHash || ''),
         publicationConsent:
           gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
             ? gallery.publicationConsent
@@ -698,7 +700,8 @@ export const getGalleryFavorites = async (gallery) => {
   }
 
   try {
-    return normalizeFavoritesState(await dropboxResponse.json());
+    const metadata = JSON.parse(dropboxResponse.headers.get('Dropbox-API-Result') || '{}');
+    return { ...normalizeFavoritesState(await dropboxResponse.json()), revision: metadata.rev };
   } catch {
     return normalizeFavoritesState(null);
   }
@@ -717,7 +720,7 @@ const saveGalleryFavorites = async (gallery, favorites) => {
       'Content-Type': 'application/octet-stream',
       'Dropbox-API-Arg': stringifyDropboxHeader({
         path: getFavoritesPath(gallery),
-        mode: 'overwrite',
+        mode: favorites.revision ? { '.tag': 'update', update: favorites.revision } : 'overwrite',
         autorename: false,
         mute: true,
         strict_conflict: false,
@@ -727,6 +730,9 @@ const saveGalleryFavorites = async (gallery, favorites) => {
   });
 
   if (!dropboxResponse.ok) {
+    if (dropboxResponse.status === 409) {
+      throw new GalleryError('Wybór zmienił się na drugim urządzeniu. Spróbuj ponownie.', 409, 'favorites_conflict');
+    }
     throw new GalleryError(
       'Nie udało się zapisać wybranych zdjęć.',
       502,
@@ -741,6 +747,11 @@ export const getGalleryFavoriteSummary = async (gallery, visitorId = '') => {
   const favorites = await getGalleryFavorites(gallery);
   const counts = {};
 
+  if (getGalleryKind(gallery) === 'weddings') {
+    const selected = favorites.selections['couple-selection'] || [];
+    return { counts: Object.fromEntries(selected.map((name) => [name, 1])), selected };
+  }
+
   Object.values(favorites.selections).forEach((photoNames) => {
     photoNames.forEach((photoName) => {
       counts[photoName] = (counts[photoName] || 0) + 1;
@@ -753,7 +764,7 @@ export const getGalleryFavoriteSummary = async (gallery, visitorId = '') => {
   };
 };
 
-export const setGalleryFavorite = async (gallery, visitorId, photoName, liked) => {
+export const setGalleryFavorite = async (gallery, visitorId, photoName, liked, retry = 0) => {
   if (!/^[a-zA-Z0-9_-]{8,80}$/.test(String(visitorId || ''))) {
     throw new GalleryError('Nie udało się zapisać wyboru.', 400, 'invalid_visitor_id');
   }
@@ -778,7 +789,15 @@ export const setGalleryFavorite = async (gallery, visitorId, photoName, liked) =
     delete favorites.selections[visitorId];
   }
 
-  const saved = await saveGalleryFavorites(gallery, favorites);
+  let saved;
+  try {
+    saved = await saveGalleryFavorites(gallery, favorites);
+  } catch (error) {
+    if (error.code === 'favorites_conflict' && retry < 3) {
+      return setGalleryFavorite(gallery, visitorId, photoName, liked, retry + 1);
+    }
+    throw error;
+  }
   const counts = {};
   Object.values(saved.selections).forEach((photoNames) => {
     photoNames.forEach((name) => {
@@ -787,7 +806,7 @@ export const setGalleryFavorite = async (gallery, visitorId, photoName, liked) =
   });
 
   return {
-    count: counts[validPhotoName] || 0,
+    count: getGalleryKind(gallery) === 'weddings' ? (liked ? 1 : 0) : counts[validPhotoName] || 0,
     selected: liked,
   };
 };

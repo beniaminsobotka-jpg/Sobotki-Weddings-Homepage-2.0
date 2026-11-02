@@ -279,6 +279,12 @@ export const GalleryPage: React.FC = () => {
   );
   const [favoriteError, setFavoriteError] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [coupleUnlocked, setCoupleUnlocked] = useState(false);
+  const [selectionConfigured, setSelectionConfigured] = useState(false);
+  const [showPinForm, setShowPinForm] = useState(false);
+  const [selectionPin, setSelectionPin] = useState('');
+  const [pinBusy, setPinBusy] = useState(false);
+  const [pinError, setPinError] = useState('');
   const [activeSegmentKey, setActiveSegmentKey] = useState('all');
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [coverFocus, setCoverFocus] = useState(DEFAULT_COVER_FOCUS);
@@ -446,6 +452,7 @@ export const GalleryPage: React.FC = () => {
   const photos = data?.photos || [];
   const displayedGallery = data?.gallery || bootstrapGallery;
   const isWeddingGallery = displayedGallery?.kind === 'weddings';
+  const canFavorite = Boolean(displayedGallery) && (!isWeddingGallery || coupleUnlocked);
   const gallerySegments = displayedGallery?.segments || [];
   const segmentFilteredPhotos =
     isWeddingGallery && activeSegmentKey !== 'all'
@@ -508,6 +515,10 @@ export const GalleryPage: React.FC = () => {
     setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
     setShowFavoritesOnly(false);
     setActiveSegmentKey('all');
+    setCoupleUnlocked(false);
+    setFavoriteCounts({});
+    setFavoritePhotoNames(new Set());
+    setShowPinForm(false);
   }, [slug]);
 
   useEffect(() => {
@@ -643,6 +654,8 @@ export const GalleryPage: React.FC = () => {
 
         if (!cancelled) {
           setFavoriteCounts(payload?.counts || {});
+          setCoupleUnlocked(payload?.unlocked === true);
+          setSelectionConfigured(payload?.configured === true || payload?.unlocked === true);
           setFavoritePhotoNames(new Set(Array.isArray(payload?.selected) ? payload.selected : []));
           setFavoriteError('');
         }
@@ -664,9 +677,57 @@ export const GalleryPage: React.FC = () => {
     };
   }, [favoriteVisitorId, slug]);
 
+  useEffect(() => {
+    if (!isWeddingGallery || !coupleUnlocked || pendingFavoritePhotos.size > 0) return;
+    let cancelled = false;
+    const refreshSelection = async () => {
+      if (document.visibilityState !== 'visible') return;
+      try {
+        const response = await fetch(`/api/gallery-favorites?slug=${encodeURIComponent(slug)}`);
+        const payload = await response.json();
+        if (!response.ok || cancelled) return;
+        setCoupleUnlocked(payload.unlocked === true);
+        setFavoriteCounts(payload.counts || {});
+        setFavoritePhotoNames(new Set(payload.selected || []));
+        if (!payload.unlocked) setShowFavoritesOnly(false);
+      } catch { /* Keep the last saved selection available during a brief connection loss. */ }
+    };
+    const timer = window.setInterval(() => void refreshSelection(), 15_000);
+    window.addEventListener('focus', refreshSelection);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+      window.removeEventListener('focus', refreshSelection);
+    };
+  }, [coupleUnlocked, isWeddingGallery, pendingFavoritePhotos.size, slug]);
+
+  const changeCoupleSession = async (unlock: boolean) => {
+    setPinBusy(true);
+    setPinError('');
+    try {
+      const response = await fetch('/api/gallery-favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, action: unlock ? 'unlock' : 'lock', pin: selectionPin }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Nie udało się odblokować wyboru.');
+      setCoupleUnlocked(payload.unlocked === true);
+      setFavoriteCounts(payload.counts || {});
+      setFavoritePhotoNames(new Set(payload.selected || []));
+      setShowFavoritesOnly(false);
+      setShowPinForm(false);
+      setSelectionPin('');
+    } catch (error) {
+      setPinError(error instanceof Error ? error.message : 'Spróbuj ponownie.');
+    } finally {
+      setPinBusy(false);
+    }
+  };
+
   const toggleFavorite = useCallback(
     async (photo: GalleryPhoto) => {
-      if (!favoriteVisitorId || pendingFavoritePhotos.has(photo.name)) {
+      if (!canFavorite || !favoriteVisitorId || pendingFavoritePhotos.has(photo.name)) {
         return;
       }
 
@@ -746,6 +807,7 @@ export const GalleryPage: React.FC = () => {
       }
     },
     [
+      canFavorite,
       favoritePhotoNames,
       favoriteVisitorId,
       pendingFavoritePhotos,
@@ -756,7 +818,7 @@ export const GalleryPage: React.FC = () => {
   );
 
   const addLightboxFavorite = useCallback(() => {
-    if (!selectedPhoto) {
+    if (!selectedPhoto || !canFavorite) {
       return;
     }
 
@@ -768,7 +830,7 @@ export const GalleryPage: React.FC = () => {
     ) {
       void toggleFavorite(selectedPhoto);
     }
-  }, [favoritePhotoNames, pendingFavoritePhotos, selectedPhoto, toggleFavorite]);
+  }, [canFavorite, favoritePhotoNames, pendingFavoritePhotos, selectedPhoto, toggleFavorite]);
 
   const togglePhotoSelection = useCallback((photoId: string) => {
     setSelectionError('');
@@ -1105,6 +1167,42 @@ export const GalleryPage: React.FC = () => {
           isSelectionMode ? 'pb-36 sm:pb-40' : 'pb-20 sm:pb-28'
         }`}
       >
+        {isWeddingGallery && (
+          <section className="mx-auto mb-12 max-w-4xl px-3 py-8 sm:mb-16 sm:px-8 sm:py-12">
+            <p className="mb-5 font-sans text-[9px] font-bold uppercase tracking-[0.25em] text-black/40">Zdjęcia są. Można wracać do imprezy.</p>
+            <h2 className="font-playfair text-[clamp(1.7rem,4vw,3.2rem)] leading-[1.4] tracking-[-0.03em]">
+              Hej, rozgośćcie się! <em>To był dobry dzień.</em> Są tu Wasi ludzie,
+              wielkie uśmiechy i <strong className="font-semibold">ruchy na parkiecie</strong>,
+              których pewnie nikt już nie pamięta.
+            </h2>
+            <div className="mt-7 space-y-4 font-sans text-sm font-light leading-7 text-black/60 sm:text-base sm:leading-8">
+              <p>Zróbcie sobie coś dobrego do picia i przewijajcie bez pośpiechu. U góry możecie wybrać konkretną część dnia, a każde zdjęcie otworzyć na cały ekran i pobrać.</p>
+              <p>Para młoda może odblokować serduszka PIN-em i wybrać zdjęcia do druku. To Wasza wspólna lista — goście jej nie widzą. {displayedGallery?.fullResolutionAvailable && 'Na końcu galerii czeka też paczka zdjęć w pełnej rozdzielczości.'}</p>
+              <p>Wrzucacie zdjęcia do sieci? Oznaczcie <a href="https://www.instagram.com/sobotki.weddings/" target="_blank" rel="noopener noreferrer" className="font-medium text-black underline decoration-black/25 underline-offset-4">Sobotki Weddings</a>. Chętnie zobaczymy, które kadry wybraliście.</p>
+            </div>
+            <div className="mt-7 border-t border-black/10 pt-6">
+              {coupleUnlocked ? (
+                <div className="flex flex-wrap items-center gap-4">
+                  <span className="font-sans text-xs text-black/60">♥ Wspólny wybór pary jest odblokowany</span>
+                  <button type="button" disabled={pinBusy} onClick={() => void changeCoupleSession(false)} className="font-sans text-[10px] font-bold uppercase tracking-widest underline underline-offset-4">Zablokuj wybór</button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setShowPinForm((current) => !current)} className="rounded-full border border-black/15 px-5 py-3 font-sans text-[10px] font-bold uppercase tracking-[0.16em] hover:bg-black hover:text-white">Wybierz zdjęcia do druku — dla pary</button>
+              )}
+              {showPinForm && !coupleUnlocked && (
+                <form onSubmit={(event) => { event.preventDefault(); void changeCoupleSession(true); }} className="mt-4 max-w-sm">
+                  <label className="block font-sans text-xs leading-5 text-black/60">
+                    Wpiszcie 6-cyfrowy PIN przekazany przez nas razem z galerią.
+                    <input type="password" inputMode="numeric" autoComplete="off" pattern="[0-9]{6}" required maxLength={6} value={selectionPin} onChange={(event) => setSelectionPin(event.target.value.replace(/\D/g, ''))} className="mt-3 block min-h-12 w-full rounded-xl border border-black/15 bg-white/50 px-4 text-lg tracking-[0.4em]" aria-label="PIN do wyboru zdjęć" />
+                  </label>
+                  <button type="submit" disabled={pinBusy} className="mt-3 rounded-full bg-black px-6 py-3 font-sans text-[10px] font-bold uppercase tracking-widest text-white disabled:opacity-40">{pinBusy ? 'Sprawdzam…' : 'Odblokuj serduszka'}</button>
+                  {!selectionConfigured && <p className="mt-3 font-sans text-xs text-black/50">Jeśli nie macie jeszcze PIN-u, napiszcie do nas.</p>}
+                </form>
+              )}
+              {pinError && <p role="alert" className="mt-3 font-sans text-xs text-red-800">{pinError}</p>}
+            </div>
+          </section>
+        )}
         <div
           className={`mb-7 flex justify-between gap-4 px-1 sm:mb-9 sm:flex-row sm:items-center ${
             isSelectionMode ? 'flex-col items-stretch' : 'items-center'
@@ -1170,7 +1268,7 @@ export const GalleryPage: React.FC = () => {
               </button>
             )}
 
-            {!isSelectionMode && (
+            {!isSelectionMode && canFavorite && (
               <button
                 type="button"
                 onClick={() => setShowFavoritesOnly((current) => !current)}
@@ -1401,7 +1499,7 @@ export const GalleryPage: React.FC = () => {
                         : 'Zobacz zdjęcie'}
                     </span>
                   </button>
-                  {!isSelectionMode && (
+                  {!isSelectionMode && canFavorite && (
                     <button
                       type="button"
                       onClick={(event) => {
@@ -1515,7 +1613,7 @@ export const GalleryPage: React.FC = () => {
       </footer>
 
       <AnimatePresence>
-        {!isSelectionMode && photos.length > 0 && (
+        {!isSelectionMode && canFavorite && photos.length > 0 && (
           <motion.button
             type="button"
             onClick={() => setShowFavoritesOnly((current) => !current)}
@@ -1771,6 +1869,7 @@ export const GalleryPage: React.FC = () => {
                   {selectedNavigationIndex + 1} / {navigationPhotos.length}
                 </span>
                 <div className="flex items-center gap-1">
+                {canFavorite && (
                 <button
                   type="button"
                   onClick={() => void toggleFavorite(selectedPhoto)}
@@ -1816,6 +1915,7 @@ export const GalleryPage: React.FC = () => {
                   </AnimatePresence>
                   <span className="hidden sm:inline">Do druku</span>
                 </button>
+                )}
                 <a
                   href={selectedPhoto.downloadUrl}
                   target="_blank"
