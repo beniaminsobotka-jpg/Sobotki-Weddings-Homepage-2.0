@@ -4,6 +4,8 @@ import {
   listMatchedFullResolutionPhotos,
   resolveGallery,
 } from '../server/dropbox-gallery.js';
+import { hasCoupleSession } from '../server/gallery-couple-auth.js';
+import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
 
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -19,6 +21,9 @@ export default async function handler(request, response) {
 
   try {
     const gallery = await resolveGallery(request.query?.slug);
+    if (gallery.kind === 'weddings' && !hasCoupleSession(request, gallery) && !isGalleryAdmin(request)) {
+      throw new GalleryError('Wpisz PIN pary młodej, aby pobrać wszystkie pliki.', 403, 'couple_pin_required');
+    }
 
     if (!gallery.fullResolutionFolder) {
       throw new GalleryError(

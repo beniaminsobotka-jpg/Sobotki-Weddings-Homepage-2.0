@@ -267,6 +267,8 @@ export const GalleryPage: React.FC = () => {
   );
   const [isDownloadingSelection, setIsDownloadingSelection] = useState(false);
   const [isDownloadingFullResolution, setIsDownloadingFullResolution] = useState(false);
+  const [archiveSource, setArchiveSource] = useState<'social' | 'full'>('full');
+  const [archiveNotice, setArchiveNotice] = useState('');
   const [downloadProgress, setDownloadProgress] = useState('');
   const [selectionError, setSelectionError] = useState('');
   const [fullResolutionDownloadError, setFullResolutionDownloadError] = useState('');
@@ -927,18 +929,20 @@ export const GalleryPage: React.FC = () => {
     }
   }, [closeSelectionMode, isDownloadingSelection, photos, selectedPhotoIds, slug]);
 
-  const downloadAllFullResolutionPhotos = useCallback(async () => {
-    if (isDownloadingFullResolution) {
+  const downloadAllPhotos = useCallback(async (source: 'social' | 'full') => {
+    if (isDownloadingFullResolution || (isWeddingGallery && !coupleUnlocked)) {
       return;
     }
 
     setIsDownloadingFullResolution(true);
+    setArchiveSource(source);
+    setArchiveNotice('');
     setFullResolutionDownloadError('');
-    setFullResolutionDownloadProgress('Sprawdzam oryginały…');
+    setFullResolutionDownloadProgress('Przygotowuję pobieranie…');
 
     try {
       const manifestResponse = await fetch(
-        `/api/gallery-full-resolution?slug=${encodeURIComponent(slug)}`,
+        `/api/gallery-full-resolution-download?slug=${encodeURIComponent(slug)}&source=${source}&prepare=1`,
         { headers: { Accept: 'application/json' } }
       );
       const manifest = await manifestResponse.json().catch(() => null);
@@ -949,33 +953,16 @@ export const GalleryPage: React.FC = () => {
         );
       }
 
-      if (Number(manifest?.missingPhotoCount || 0) > 0) {
-        throw new Error(
-          `Pełna galeria jest jeszcze przygotowywana — brakuje ${Number(
-            manifest.missingPhotoCount
-          )} oryginalnych plików.`
-        );
-      }
-
-      if (!Number(manifest?.matchedPhotoCount || 0)) {
-        throw new Error('Zdjęcia w pełnej rozdzielczości nie są jeszcze dostępne.');
-      }
-
-      if (Number(manifest?.totalBytes || 0) > 2 * 1024 * 1024 * 1024) {
-        throw new Error(
-          'Galeria przekracza 2 GB i nie może zostać pobrana jako jedna paczka ZIP.'
-        );
-      }
-
-      setFullResolutionDownloadProgress('Dropbox przygotowuje jedną paczkę…');
+      setFullResolutionDownloadProgress('Rozpoczynam pobieranie…');
       const downloadLink = document.createElement('a');
       downloadLink.href = `/api/gallery-full-resolution-download?slug=${encodeURIComponent(
         slug
-      )}`;
-      downloadLink.download = `sobotki-${slug}-pelna-rozdzielczosc.zip`;
+      )}&source=${source}`;
+      downloadLink.download = `sobotki-${slug}-${source === 'social' ? 'social-media' : 'pelna-rozdzielczosc'}.zip`;
       document.body.appendChild(downloadLink);
       downloadLink.click();
       downloadLink.remove();
+      setArchiveNotice('Pobieranie zostało przekazane do przeglądarki. Przy dużej galerii rozpoczęcie może chwilę potrwać — postęp zobaczysz na liście pobieranych plików.');
     } catch (downloadError) {
       setFullResolutionDownloadError(
         downloadError instanceof Error
@@ -986,7 +973,7 @@ export const GalleryPage: React.FC = () => {
       setIsDownloadingFullResolution(false);
       setFullResolutionDownloadProgress('');
     }
-  }, [isDownloadingFullResolution, slug]);
+  }, [coupleUnlocked, isWeddingGallery, isDownloadingFullResolution, slug]);
 
   const showPrevious = useCallback(() => {
     if (!navigationPhotos.length) {
@@ -1177,7 +1164,7 @@ export const GalleryPage: React.FC = () => {
             </h2>
             <div className="mt-7 space-y-4 font-sans text-sm font-light leading-7 text-black/60 sm:text-base sm:leading-8">
               <p>Zróbcie sobie coś dobrego do picia i przewijajcie bez pośpiechu. U góry możecie wybrać konkretną część dnia, a każde zdjęcie otworzyć na cały ekran i pobrać.</p>
-              <p>Para młoda może odblokować serduszka PIN-em i wybrać zdjęcia do druku. To Wasza wspólna lista — goście jej nie widzą. {displayedGallery?.fullResolutionAvailable && 'Na końcu galerii czeka też paczka zdjęć w pełnej rozdzielczości.'}</p>
+              <p>Para młoda może odblokować serduszka PIN-em i wybrać zdjęcia do druku. To Wasza wspólna lista — goście jej nie widzą. Po wpisaniu PIN-u na końcu galerii znajdziecie też pobieranie wszystkich plików.</p>
               <p>Wrzucacie zdjęcia do sieci? Oznaczcie <a href="https://www.instagram.com/sobotki.weddings/" target="_blank" rel="noopener noreferrer" className="font-medium text-black underline decoration-black/25 underline-offset-4">Sobotki Weddings</a>. Chętnie zobaczymy, które kadry wybraliście.</p>
             </div>
             <div className="mt-7 border-t border-black/10 pt-6">
@@ -1569,33 +1556,51 @@ export const GalleryPage: React.FC = () => {
           />
         )}
 
-        {displayedGallery?.fullResolutionAvailable && photos.length > 0 && (
-          <section className="mx-auto mt-14 max-w-2xl border-t border-black/10 px-4 pt-10 text-center sm:mt-20 sm:pt-14">
+        {coupleUnlocked && isWeddingGallery && photos.length > 0 && (
+          <section className="mx-auto mt-14 max-w-4xl border-t border-black/10 px-4 pt-10 text-center sm:mt-20 sm:pt-14">
             <p className="font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-black/38">
-              Oryginalne pliki
+              Cała galeria w jednej paczce
             </p>
             <h2 className="mt-3 font-serif text-3xl font-black uppercase tracking-[-0.04em] sm:text-4xl">
-              Pełna rozdzielczość
+              Pobierz wszystkie pliki
             </h2>
             <p className="mx-auto mt-3 max-w-lg font-sans text-sm leading-6 text-black/50">
-              Pobierz wszystkie zdjęcia w jakości przygotowanej do druku jako jedną paczkę ZIP
-              do 2 GB.
+              Wybierzcie wersję zdjęć, której potrzebujecie. Każda pobiera się jako osobny ZIP.
             </p>
-            <button
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {(['social', 'full'] as const).map((source) => {
+                const full = source === 'full';
+                const available = !full || displayedGallery?.fullResolutionAvailable;
+                const preparing = isDownloadingFullResolution && archiveSource === source;
+                return (
+                  <div key={source} className="flex flex-col rounded-2xl border border-black/10 bg-white/35 p-6 sm:p-7">
+                    <h3 className="font-playfair text-2xl italic">{full ? 'Pełna rozdzielczość' : 'Do social mediów'}</h3>
+                    <p className="mt-3 flex-1 font-sans text-sm leading-6 text-black/50">
+                      {full
+                        ? 'Oryginalne, duże pliki. Najlepsze do odbitek, albumów i większych wydruków.'
+                        : 'Wszystkie zdjęcia w pomniejszonej rozdzielczości — najlepsze do publikacji w social mediach i wygodnego udostępniania.'}
+                    </p>
+                    {!available && <p className="mt-3 font-sans text-xs text-black/45">Pełne pliki są jeszcze przygotowywane.</p>}
+                    <button
               type="button"
-              onClick={() => void downloadAllFullResolutionPhotos()}
-              disabled={isDownloadingFullResolution}
+              onClick={() => void downloadAllPhotos(source)}
+              disabled={isDownloadingFullResolution || !available}
               className="mt-6 inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-black px-7 py-4 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white transition-opacity hover:opacity-85 disabled:cursor-wait disabled:opacity-45"
             >
-              {isDownloadingFullResolution ? (
+              {preparing ? (
                 <RefreshCw size={15} className="animate-spin" aria-hidden="true" />
               ) : (
                 <Download size={15} aria-hidden="true" />
               )}
-              {isDownloadingFullResolution
+              {preparing
                 ? fullResolutionDownloadProgress || 'Przygotowuję…'
-                : 'Pobierz wszystkie w pełnej rozdzielczości'}
+                : full ? 'Pobierz oryginały — ZIP' : 'Pobierz do social mediów — ZIP'}
             </button>
+                  </div>
+                );
+              })}
+            </div>
+            {archiveNotice && <p role="status" className="mx-auto mt-5 max-w-xl font-sans text-xs leading-5 text-black/50">{archiveNotice}</p>}
             {fullResolutionDownloadError && (
               <p className="mt-4 font-sans text-xs text-red-800" role="alert">
                 {fullResolutionDownloadError}

@@ -9,6 +9,7 @@ import {
   resolveGallery,
 } from '../server/dropbox-gallery.js';
 import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
+import { hasCoupleSession } from '../server/gallery-couple-auth.js';
 
 const MAX_ARCHIVE_PHOTOS = 100;
 const MAX_ARCHIVE_BYTES = 2 * 1024 * 1024 * 1024;
@@ -209,6 +210,9 @@ export default async function handler(request, response) {
     }
 
     const useFullResolution = body.source === 'full';
+    if (useFullResolution && gallery.kind === 'weddings' && !isGalleryAdmin(request) && !hasCoupleSession(request, gallery)) {
+      throw new GalleryError('Wpisz PIN pary młodej, aby pobrać oryginały.', 403, 'couple_pin_required');
+    }
     const photos = useFullResolution
       ? await listGalleryFullResolutionPhotos(gallery)
       : await listGalleryPhotos(gallery);

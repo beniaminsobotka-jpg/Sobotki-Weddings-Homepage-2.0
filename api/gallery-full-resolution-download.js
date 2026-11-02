@@ -1,12 +1,19 @@
 import {
   GalleryError,
+  buildPhotoPath,
+  getPhotoFile,
   getDropboxFolderZip,
   listGalleryFullResolutionPhotos,
   listGalleryPhotos,
   resolveGallery,
 } from '../server/dropbox-gallery.js';
+import { hasCoupleSession } from '../server/gallery-couple-auth.js';
+import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
+import { getPhotoZipSize, streamPhotoZip } from '../server/stream-photo-zip.js';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 
-const MAX_SINGLE_ZIP_BYTES = 2 * 1024 * 1024 * 1024;
+const MAX_SINGLE_ZIP_BYTES = 20_000_000_000;
 
 const sendJson = (response, status, body) => {
   response.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -22,8 +29,12 @@ export default async function handler(request, response) {
 
   try {
     const gallery = await resolveGallery(request.query?.slug);
+    if (gallery.kind === 'weddings' && !hasCoupleSession(request, gallery) && !isGalleryAdmin(request)) {
+      throw new GalleryError('Odblokuj pobieranie wszystkich plików PIN-em pary młodej.', 403, 'couple_pin_required');
+    }
+    const social = request.query?.source === 'social';
 
-    if (!gallery.fullResolutionFolder) {
+    if (!social && !gallery.fullResolutionFolder) {
       throw new GalleryError(
         'Pełna rozdzielczość nie jest jeszcze dostępna dla tej galerii.',
         404,
@@ -33,7 +44,7 @@ export default async function handler(request, response) {
 
     const [galleryPhotos, fullResolutionPhotos] = await Promise.all([
       listGalleryPhotos(gallery),
-      listGalleryFullResolutionPhotos(gallery),
+      social ? Promise.resolve([]) : listGalleryFullResolutionPhotos(gallery),
     ]);
     const fullResolutionNames = new Set(
       fullResolutionPhotos.map((photo) => photo.name.toLocaleLowerCase('pl-PL'))
@@ -42,7 +53,7 @@ export default async function handler(request, response) {
       (photo) => !fullResolutionNames.has(photo.name.toLocaleLowerCase('pl-PL'))
     ).length;
 
-    if (missingPhotoCount > 0) {
+    if (!social && missingPhotoCount > 0) {
       throw new GalleryError(
         `Pełna galeria jest jeszcze przygotowywana — brakuje ${missingPhotoCount} oryginalnych plików.`,
         409,
@@ -50,53 +61,47 @@ export default async function handler(request, response) {
       );
     }
 
-    const totalBytes = fullResolutionPhotos.reduce(
+    const archivePhotos = social ? galleryPhotos : fullResolutionPhotos;
+    if (!archivePhotos.length) {
+      throw new GalleryError('Nie ma jeszcze zdjęć do pobrania.', 404, 'archive_empty');
+    }
+    const totalBytes = archivePhotos.reduce(
       (total, photo) => total + Math.max(0, Number(photo.size) || 0),
       0
     );
 
-    if (totalBytes > MAX_SINGLE_ZIP_BYTES) {
+    if (totalBytes >= MAX_SINGLE_ZIP_BYTES) {
       throw new GalleryError(
-        'Galeria przekracza limit 2 GB dla jednej paczki ZIP.',
+        'Ta galeria przekracza 20 GB. Skontaktuj się z nami, aby otrzymać duże pliki inną drogą.',
         413,
         'single_zip_too_large'
       );
     }
 
-    const dropboxZip = await getDropboxFolderZip(gallery.fullResolutionFolder);
-
-    if (!dropboxZip.body) {
-      throw new GalleryError(
-        'Dropbox nie zwrócił paczki ZIP.',
-        502,
-        'dropbox_zip_empty'
-      );
+    if (request.query?.prepare === '1') {
+      return sendJson(response, 200, { photoCount: archivePhotos.length, totalBytes });
     }
+
+    const dropboxZip = social ? null : await getDropboxFolderZip(gallery.fullResolutionFolder);
+    if (!social && !dropboxZip?.body) throw new GalleryError('Dropbox nie zwrócił paczki ZIP.', 502, 'dropbox_zip_empty');
 
     response.status(200);
     response.setHeader('Content-Type', 'application/zip');
     response.setHeader(
       'Content-Disposition',
-      `attachment; filename="sobotki-${gallery.slug}-pelna-rozdzielczosc.zip"`
+      `attachment; filename="sobotki-${gallery.slug}-${social ? 'social-media' : 'pelna-rozdzielczosc'}.zip"`
     );
     response.setHeader('Cache-Control', 'private, no-store');
     response.setHeader('X-Accel-Buffering', 'no');
+    const contentLength = social
+      ? getPhotoZipSize(galleryPhotos).toString()
+      : dropboxZip.headers.get('content-length');
+    if (contentLength) response.setHeader('Content-Length', contentLength);
 
-    const reader = dropboxZip.body.getReader();
-
-    while (true) {
-      const { done, value } = await reader.read();
-
-      if (done) {
-        break;
-      }
-
-      if (!response.write(Buffer.from(value))) {
-        await new Promise((resolve) => response.once('drain', resolve));
-      }
+    if (social) {
+      return await streamPhotoZip(galleryPhotos, (photo) => getPhotoFile(buildPhotoPath(gallery, photo.name)), response);
     }
-
-    return response.end();
+    await pipeline(Readable.fromWeb(dropboxZip.body), response);
   } catch (error) {
     const galleryError =
       error instanceof GalleryError

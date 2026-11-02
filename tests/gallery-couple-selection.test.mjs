@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import { hashSelectionPin, coupleSessionCookie, hasCoupleSession } from '../server/gallery-couple-auth.js';
 import handler from '../api/gallery-favorites.js';
 import galleryHandler from '../api/gallery.js';
+import allDownloadsHandler from '../api/gallery-full-resolution-download.js';
 import { getGalleryFavoriteSummary } from '../server/dropbox-gallery.js';
 
 process.env.DROPBOX_ACCESS_TOKEN = 'mock-token';
@@ -10,7 +11,7 @@ process.env.DROPBOX_APP_SECRET = 'test-only-session-secret';
 process.env.GALLERY_ADMIN_PASSWORD = 'test-admin';
 const gallery = {
   slug: 'weddings-test', title: 'Test', kind: 'weddings', folder: '/Galerie/WEDDINGS Test',
-  active: true, selectionPinHash: hashSelectionPin('123456'),
+  active: true, fullResolutionFolder: '/Galerie/WEDDINGS Originals', selectionPinHash: hashSelectionPin('123456'),
 };
 let favorites = { selections: { 'old-guest-123': ['guest.jpg'] } };
 const originalFetch = globalThis.fetch;
@@ -24,7 +25,7 @@ globalThis.fetch = async (url, options = {}) => {
     return Response.json({});
   }
   if (String(url).endsWith('/files/list_folder')) {
-    return Response.json({ entries: ['one.jpg', 'two.jpg'].map((name) => ({ '.tag': 'file', name, rev: 'r1' })), has_more: false });
+    return Response.json({ entries: ['one.jpg', 'two.jpg'].map((name) => ({ '.tag': 'file', name, rev: 'r1', size: 1_600_000_000 })), has_more: false });
   }
   throw new Error(`Unexpected request ${url}`);
 };
@@ -54,6 +55,17 @@ test('PIN protects a shared couple list and keeps guest selections private', asy
     assert.ok(unlock.headers['Set-Cookie'].includes('HttpOnly'));
     assert.equal((await call('POST', { photoName: 'one.jpg', liked: true }, cookie)).statusCode, 200);
     const secondDeviceCookie = coupleSessionCookie(gallery).split(';')[0];
+    for (const source of ['social', 'full']) {
+      for (const prepare of ['1', '0']) {
+        const denied = { status(code) { this.code=code; return this; }, setHeader() { return this; }, end(value) { this.body=JSON.parse(value); } };
+        await allDownloadsHandler({method:'GET',query:{slug:gallery.slug,source,prepare},headers:{}},denied);
+        assert.equal(denied.code,403);
+      }
+      const allowed = { status(code) { this.code=code; return this; }, setHeader() { return this; }, end(value) { this.body=JSON.parse(value); } };
+      await allDownloadsHandler({method:'GET',query:{slug:gallery.slug,source,prepare:'1'},headers:{cookie}},allowed);
+      assert.equal(allowed.code,200);
+      assert.equal(allowed.body.totalBytes,3_200_000_000);
+    }
     assert.deepEqual((await call('GET', {}, secondDeviceCookie)).body.selected, ['one.jpg']);
     await call('POST', { photoName: 'two.jpg', liked: true }, secondDeviceCookie);
     assert.deepEqual((await getGalleryFavoriteSummary(gallery)).selected, ['one.jpg', 'two.jpg']);
