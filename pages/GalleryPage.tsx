@@ -45,6 +45,7 @@ type GalleryData = {
     title: string;
     date: string;
     kind: 'portraits' | 'weddings';
+    photosOnly?: boolean;
     fullResolutionAvailable: boolean;
     coverPreviewUrl: string;
     coverUrl: string;
@@ -1165,10 +1166,10 @@ export const GalleryPage: React.FC = () => {
             </h2>
             <div className="mt-7 space-y-4 font-sans text-sm font-light leading-7 text-black/60 sm:text-base sm:leading-8">
               <p>Zróbcie sobie coś dobrego do picia i przewijajcie bez pośpiechu. U góry możecie wybrać konkretną część dnia, a każde zdjęcie otworzyć na cały ekran i pobrać.</p>
-              <p>Para młoda może odblokować serduszka PIN-em i wybrać zdjęcia do druku. To Wasza wspólna lista — goście jej nie widzą. Po wpisaniu PIN-u na końcu galerii znajdziecie też pobieranie wszystkich plików.</p>
+              {!displayedGallery?.photosOnly && <p>Para młoda może odblokować serduszka PIN-em i wybrać zdjęcia do druku. To Wasza wspólna lista — goście jej nie widzą. Po wpisaniu PIN-u na końcu galerii znajdziecie też pobieranie wszystkich plików.</p>}
               <p>Wrzucacie zdjęcia do sieci? Oznaczcie <a href="https://www.instagram.com/sobotki.weddings/" target="_blank" rel="noopener noreferrer" className="font-medium text-black underline decoration-black/25 underline-offset-4">Sobotki Weddings</a>. Chętnie zobaczymy, które kadry wybraliście.</p>
             </div>
-            <div className="mt-7 border-t border-black/10 pt-6">
+            {!displayedGallery?.photosOnly && <div className="mt-7 border-t border-black/10 pt-6">
               {coupleUnlocked ? (
                 <div className="flex flex-wrap items-center gap-4">
                   <span className="font-sans text-xs text-black/60">♥ Wspólny wybór pary jest odblokowany</span>
@@ -1188,7 +1189,7 @@ export const GalleryPage: React.FC = () => {
                 </form>
               )}
               {pinError && <p role="alert" className="mt-3 font-sans text-xs text-red-800">{pinError}</p>}
-            </div>
+            </div>}
           </section>
         )}
         <div
@@ -1609,7 +1610,7 @@ export const GalleryPage: React.FC = () => {
             )}
           </section>
         )}
-        {isWeddingGallery && <GalleryVideos key={`${slug}:${coupleUnlocked}`} slug={slug} coupleUnlocked={coupleUnlocked} />}
+        {isWeddingGallery && !displayedGallery?.photosOnly && <GalleryVideos key={`${slug}:${coupleUnlocked}`} slug={slug} coupleUnlocked={coupleUnlocked} />}
       </main>
 
       <footer className="border-t border-black/[0.08] px-6 py-9 text-center">

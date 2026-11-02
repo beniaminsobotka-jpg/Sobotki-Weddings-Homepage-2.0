@@ -5,6 +5,7 @@ import { hashSelectionPin, coupleSessionCookie } from '../server/gallery-couple-
 import { normalizeGalleryVideos, getVisibleVideoItems, youtubeVideoId } from '../server/gallery-videos.js';
 import adminHandler from '../api/admin-galleries.js';
 import { createAdminSessionCookie } from '../server/gallery-admin-auth.js';
+import { resolveGallery } from '../server/dropbox-gallery.js';
 
 test('optional films accept supported links and reject unsafe or folder links', () => {
   assert.deepEqual(getVisibleVideoItems({}),[]);
@@ -72,7 +73,42 @@ test('only PIN session can expose or hide film URLs; guests see only explicitly 
     assert.equal(registry.galleries[0].videosPublic,false);
     assert.deepEqual((await call('GET')).body.videos,[]);
     assert.equal((await call('GET',cookie)).body.videos.length,2);
+
+    const createPhotosLink = async (session = adminCookie) => {
+      const response={status(code){this.code=code;return this;},setHeader(){return this;},end(value){this.body=JSON.parse(value);}};
+      await adminHandler({method:'POST',headers:{cookie:session},body:{action:'photos_only_link',slug:gallery.slug}},response);
+      return response;
+    };
+    assert.equal((await createPhotosLink('')).code,401);
+    const photosLink = await createPhotosLink();
+    assert.equal(photosLink.code,200);
+    const alias = photosLink.body.photosOnlySlug;
+    assert.match(alias,/^podglad-[a-f0-9]{24}$/);
+    assert.equal((await createPhotosLink()).body.photosOnlySlug,alias,'same permanent link on every copy');
+    assert.equal((await save(registry.galleries[0].videos)).code,200);
+    assert.equal(registry.galleries[0].photosOnlySlug,alias,'editing preserves the link');
+    const resolved = await resolveGallery(alias);
+    assert.equal(resolved.photosOnly,true);
+    assert.equal(resolved.slug,alias,'image and share URLs retain alias');
+    assert.equal(resolved.title,gallery.title);
+    assert.equal(resolved.folder,gallery.folder);
+    assert.equal(resolved.selectionPinHash,undefined);
+    assert.equal(resolved.videos,undefined);
+    await call('POST',cookie,{public:true});
+    assert.equal((await call('GET')).body.videos.length,2);
+    const aliasCall = async (method) => {
+      const response={status(code){this.code=code;return this;},setHeader(){return this;},end(value){this.body=JSON.parse(value);}};
+      await handler({method,query:{slug:alias},headers:{cookie},body:{slug:alias,public:true}},response);
+      return response;
+    };
+    assert.deepEqual((await aliasCall('GET')).body,{public:false,canManage:false,videos:[]},'even an unlocked couple cannot reveal videos on the sample link');
+    assert.equal((await aliasCall('POST')).code,403);
+    const collisionResponse={status(code){this.code=code;return this;},setHeader(){return this;},end(value){this.body=JSON.parse(value);}};
+    await adminHandler({method:'POST',headers:{cookie:adminCookie},body:{action:'save',gallery:{...registry.galleries[0],originalSlug:gallery.slug,slug:alias}}},collisionResponse);
+    assert.equal(collisionResponse.code,409,'main gallery cannot overwrite a photos-only address');
     registry.galleries[0].active=false;
     assert.equal((await call('GET')).code,404);
+    assert.equal((await aliasCall('GET')).code,404);
+    assert.equal((await createPhotosLink()).code,404);
   } finally {globalThis.fetch=originalFetch;}
 });

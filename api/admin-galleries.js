@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
 import { hashSelectionPin } from '../server/gallery-couple-auth.js';
 import { normalizeGalleryVideos } from '../server/gallery-videos.js';
@@ -232,6 +233,22 @@ export default async function handler(request, response) {
       galleries: [],
     };
 
+    if (action === 'photos_only_link') {
+      const gallery = registry.galleries.find((item) => item.slug === body.slug);
+      if (!gallery || !gallery.active || getGalleryKind(gallery) !== 'weddings') {
+        return sendJson(response, 404, { error: 'Nie znaleziono aktywnej galerii ślubnej.' });
+      }
+      if (!gallery.photosOnlySlug) {
+        let alias;
+        do {
+          alias = `podglad-${randomBytes(12).toString('hex')}`;
+        } while (registry.galleries.some((item) => item.slug === alias || item.photosOnlySlug === alias));
+        gallery.photosOnlySlug = alias;
+        await saveGalleryRegistry(registry);
+      }
+      return sendJson(response, 200, { photosOnlySlug: gallery.photosOnlySlug });
+    }
+
     if (action === 'add_to_best_of') {
       const slug = normalizeText(body.slug, 96).toLowerCase();
       const gallery = registry.galleries.find((item) => item.slug === slug);
@@ -417,7 +434,7 @@ export default async function handler(request, response) {
       ? registry.galleries.findIndex((gallery) => gallery.slug === originalSlug)
       : -1;
     const slugTaken = registry.galleries.some(
-      (gallery, index) => gallery.slug === slug && index !== existingIndex
+      (gallery, index) => (gallery.slug === slug && index !== existingIndex) || gallery.photosOnlySlug === slug
     );
 
     if (slugTaken) {
@@ -438,6 +455,7 @@ export default async function handler(request, response) {
     }
     const savedGallery = {
       slug,
+      photosOnlySlug: existingIndex >= 0 ? registry.galleries[existingIndex].photosOnlySlug || '' : '',
       title,
       date,
       folder,

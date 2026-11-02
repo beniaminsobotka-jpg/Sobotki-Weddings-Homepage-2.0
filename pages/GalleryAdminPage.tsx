@@ -29,6 +29,7 @@ import {
 import { sobotkiPortraitsLogoDataUrl } from '../assets/sobotkiPortraitsLogo';
 
 type GalleryRecord = {
+  photosOnlySlug?: string;
   videos?: GalleryVideos;
   videosPublic?: boolean;
   slug: string;
@@ -1047,6 +1048,31 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
     window.setTimeout(() => setCopiedSlug(''), 1800);
   };
 
+  const copyPhotosOnlyUrl = async (gallery: GalleryRecord) => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/admin-galleries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'photos_only_link', slug: gallery.slug }),
+      });
+      if (!response.ok) throw new Error(await getErrorMessage(response, 'Nie udało się przygotować linku.'));
+      const { photosOnlySlug } = await response.json() as { photosOnlySlug: string };
+      const url = `${origin}/galeria/${photosOnlySlug}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        setNotice('Skopiowano link do galerii bez filmów. Możesz wysłać go przyszłym parom.');
+      } catch {
+        window.prompt('Skopiuj link do galerii bez filmów:', url);
+      }
+    } catch (linkError) {
+      setError(linkError instanceof Error ? linkError.message : 'Nie udało się przygotować linku.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const downloadQr = async (gallery: GalleryRecord) => {
     const dataUrl = await QRCode.toDataURL(`${origin}/galeria/${gallery.slug}`, {
       width: 1200,
@@ -1682,6 +1708,18 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                       {copiedSlug === gallery.slug ? <Check size={14} /> : <Copy size={14} />}
                       {copiedSlug === gallery.slug ? 'Skopiowano' : 'Kopiuj adres'}
                     </button>
+                    {mode === 'weddings' && gallery.active && (
+                      <button
+                        type="button"
+                        onClick={() => void copyPhotosOnlyUrl(gallery)}
+                        disabled={isLoading}
+                        title="Stały link z samymi zdjęciami, również gdy para udostępni filmy gościom"
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/10 px-4 font-sans text-[8px] font-bold uppercase tracking-[0.14em] transition-colors hover:bg-black hover:text-white disabled:opacity-40"
+                      >
+                        <Copy size={14} aria-hidden="true" />
+                        Kopiuj link bez filmów
+                      </button>
+                    )}
                     {mode === 'portraits' && (
                       <>
                         <button

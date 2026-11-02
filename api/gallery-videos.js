@@ -21,6 +21,11 @@ export default async function handler(request, response) {
     }
     const slug = validateGallerySlug(request.method === 'GET' ? request.query?.slug : body.slug);
     const registry = await getGalleryRegistry({fresh:true});
+    if (registry?.galleries.some((gallery) => gallery.photosOnlySlug === slug && gallery.active !== false && getGalleryKind(gallery) === 'weddings')) {
+      return request.method === 'GET'
+        ? send(response,200,{public:false,canManage:false,videos:[]})
+        : send(response,403,{error:'Ten link udostępnia wyłącznie zdjęcia.'});
+    }
     const index = registry?.galleries.findIndex((gallery) => gallery.slug === slug && gallery.active !== false);
     const gallery = index >= 0 ? registry.galleries[index] : null;
     if (!gallery || getGalleryKind(gallery) !== 'weddings') return send(response,404,{error:'Nie znaleziono galerii.'});

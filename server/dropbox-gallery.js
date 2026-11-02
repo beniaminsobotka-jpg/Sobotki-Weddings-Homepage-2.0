@@ -241,7 +241,7 @@ export const resolveGallery = async (rawSlug) => {
 
   if (registry) {
     const registeredGallery = registry.galleries.find(
-      (gallery) => gallery.slug === slug && gallery.active !== false
+      (gallery) => (gallery.slug === slug || (gallery.photosOnlySlug === slug && getGalleryKind(gallery) === 'weddings')) && gallery.active !== false
     );
 
     if (!registeredGallery) {
@@ -261,7 +261,8 @@ export const resolveGallery = async (rawSlug) => {
           }
         : {}),
       coverPhoto: String(registeredGallery.coverPhoto || '').trim(),
-      ...(registeredGallery.selectionPinHash ? { selectionPinHash: registeredGallery.selectionPinHash } : {}),
+      ...(registeredGallery.photosOnlySlug === slug ? { photosOnly: true } : {}),
+      ...(registeredGallery.selectionPinHash && registeredGallery.photosOnlySlug !== slug ? { selectionPinHash: registeredGallery.selectionPinHash } : {}),
       ...(getGalleryKind(registeredGallery) === 'weddings'
         ? { segmentLabels: normalizeSegmentLabels(registeredGallery.segmentLabels) }
         : {}),
@@ -473,6 +474,7 @@ const normalizeRegistry = (payload) => {
 
       return {
         slug: validateGallerySlug(gallery.slug),
+        photosOnlySlug: gallery.photosOnlySlug ? validateGallerySlug(gallery.photosOnlySlug) : '',
         title: String(gallery.title || '').trim(),
         date: String(gallery.date || '').trim(),
         folder,
