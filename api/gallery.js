@@ -1,5 +1,7 @@
 import {
   GalleryError,
+  getGallerySegments,
+  getPhotoSegment,
   listGalleryPhotos,
   resolveGallery,
 } from '../server/dropbox-gallery.js';
@@ -18,6 +20,7 @@ export default async function handler(request, response) {
   try {
     const gallery = await resolveGallery(request.query?.slug);
     const photos = await listGalleryPhotos(gallery);
+    const segments = getGallerySegments(photos, gallery);
     const coverPhoto = photos.find((photo) => photo.name === gallery.coverPhoto);
     const coverQuery = coverPhoto
       ? new URLSearchParams({
@@ -52,6 +55,7 @@ export default async function handler(request, response) {
           ? `/api/gallery-photo?${coverPreviewQuery.toString()}`
           : '',
         coverUrl: coverQuery ? `/api/gallery-photo?${coverQuery.toString()}` : '',
+        segments,
       },
       photos: photos.map((photo) => {
         const query = new URLSearchParams({
@@ -62,6 +66,10 @@ export default async function handler(request, response) {
 
         return {
           ...photo,
+          segmentKey:
+            gallery.kind === 'weddings'
+              ? getPhotoSegment(photo.name, gallery.segmentLabels).key
+              : '',
           previewUrl: `/api/gallery-photo?${query.toString()}&size=preview`,
           thumbnailUrl: `/api/gallery-photo?${query.toString()}`,
           largeUrl: `/api/gallery-photo?${query.toString()}&size=large`,

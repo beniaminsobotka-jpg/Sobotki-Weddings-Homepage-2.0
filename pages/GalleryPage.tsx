@@ -29,6 +29,13 @@ type GalleryPhoto = {
   thumbnailUrl: string;
   largeUrl: string;
   downloadUrl: string;
+  segmentKey: string;
+};
+
+type GallerySegment = {
+  key: string;
+  label: string;
+  photoCount: number;
 };
 
 type GalleryData = {
@@ -40,6 +47,7 @@ type GalleryData = {
     fullResolutionAvailable: boolean;
     coverPreviewUrl: string;
     coverUrl: string;
+    segments: GallerySegment[];
   };
   photos: GalleryPhoto[];
   refreshAfterMs: number;
@@ -278,6 +286,7 @@ export const GalleryPage: React.FC = () => {
   );
   const [favoriteError, setFavoriteError] = useState('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [activeSegmentKey, setActiveSegmentKey] = useState('all');
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [coverFocus, setCoverFocus] = useState(DEFAULT_COVER_FOCUS);
   const [lightboxHeartBurst, setLightboxHeartBurst] = useState(0);
@@ -444,25 +453,46 @@ export const GalleryPage: React.FC = () => {
   const photos = data?.photos || [];
   const displayedGallery = data?.gallery || bootstrapGallery;
   const isWeddingGallery = displayedGallery?.kind === 'weddings';
-  const visiblePhotos = isWeddingGallery ? photos.slice(0, visiblePhotoCount) : photos;
+  const gallerySegments = displayedGallery?.segments || [];
+  const segmentFilteredPhotos =
+    isWeddingGallery && activeSegmentKey !== 'all'
+      ? photos.filter((photo) => photo.segmentKey === activeSegmentKey)
+      : photos;
+  const visiblePhotos = isWeddingGallery
+    ? segmentFilteredPhotos.slice(0, visiblePhotoCount)
+    : segmentFilteredPhotos;
   const favoritePhotos = useMemo(
-    () => photos.filter((photo) => favoritePhotoNames.has(photo.name)),
-    [favoritePhotoNames, photos]
+    () => segmentFilteredPhotos.filter((photo) => favoritePhotoNames.has(photo.name)),
+    [favoritePhotoNames, segmentFilteredPhotos]
   );
   const displayedPhotos = showFavoritesOnly ? favoritePhotos : visiblePhotos;
-  const displayedPhotoColumns = useMemo(() => {
-    const columns = Array.from(
-      { length: galleryColumnCount },
-      () => [] as Array<{ photo: GalleryPhoto; index: number }>
-    );
+  const displayedPhotoGroups = useMemo(() => {
+    const segmentOrder = isWeddingGallery
+      ? gallerySegments.filter((segment) =>
+          displayedPhotos.some((photo) => photo.segmentKey === segment.key)
+        )
+      : [{ key: 'all', label: '', photoCount: displayedPhotos.length }];
+    let globalIndex = 0;
 
-    displayedPhotos.forEach((photo, index) => {
-      columns[index % galleryColumnCount].push({ photo, index });
+    return segmentOrder.map((segment) => {
+      const groupPhotos = isWeddingGallery
+        ? displayedPhotos.filter((photo) => photo.segmentKey === segment.key)
+        : displayedPhotos;
+      const columns = Array.from(
+        { length: galleryColumnCount },
+        () => [] as Array<{ photo: GalleryPhoto; index: number }>
+      );
+
+      groupPhotos.forEach((photo, groupIndex) => {
+        const index = globalIndex;
+        columns[groupIndex % galleryColumnCount].push({ photo, index });
+        globalIndex += 1;
+      });
+
+      return { ...segment, columns };
     });
-
-    return columns;
-  }, [displayedPhotos, galleryColumnCount]);
-  const navigationPhotos = showFavoritesOnly ? favoritePhotos : photos;
+  }, [displayedPhotos, galleryColumnCount, gallerySegments, isWeddingGallery]);
+  const navigationPhotos = showFavoritesOnly ? favoritePhotos : segmentFilteredPhotos;
   const selectedPhoto = selectedIndex === null ? null : photos[selectedIndex] || null;
   const selectedNavigationIndex = selectedPhoto
     ? navigationPhotos.findIndex((photo) => photo.id === selectedPhoto.id)
@@ -490,7 +520,17 @@ export const GalleryPage: React.FC = () => {
   useEffect(() => {
     setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
     setShowFavoritesOnly(false);
+    setActiveSegmentKey('all');
   }, [slug]);
+
+  useEffect(() => {
+    if (
+      activeSegmentKey !== 'all' &&
+      !gallerySegments.some((segment) => segment.key === activeSegmentKey)
+    ) {
+      setActiveSegmentKey('all');
+    }
+  }, [activeSegmentKey, gallerySegments]);
 
   useEffect(() => {
     const updateColumnCount = () => {
@@ -512,7 +552,7 @@ export const GalleryPage: React.FC = () => {
       !trigger ||
       !isWeddingGallery ||
       showFavoritesOnly ||
-      visiblePhotos.length >= photos.length
+      visiblePhotos.length >= segmentFilteredPhotos.length
     ) {
       return;
     }
@@ -524,7 +564,7 @@ export const GalleryPage: React.FC = () => {
         }
 
         setVisiblePhotoCount((current) =>
-          Math.min(photos.length, current + WEDDING_GALLERY_BATCH_SIZE)
+          Math.min(segmentFilteredPhotos.length, current + WEDDING_GALLERY_BATCH_SIZE)
         );
       },
       { rootMargin: '1200px 0px' }
@@ -532,7 +572,12 @@ export const GalleryPage: React.FC = () => {
 
     observer.observe(trigger);
     return () => observer.disconnect();
-  }, [isWeddingGallery, photos.length, showFavoritesOnly, visiblePhotos.length]);
+  }, [
+    isWeddingGallery,
+    segmentFilteredPhotos.length,
+    showFavoritesOnly,
+    visiblePhotos.length,
+  ]);
 
   useEffect(() => {
     setCoverLoaded(false);
@@ -1191,6 +1236,45 @@ export const GalleryPage: React.FC = () => {
           </div>
         </div>
 
+        {isWeddingGallery && gallerySegments.length > 0 && (
+          <nav
+            className="-mx-3 mb-7 overflow-x-auto px-3 pb-1 sm:-mx-6 sm:mb-9 sm:px-6 lg:-mx-8 lg:px-8"
+            aria-label="Segmenty reportażu"
+          >
+            <div className="flex w-max min-w-full gap-2">
+              {[
+                { key: 'all', label: 'Wszystkie', photoCount: photos.length },
+                ...gallerySegments,
+              ].map((segment) => {
+                const active = activeSegmentKey === segment.key;
+
+                return (
+                  <button
+                    key={segment.key}
+                    type="button"
+                    onClick={() => {
+                      setActiveSegmentKey(segment.key);
+                      setVisiblePhotoCount(WEDDING_GALLERY_BATCH_SIZE);
+                      setSelectedIndex(null);
+                    }}
+                    className={`inline-flex min-h-10 items-center gap-2 whitespace-nowrap rounded-full border px-4 font-sans text-[9px] font-bold uppercase tracking-[0.14em] transition-colors sm:min-h-11 sm:px-5 sm:text-[10px] ${
+                      active
+                        ? 'border-black bg-black text-white'
+                        : 'border-black/10 bg-white/35 text-black/58 hover:border-black/30 hover:text-black'
+                    }`}
+                    aria-pressed={active}
+                  >
+                    {segment.label}
+                    <span className={active ? 'text-white/55' : 'text-black/32'}>
+                      {segment.photoCount}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+        )}
+
         {favoriteError && (
           <p
             className="mb-5 rounded-xl border border-red-700/15 bg-red-700/[0.06] px-4 py-3 font-sans text-xs text-red-800"
@@ -1266,8 +1350,24 @@ export const GalleryPage: React.FC = () => {
         )}
 
         {photos.length > 0 && displayedPhotos.length > 0 && (
-          <div className="grid grid-cols-2 items-start gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-            {displayedPhotoColumns.map((column, columnIndex) => (
+          <div className="space-y-12 sm:space-y-16">
+            {displayedPhotoGroups.map((group) => (
+              <section key={group.key} aria-labelledby={`segment-${group.key}`}>
+                {isWeddingGallery && (
+                  <div className="mb-5 flex items-end justify-between gap-4 border-b border-black/10 pb-3 sm:mb-7">
+                    <h2
+                      id={`segment-${group.key}`}
+                      className="font-serif text-2xl font-black uppercase tracking-[-0.04em] sm:text-3xl"
+                    >
+                      {group.label}
+                    </h2>
+                    <span className="pb-1 font-sans text-[9px] font-bold uppercase tracking-[0.16em] text-black/35">
+                      {group.photoCount} zdjęć
+                    </span>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 items-start gap-2 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {group.columns.map((column, columnIndex) => (
               <div key={columnIndex} className="flex min-w-0 flex-col">
               {column.map(({ photo, index }) => {
               const isSelected = selectedPhotoIds.has(photo.id);
@@ -1385,10 +1485,15 @@ export const GalleryPage: React.FC = () => {
             })}
               </div>
             ))}
+                </div>
+              </section>
+            ))}
           </div>
         )}
 
-        {!showFavoritesOnly && isWeddingGallery && visiblePhotos.length < photos.length && (
+        {!showFavoritesOnly &&
+          isWeddingGallery &&
+          visiblePhotos.length < segmentFilteredPhotos.length && (
           <div
             ref={galleryLoadMoreTrigger}
             className="h-px w-full"

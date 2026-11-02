@@ -12,6 +12,52 @@ const IMAGE_EXTENSIONS = new Set([
 ]);
 const BEST_OF_FOLDER_NAME = 'Best Of';
 const FAVORITES_FILE_NAME = '_sobotki-favorites.json';
+const DEFAULT_SEGMENT_LABEL = 'Pozostałe';
+
+const normalizeSearchText = (value) =>
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ł/g, 'l')
+    .replace(/Ł/g, 'L')
+    .toLocaleLowerCase('pl-PL');
+
+const normalizeSegmentKey = (value) => {
+  const key = normalizeSearchText(value)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 64);
+
+  return key || 'pozostale';
+};
+
+const normalizeSegmentLabels = (value) => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .slice(0, 80)
+      .map(([key, label]) => [normalizeSegmentKey(key), String(label || '').trim().slice(0, 60)])
+      .filter(([, label]) => label)
+  );
+};
+
+const SEGMENT_PATTERNS = [
+  { pattern: /\b(mini[\s._-]*sesj|mini[\s._-]*plener)/i, key: 'mini-sesja', label: 'Mini Sesja' },
+  { pattern: /\b(przygotowan|getting[\s._-]*ready)/i, key: 'przygotowania', label: 'Przygotowania' },
+  { pattern: /\b(first[\s._-]*look|pierwsz[ey][\s._-]*spotkani)/i, key: 'first-look', label: 'First Look' },
+  { pattern: /\b(kosciol|slub[\s._-]*koscieln)/i, key: 'kosciol', label: 'Kościół' },
+  { pattern: /\b(ceremoni|slub[\s._-]*cywiln|urzad)/i, key: 'ceremonia', label: 'Ceremonia' },
+  { pattern: /\b(zyczeni|gratulac)/i, key: 'zyczenia', label: 'Życzenia' },
+  { pattern: /\b(plener|sesj[ae][\s._-]*(?:slubn|pary))/i, key: 'plener', label: 'Plener' },
+  { pattern: /\b(pierwsz[ey][\s._-]*tani)/i, key: 'pierwszy-taniec', label: 'Pierwszy Taniec' },
+  { pattern: /\b(tort)/i, key: 'tort', label: 'Tort' },
+  { pattern: /\b(oczepin)/i, key: 'oczepiny', label: 'Oczepiny' },
+  { pattern: /\b(parkiet|zabaw|dance)/i, key: 'zabawa', label: 'Zabawa' },
+  { pattern: /\b(wesele|przyjec|sala)/i, key: 'wesele', label: 'Wesele' },
+];
 
 let cachedAccessToken = null;
 let cachedAccessTokenExpiresAt = 0;
@@ -58,6 +104,84 @@ export const getGalleryKind = (gallery) => {
   return /weddings/i.test(folderName)
     ? 'weddings'
     : 'portraits';
+};
+
+export const getPhotoSegment = (fileName, segmentLabels = {}) => {
+  const withoutExtension = String(fileName || '').replace(/\.[^.]+$/, '');
+  const searchableName = normalizeSearchText(withoutExtension);
+  const knownSegment = SEGMENT_PATTERNS.find(({ pattern }) => pattern.test(searchableName));
+
+  if (knownSegment) {
+    return {
+      key: knownSegment.key,
+      label: segmentLabels[knownSegment.key] || knownSegment.label,
+    };
+  }
+
+  let candidate = withoutExtension
+    .replace(/^\s*\d{1,4}[\s._-]+/, '')
+    .replace(/[\s._-]+(?:img|foto|photo)?\d{1,7}\s*$/i, '')
+    .trim();
+  const chunks = candidate.split(/\s+(?:-|–|—)\s+|__+/).filter(Boolean);
+
+  if (chunks.length > 1) {
+    candidate = chunks.at(-1).trim();
+  }
+
+  candidate = candidate.replace(/[_]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+
+  if (
+    !candidate ||
+    candidate.length > 60 ||
+    !/[a-ząćęłńóśźż]/i.test(candidate) ||
+    /^(?:dsc|img|image|photo|foto|untitled|bez nazwy)$/i.test(candidate)
+  ) {
+    candidate = DEFAULT_SEGMENT_LABEL;
+  }
+
+  const key = normalizeSegmentKey(candidate);
+  const defaultLabel =
+    candidate === DEFAULT_SEGMENT_LABEL
+      ? DEFAULT_SEGMENT_LABEL
+      : candidate.replace(/(^|\s)\p{L}/gu, (match) => match.toLocaleUpperCase('pl-PL'));
+
+  return {
+    key,
+    label: segmentLabels[key] || defaultLabel,
+  };
+};
+
+export const getGallerySegments = (photos, gallery) => {
+  if (getGalleryKind(gallery) !== 'weddings') {
+    return [];
+  }
+
+  const segmentLabels = normalizeSegmentLabels(gallery?.segmentLabels);
+  const segments = new Map();
+
+  photos.forEach((photo, index) => {
+    const segment = getPhotoSegment(photo.name, segmentLabels);
+    const existing = segments.get(segment.key);
+
+    if (existing) {
+      existing.photoCount += 1;
+      return;
+    }
+
+    segments.set(segment.key, {
+      ...segment,
+      photoCount: 1,
+      firstIndex: index,
+    });
+  });
+
+  return [...segments.values()]
+    .sort(
+      (first, second) =>
+        Number(second.key === 'mini-sesja') - Number(first.key === 'mini-sesja') ||
+        first.firstIndex - second.firstIndex
+    )
+    .map(({ firstIndex: _firstIndex, ...segment }) => segment);
 };
 
 export const validateGallerySlug = (slug) => {
@@ -134,6 +258,9 @@ export const resolveGallery = async (rawSlug) => {
           }
         : {}),
       coverPhoto: String(registeredGallery.coverPhoto || '').trim(),
+      ...(getGalleryKind(registeredGallery) === 'weddings'
+        ? { segmentLabels: normalizeSegmentLabels(registeredGallery.segmentLabels) }
+        : {}),
       kind: getGalleryKind(registeredGallery),
     };
   }
@@ -167,6 +294,9 @@ export const resolveGallery = async (rawSlug) => {
         ? { fullResolutionFolder: normalizeDropboxPath(event.fullResolutionFolder) }
         : {}),
       coverPhoto: String(event.coverPhoto || '').trim(),
+      ...(getGalleryKind(event) === 'weddings'
+        ? { segmentLabels: normalizeSegmentLabels(event.segmentLabels) }
+        : {}),
       kind: getGalleryKind(event),
     };
   }
@@ -347,6 +477,7 @@ const normalizeRegistry = (payload) => {
           : '',
         kind: getGalleryKind({ ...gallery, folder }),
         coverPhoto: String(gallery.coverPhoto || '').trim(),
+        segmentLabels: normalizeSegmentLabels(gallery.segmentLabels),
         publicationConsent:
           gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
             ? gallery.publicationConsent
@@ -743,7 +874,7 @@ const listPhotosInFolder = async (folder, gallery) => {
     entries.push(...result.entries);
   }
 
-  const chronologicalDirection = getGalleryKind(gallery) === 'weddings' ? 1 : -1;
+  const isWeddingGallery = getGalleryKind(gallery) === 'weddings';
 
   return entries
     .filter(
@@ -751,12 +882,28 @@ const listPhotosInFolder = async (folder, gallery) => {
         entry?.['.tag'] === 'file' &&
         IMAGE_EXTENSIONS.has(getFileExtension(entry.name || ''))
     )
-    .sort(
-      (first, second) =>
-        chronologicalDirection *
-        (new Date(first.client_modified || first.server_modified || 0).getTime() -
-          new Date(second.client_modified || second.server_modified || 0).getTime())
-    )
+    .sort((first, second) => {
+      if (isWeddingGallery) {
+        const firstSegment = getPhotoSegment(first.name, gallery?.segmentLabels);
+        const secondSegment = getPhotoSegment(second.name, gallery?.segmentLabels);
+        const miniSessionOrder =
+          Number(secondSegment.key === 'mini-sesja') -
+          Number(firstSegment.key === 'mini-sesja');
+
+        return (
+          miniSessionOrder ||
+          first.name.localeCompare(second.name, 'pl', {
+            numeric: true,
+            sensitivity: 'base',
+          })
+        );
+      }
+
+      return (
+        new Date(second.client_modified || second.server_modified || 0).getTime() -
+        new Date(first.client_modified || first.server_modified || 0).getTime()
+      );
+    })
     .map((entry) => ({
       id: entry.id || `${entry.name}:${entry.rev}`,
       name: entry.name,

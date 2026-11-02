@@ -36,6 +36,8 @@ type GalleryRecord = {
   fullResolutionFolder: string;
   kind: 'portraits' | 'weddings';
   coverPhoto: string;
+  segmentLabels: Record<string, string>;
+  segments: GallerySegment[];
   photoCount: number | null;
   fullResolutionPhotoCount: number | null;
   matchedFullResolutionCount: number | null;
@@ -44,6 +46,12 @@ type GalleryRecord = {
   isBestOf?: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+type GallerySegment = {
+  key: string;
+  label: string;
+  photoCount: number;
 };
 
 type GalleryAdminMode = 'chooser' | 'portraits' | 'weddings';
@@ -81,6 +89,7 @@ type FormState = {
   fullResolutionFolder: string;
   slug: string;
   publicationConsent: 'granted' | 'denied' | '';
+  segmentLabels: Record<string, string>;
   active: boolean;
 };
 
@@ -92,6 +101,7 @@ const emptyForm = (): FormState => ({
   fullResolutionFolder: '',
   slug: '',
   publicationConsent: '',
+  segmentLabels: {},
   active: true,
 });
 
@@ -554,6 +564,13 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
     () => browserPhotos.filter((photo) => photo.favoriteCount > 0).length,
     [browserPhotos]
   );
+  const editedGallerySegments = useMemo(
+    () =>
+      form.originalSlug
+        ? data?.galleries.find((gallery) => gallery.slug === form.originalSlug)?.segments || []
+        : [],
+    [data?.galleries, form.originalSlug]
+  );
 
   const openCreateForm = () => {
     suffixRef.current = createSuffix();
@@ -906,6 +923,12 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
         gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
           ? gallery.publicationConsent
           : '',
+      segmentLabels: Object.fromEntries(
+        (gallery.segments || []).map((segment) => [
+          segment.key,
+          gallery.segmentLabels?.[segment.key] || segment.label,
+        ])
+      ),
       active: gallery.active,
     });
     setShowForm(true);
@@ -2381,6 +2404,52 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                     ten folder, panel przypomni o jego dodaniu.
                   </span>
                 </label>
+              )}
+
+              {mode === 'weddings' && form.originalSlug && (
+                <fieldset className="rounded-2xl border border-black/10 bg-white/35 p-4">
+                  <legend className="px-2 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">
+                    Nazwy segmentów galerii
+                  </legend>
+                  <p className="mb-4 font-sans text-[10px] leading-4 text-black/42">
+                    Segmenty są wykrywane automatycznie z nazw plików. Tutaj możesz zmienić
+                    nazwy widoczne dla klienta.
+                  </p>
+                  {editedGallerySegments.length > 0 ? (
+                    <div className="space-y-3">
+                      {editedGallerySegments.map((segment) => (
+                        <label
+                          key={segment.key}
+                          className="grid gap-2 sm:grid-cols-[130px_1fr] sm:items-center"
+                        >
+                          <span className="font-sans text-[9px] font-bold uppercase tracking-[0.12em] text-black/45">
+                            {segment.photoCount} zdjęć
+                          </span>
+                          <input
+                            type="text"
+                            value={form.segmentLabels[segment.key] || segment.label}
+                            onChange={(event) =>
+                              setForm((current) => ({
+                                ...current,
+                                segmentLabels: {
+                                  ...current.segmentLabels,
+                                  [segment.key]: event.target.value,
+                                },
+                              }))
+                            }
+                            maxLength={60}
+                            className="min-h-[46px] w-full rounded-xl border border-black/12 bg-white/65 px-4 font-sans text-sm font-normal normal-case tracking-normal outline-none focus:border-black/40"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="font-sans text-[10px] text-black/38">
+                      Nie wykryto jeszcze segmentów. Sprawdź, czy nazwy plików zawierają np.
+                      „Przygotowania”, „Kościół”, „Mini Sesja” lub „Wesele”.
+                    </p>
+                  )}
+                </fieldset>
               )}
 
               <label className="block font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">

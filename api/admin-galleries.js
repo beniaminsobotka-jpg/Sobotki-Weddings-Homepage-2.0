@@ -9,6 +9,7 @@ import {
   getGalleryKind,
   getGalleryRegistry,
   getGalleryRoot,
+  getGallerySegments,
   listGalleryFullResolutionPhotos,
   listGalleryFolders,
   listGalleryPhotos,
@@ -118,6 +119,7 @@ const getAdminData = async () => {
           photoCount: photos.length,
           fullResolutionPhotoCount: fullResolutionPhotos.length,
           matchedFullResolutionCount,
+          segments: getGallerySegments(photos, gallery),
         };
       } catch {
         return {
@@ -125,6 +127,7 @@ const getAdminData = async () => {
           photoCount: null,
           fullResolutionPhotoCount: gallery.fullResolutionFolder ? null : 0,
           matchedFullResolutionCount: null,
+          segments: [],
         };
       }
     })
@@ -427,6 +430,12 @@ export default async function handler(request, response) {
       kind: getGalleryKind({ folder }),
       coverPhoto:
         existingIndex >= 0 ? String(registry.galleries[existingIndex].coverPhoto || '') : '',
+      segmentLabels:
+        body.gallery?.segmentLabels && typeof body.gallery.segmentLabels === 'object'
+          ? body.gallery.segmentLabels
+          : existingIndex >= 0
+            ? registry.galleries[existingIndex].segmentLabels || {}
+            : {},
       publicationConsent,
       active: body.gallery?.active !== false,
       createdAt: existingIndex >= 0 ? registry.galleries[existingIndex].createdAt : now,

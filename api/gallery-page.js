@@ -1,4 +1,8 @@
-import { listGalleryPhotos, resolveGallery } from '../server/dropbox-gallery.js';
+import {
+  getGallerySegments,
+  listGalleryPhotos,
+  resolveGallery,
+} from '../server/dropbox-gallery.js';
 
 const PUBLIC_ORIGIN = 'https://www.sobotkiweddings.pl';
 
@@ -146,6 +150,7 @@ export default async function handler(request, response) {
       fullResolutionAvailable: Boolean(gallery.fullResolutionFolder),
       coverPreviewUrl,
       coverUrl,
+      segments: getGallerySegments(photos, gallery),
     });
     html = injectImagePreload(html, coverPreviewUrl || coverUrl);
   } catch {
