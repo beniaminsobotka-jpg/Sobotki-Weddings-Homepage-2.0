@@ -1,5 +1,6 @@
 import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
 import { hashSelectionPin } from '../server/gallery-couple-auth.js';
+import { normalizeGalleryVideos } from '../server/gallery-videos.js';
 import {
   buildPhotoPath,
   copyPhotosBatch,
@@ -424,6 +425,13 @@ export default async function handler(request, response) {
     }
 
     const now = new Date().toISOString();
+    let videos;
+    try {
+      videos = normalizeGalleryVideos(body.gallery?.videos ?? (existingIndex >= 0 ? registry.galleries[existingIndex].videos : {}), true);
+    } catch (error) {
+      return sendJson(response,400,{error:error.message});
+    }
+    const previousVideos = normalizeGalleryVideos(existingIndex >= 0 ? registry.galleries[existingIndex].videos : {});
     const selectionPin = String(body.gallery?.selectionPin || '').trim();
     if (selectionPin && !/^\d{6}$/.test(selectionPin)) {
       return sendJson(response, 400, { error: 'PIN do wyboru zdjęć musi mieć 6 cyfr.' });
@@ -435,6 +443,8 @@ export default async function handler(request, response) {
       folder,
       fullResolutionFolder,
       kind: getGalleryKind({ folder }),
+      videos,
+      videosPublic: existingIndex >= 0 && registry.galleries[existingIndex].videosPublic === true && JSON.stringify(videos) === JSON.stringify(previousVideos),
       selectionPinHash: selectionPin
         ? hashSelectionPin(selectionPin)
         : existingIndex >= 0 ? registry.galleries[existingIndex].selectionPinHash || '' : '',

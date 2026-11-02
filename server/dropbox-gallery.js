@@ -1,4 +1,5 @@
 import { openDownloadStream, readDownloadError } from './download-stream.js';
+import { normalizeGalleryVideos } from './gallery-videos.js';
 
 const DROPBOX_API_URL = 'https://api.dropboxapi.com/2';
 const DROPBOX_CONTENT_URL = 'https://content.dropboxapi.com/2';
@@ -482,6 +483,8 @@ const normalizeRegistry = (payload) => {
         coverPhoto: String(gallery.coverPhoto || '').trim(),
         segmentLabels: normalizeSegmentLabels(gallery.segmentLabels),
         selectionPinHash: String(gallery.selectionPinHash || ''),
+        videos: normalizeGalleryVideos(gallery.videos),
+        videosPublic: gallery.videosPublic === true,
         publicationConsent:
           gallery.publicationConsent === 'granted' || gallery.publicationConsent === 'denied'
             ? gallery.publicationConsent

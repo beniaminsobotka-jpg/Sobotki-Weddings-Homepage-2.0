@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
+import { GalleryVideos } from '../components/GalleryVideos';
 
 type GalleryPhoto = {
   id: string;
@@ -1608,6 +1609,7 @@ export const GalleryPage: React.FC = () => {
             )}
           </section>
         )}
+        {isWeddingGallery && <GalleryVideos key={`${slug}:${coupleUnlocked}`} slug={slug} coupleUnlocked={coupleUnlocked} />}
       </main>
 
       <footer className="border-t border-black/[0.08] px-6 py-9 text-center">

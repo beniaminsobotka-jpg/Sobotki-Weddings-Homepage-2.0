@@ -29,6 +29,8 @@ import {
 import { sobotkiPortraitsLogoDataUrl } from '../assets/sobotkiPortraitsLogo';
 
 type GalleryRecord = {
+  videos?: GalleryVideos;
+  videosPublic?: boolean;
   slug: string;
   title: string;
   date: string;
@@ -54,6 +56,9 @@ type GallerySegment = {
   label: string;
   photoCount: number;
 };
+
+type GalleryVideos = Record<'creative' | 'family', {youtubeUrl:string;downloadUrl:string}>;
+const emptyVideos = (): GalleryVideos => ({creative:{youtubeUrl:'',downloadUrl:''},family:{youtubeUrl:'',downloadUrl:''}});
 
 type GalleryAdminMode = 'chooser' | 'portraits' | 'weddings';
 
@@ -83,6 +88,7 @@ type AdminData = {
 };
 
 type FormState = {
+  videos: GalleryVideos;
   selectionPin: string;
   originalSlug: string;
   title: string;
@@ -96,6 +102,7 @@ type FormState = {
 };
 
 const emptyForm = (): FormState => ({
+  videos: emptyVideos(),
   selectionPin: '',
   originalSlug: '',
   title: '',
@@ -917,6 +924,7 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
     setSlugTouched(true);
     setForm({
       originalSlug: gallery.slug,
+      videos: gallery.videos || emptyVideos(),
       selectionPin: '',
       title: gallery.title,
       date: gallery.date,
@@ -2431,6 +2439,30 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                       : ' Ustaw PIN, aby uruchomić wybieranie zdjęć. Goście mogą oglądać i pobierać zdjęcia bez kodu.'}
                   </span>
                 </label>
+              )}
+
+              {mode === 'weddings' && (
+                <fieldset className="rounded-2xl border border-black/10 bg-white/35 p-4">
+                  <legend className="px-2 font-sans text-[9px] font-bold uppercase tracking-[0.18em] text-black/48">Filmy — opcjonalnie</legend>
+                  <p className="mb-5 font-sans text-xs leading-5 text-black/45">
+                    Możesz dodać oba filmy, jeden albo zostawić wszystkie pola puste. Filmy są początkowo dostępne tylko po PIN-ie; para może udostępnić je gościom w galerii. Zmiana linków ponownie ukrywa filmy przed gośćmi.
+                  </p>
+                  <div className="space-y-6">
+                    {(['creative','family'] as const).map((key) => (
+                      <div key={key} className="space-y-3">
+                        <h3 className="font-playfair text-xl italic">Film {key === 'creative' ? 'Kreatywny' : 'Rodzinny'}</h3>
+                        {(['youtubeUrl','downloadUrl'] as const).map((field) => (
+                          <label key={field} className="block font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-black/48">
+                            {field === 'youtubeUrl' ? 'Link do YouTube' : 'Link do pobrania z Dropboxa'}
+                            <input type="url" value={form.videos[key][field]} placeholder={field === 'youtubeUrl' ? 'https://www.youtube.com/watch?v=…' : 'https://www.dropbox.com/scl/fi/…'} maxLength={2048}
+                              onChange={(event) => setForm((current) => ({...current,videos:{...current.videos,[key]:{...current.videos[key],[field]:event.target.value}}}))}
+                              className="mt-2 min-h-12 w-full rounded-xl border border-black/12 bg-white/60 px-4 font-sans text-sm font-normal normal-case tracking-normal outline-none focus:border-black/40" />
+                          </label>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </fieldset>
               )}
 
               {mode === 'weddings' && form.originalSlug && (
