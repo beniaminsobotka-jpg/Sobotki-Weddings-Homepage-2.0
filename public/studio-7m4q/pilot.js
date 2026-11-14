@@ -99,16 +99,9 @@ byId('lead').addEventListener('submit', async event => {
 });
 
 const inquiry = byId('inquiry');
-const printLimits = { essential: { '15x20': 100, '10x15': 200 }, exclusive: { '15x20': 200, '10x15': 400 } };
-const printLabel = (packageKey, format) =>
-  'Do ' + printLimits[packageKey][format] + ' odbitek ' + format.replace('x', ' × ') + ' cm';
 function updateInquiry() {
   if (!lead) return;
   const exclusive = inquiry.elements.package.value === 'exclusive';
-  const packageKey = exclusive ? 'exclusive' : 'essential';
-  for (const option of inquiry.elements.prints.options) {
-    option.textContent = printLabel(packageKey, option.value);
-  }
   byId('colorOption').hidden = exclusive;
   inquiry.elements.color.disabled = exclusive;
   const total = lead.editorialPilot[exclusive ? 'exclusive' : 'essential'] +
@@ -139,7 +132,7 @@ inquiry.addEventListener('submit', async event => {
       timestamp, eventTimestamp: timestamp, interestedOffers: ['Fotostacja portretowa'],
       inquiryMessage: [
         'Fotostacja Edytorialna · Pilotaż P1 · ' + pilot.id,
-        packageName + ': ' + money(amount), 'Odbitki: ' + printLabel(packageName.toLowerCase(), data.get('prints')),
+        packageName + ': ' + money(amount), 'Format odbitek: do wyboru w ankiecie przed weselem',
         'Kolor cyfrowy: ' + (packageName === 'Exclusive' ? 'w cenie' : hasColorAddon ? '+300 zł' : 'nie wybrano'),
         'Razem bez transportu: ' + money(amount + (hasColorAddon ? COLOR_PRICE : 0)),
         'Essential: ' + money(pilot.essential) + '; Exclusive: ' + money(pilot.exclusive),
