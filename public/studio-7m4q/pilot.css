@@ -28,8 +28,16 @@
 .portrait-pilot .back { display: inline-block; margin-bottom: 28px; }
 .pilot-hero { align-items: center; }
 .pilot-hero p:not(.eyebrow) { margin: 18px 0; }
-.pilot-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 35px 0 60px; }
-.pilot-gallery img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; border-radius: 0; }
+.portrait-pilot .portrait-gallery-section { width: 100%; }
+.portrait-pilot .cloud-section { margin: 0 0 var(--section-space); }
+.portrait-pilot .cloud-visual { display: grid; justify-items: center; gap: 12px; }
+.portrait-pilot #phoneToggle { min-height: 44px; }
+.portrait-pilot .iphone-screen video { object-fit: contain; background: #fff; }
+.portrait-pilot .editorial-book { margin-top: var(--section-space); }
+.portrait-pilot .editorial-book .feature-copy > p { color: #555; }
+.editorial-book-photo { margin: 0; justify-self: center; max-width: 360px; }
+.editorial-book-photo img { display: block; width: 100%; height: auto; }
+.editorial-book-photo figcaption { margin-top: 8px; color: #666; font-size: .75rem; }
 .portrait-pilot #pakiety { padding: clamp(22px, 5vw, 64px); color-scheme: dark; scroll-margin-top: 18px; }
 .portrait-pilot #pakiety .eyebrow { color: var(--color-muted); }
 .portrait-pilot .packages { margin-bottom: 24px; }
@@ -43,5 +51,4 @@
   .portrait-pilot #choice .eyebrow { font-size: 9px; letter-spacing: .12em; }
   .portrait-pilot #choice article > p { font-size: .85rem; }
   .portrait-pilot #choice .button { padding: 10px 8px; letter-spacing: .07em; min-height: 44px; font-size: 9px; }
-  .pilot-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

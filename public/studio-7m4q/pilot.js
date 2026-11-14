@@ -122,4 +122,85 @@ byId('inquiry').addEventListener('submit', async event => {
 });
 
 window.addEventListener('hashchange', route);
+
+const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const mosaic = byId('editorialMosaic');
+const viewport = mosaic.parentElement;
+const tiles = Array.from(mosaic.children);
+const copies = tiles.map(tile => {
+  const copy = tile.cloneNode(true);
+  copy.setAttribute('aria-hidden', 'true');
+  copy.classList.add('mosaic-loop-copy');
+  copy.firstElementChild.alt = '';
+  copy.hidden = true;
+  mosaic.append(copy);
+  return copy;
+});
+
+function layoutMosaic() {
+  const width = mosaic.clientWidth;
+  if (!width) return;
+  const columns = width < 560 ? 3 : width < 900 ? 4 : 6;
+  const gap = width < 560 ? 10 : width < 900 ? 14 : 18;
+  const unit = (width - (columns - 1) * gap) / columns;
+  const bottoms = Array(columns).fill(0);
+  const positions = tiles.map(tile => {
+    const span = tile.hasAttribute('data-large') ? 2 : 1;
+    const w = unit * span + gap * (span - 1);
+    const image = tile.firstElementChild;
+    const h = w * Number(image.getAttribute('height')) / Number(image.getAttribute('width'));
+    let column = 0, top = Infinity;
+    for (let i = 0; i <= columns - span; i++) {
+      const candidate = Math.max(...bottoms.slice(i, i + span));
+      if (candidate < top) { column = i; top = candidate; }
+    }
+    bottoms.fill(top + h + gap, column, column + span);
+    return { x: column * (unit + gap), top, w, h };
+  });
+  const cycle = Math.max(...bottoms);
+  const place = (tile, p, offset = 0) => Object.assign(tile.style, {
+    left: p.x + 'px', top: p.top + offset + 'px', width: p.w + 'px', height: p.h + 'px',
+  });
+  tiles.forEach((tile, i) => place(tile, positions[i]));
+  copies.forEach((tile, i) => {
+    place(tile, positions[i], cycle);
+    tile.hidden = motion.matches;
+  });
+  mosaic.style.height = cycle * (motion.matches ? 1 : 2) - gap + 'px';
+  mosaic.style.setProperty('--mosaic-loop-distance', cycle + 'px');
+  mosaic.style.setProperty('--mosaic-loop-duration', cycle / 32 + 's');
+  mosaic.classList.add('mosaic-ready');
+  viewport.classList.toggle('is-looping', !motion.matches);
+}
+let lastMosaicWidth = 0;
+new ResizeObserver(() => {
+  const width = mosaic.clientWidth;
+  if (width && width !== lastMosaicWidth) layoutMosaic();
+  lastMosaicWidth = width;
+}).observe(mosaic);
+motion.addEventListener('change', layoutMosaic);
+
+const phone = byId('editorialPhone');
+const phoneToggle = byId('phoneToggle');
+let phoneVisible = false;
+let manualPlayback = null;
+function syncPhone() {
+  const shouldPlay = phoneVisible && !document.hidden && (manualPlayback ?? !motion.matches);
+  if (shouldPlay) phone.play().catch(() => {});
+  else phone.pause();
+}
+new IntersectionObserver(([entry]) => {
+  phoneVisible = entry.isIntersecting && entry.intersectionRatio >= .15;
+  syncPhone();
+}, { threshold: .15 }).observe(phone);
+phoneToggle.addEventListener('click', () => {
+  manualPlayback = phone.paused;
+  if (manualPlayback) phone.play().catch(() => {});
+  else phone.pause();
+});
+phone.addEventListener('play', () => { phoneToggle.textContent = 'Wstrzymaj podgląd'; });
+phone.addEventListener('pause', () => { phoneToggle.textContent = 'Odtwórz podgląd'; });
+document.addEventListener('visibilitychange', syncPhone);
+motion.addEventListener('change', syncPhone);
+
 unlock();

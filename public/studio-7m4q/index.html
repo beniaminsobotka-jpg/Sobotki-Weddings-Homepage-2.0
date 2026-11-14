@@ -61,15 +61,46 @@
       <p>Wyraziste światło, drapowana scenografia i pionowe kadry jak z sesji modowej. Najlepiej sprawdzi się w portretach solo oraz w grupach 2–3 osób.</p><a class="button button-primary" href="#pakiety">Zobacz pakiety ↓</a></div>
       <img class="cover" src="./photos/cover.webp" alt="Portret edytorialny na weselu">
     </div>
-    <div class="pilot-gallery" aria-label="Przykładowe portrety edytorialne">
-      <img src="./photos/01.webp" loading="lazy" alt="Solowy portret w scenografii">
-      <img src="./photos/02.webp" loading="lazy" alt="Mała grupa na tle draperii">
-      <img src="./photos/03.webp" loading="lazy" alt="Portret z wyrazistym światłem">
-      <img src="./photos/04.webp" loading="lazy" alt="Pionowy portret siedzący">
-      <img src="./photos/05.webp" loading="lazy" alt="Bliski portret dwojga gości">
-      <img src="./photos/06.webp" loading="lazy" alt="Solowy portret w garniturze">
-      <img src="./photos/07.webp" loading="lazy" alt="Swobodny portret na tle scenografii">
-      <img src="./photos/08.webp" loading="lazy" alt="Dwie osoby w portrecie edytorialnym">
+    <div class="portrait-gallery-section">
+      <div class="gallery-heading">
+        <div><p class="eyebrow">Galeria portretów</p><h2>Tak wygląda <span class="serif-accent">Edytorialna.</span></h2></div>
+        <p>Pionowe kadry, mocny błysk i portrety solo lub w małych grupach.</p>
+      </div>
+      <div class="portrait-gallery-viewport" tabindex="0" role="region" aria-label="Przykładowe portrety edytorialne">
+        <div class="portrait-gallery" id="editorialMosaic">
+          <figure data-large><img src="./photos/09.webp" width="760" height="1140" alt="Solowy portret siedzący" loading="lazy"></figure>
+          <figure><img src="./photos/02.webp" width="650" height="975" alt="Mała grupa na tle draperii" loading="lazy"></figure>
+          <figure><img src="./photos/03.webp" width="650" height="975" alt="Portret z wyrazistym światłem" loading="lazy"></figure>
+          <figure data-large><img src="./photos/10.webp" width="760" height="1140" alt="Dwie osoby w swobodnej pozie" loading="lazy"></figure>
+          <figure><img src="./photos/11.webp" width="760" height="1140" alt="Solowy portret w ciemnym stroju" loading="lazy"></figure>
+          <figure><img src="./photos/12.webp" width="760" height="1140" alt="Uśmiechnięta gościni przed obiektywem" loading="lazy"></figure>
+          <figure><img src="./photos/06.webp" width="650" height="975" alt="Solowy portret gościa" loading="lazy"></figure>
+          <figure data-large><img src="./photos/14.webp" width="760" height="1140" alt="Portret w scenografii z krzesłem" loading="lazy"></figure>
+          <figure><img src="./photos/05.webp" width="650" height="975" alt="Bliski portret dwojga gości" loading="lazy"></figure>
+          <figure><img src="./photos/15.webp" width="760" height="1140" alt="Portret na tle draperii" loading="lazy"></figure>
+          <figure><img src="./photos/08.webp" width="650" height="975" alt="Dwie osoby w portrecie edytorialnym" loading="lazy"></figure>
+          <figure><img src="./photos/04.webp" width="650" height="975" alt="Pionowy portret siedzący" loading="lazy"></figure>
+          <figure data-large><img src="./photos/16.webp" width="760" height="1140" alt="Bliski portret w duecie" loading="lazy"></figure>
+          <figure><img src="./photos/13.webp" width="760" height="1140" alt="Para w scenografii edytorialnej" loading="lazy"></figure>
+          <figure><img src="./photos/07.webp" width="650" height="975" alt="Swobodny portret na tle scenografii" loading="lazy"></figure>
+          <figure><img src="./photos/01.webp" width="650" height="975" alt="Solowy portret w scenografii" loading="lazy"></figure>
+        </div>
+      </div>
+    </div>
+    <div class="cloud-section" role="region" aria-labelledby="editorial-cloud-title">
+      <div class="cloud-copy">
+        <p class="eyebrow">Galeria dla gości</p>
+        <h2 id="editorial-cloud-title">Zdjęcia od razu <span class="serif-accent">na telefonie.</span></h2>
+        <p>Goście skanują kod QR przy Fotostacji i od razu otwierają galerię w chmurze, bez instalowania aplikacji. Mogą przeglądać i pobierać swoje portrety już w trakcie wesela.</p>
+        <p class="cloud-included">Czarno-biała galeria w cenie Essential i Exclusive.</p>
+        <p class="cloud-note">Dostęp na miejscu zależy od internetu w obiekcie. Kolorowe wersje w Exclusive trafiają do galerii do 3 dni po weselu.</p>
+      </div>
+      <div class="cloud-visual">
+        <div class="iphone-shell"><div class="iphone-screen">
+          <video id="editorialPhone" muted loop playsinline preload="none" poster="./photos/phone-poster.webp" disablepictureinpicture disableremoteplayback aria-label="Podgląd galerii Edytorialnej w telefonie" src="./editorial-phone.mp4"></video>
+        </div></div>
+        <button id="phoneToggle" type="button" class="button button-primary">Odtwórz podgląd</button>
+      </div>
     </div>
     <div id="pakiety" class="pricing-section">
       <p class="eyebrow">Cennik</p><h2>Wybierzcie <em class="serif-accent">pakiet.</em></h2>
@@ -78,10 +109,10 @@
           <li>3 godziny i 2 osoby obsługi</li><li>Autorska scenografia i czarno-białe portrety</li><li>100 odbitek 15 × 20 cm <strong>lub</strong> 200 odbitek 10 × 15 cm</li><li>Galeria czarno-biała dostępna już podczas wesela*</li>
         </ul></article>
         <article class="package-card package-featured"><h3>Exclusive</h3><p class="price" id="exclusive"></p><ul>
-          <li>Wszystko z Essential, w tym wybór formatu odbitek</li><li>Księga gości 30 × 30 cm</li><li>Kolorowe wersje zdjęć w galerii cyfrowej do 3 dni po weselu</li>
+          <li>Wszystko z Essential, w tym wybór formatu odbitek</li><li>Księga gości 42 × 30 cm</li><li>Kolorowe wersje zdjęć w galerii cyfrowej do 3 dni po weselu</li>
         </ul></article>
       </div>
-      <p>Przed weselem wybieracie jeden format. Na miejscu drukujemy wyłącznie czarno-białe odbitki. Odbitki ponad limit: 1,50 zł/szt., rozliczane z organizatorem po weselu. Dodatkowa godzina: 600 zł. Księga gości do Essential: 600 zł. Transport: 1 zł/km od Gliwic, rozliczany osobno.</p>
+      <p>Przed weselem wybieracie jeden format. Na miejscu drukujemy wyłącznie czarno-białe odbitki. Odbitki ponad limit: 1,50 zł/szt., rozliczane z organizatorem po weselu. Dodatkowa godzina: 600 zł. Księga gości 42 × 30 cm do Essential: 600 zł. Transport: 1 zł/km od Gliwic, rozliczany osobno.</p>
       <p class="fine">* Dostęp na miejscu zależy od internetu w obiekcie.</p>
       <form id="inquiry">
         <label>Pakiet<select name="package"><option value="essential">Essential</option><option value="exclusive">Exclusive</option></select></label>
@@ -89,6 +120,14 @@
         <button class="wide button button-primary button-reserve">Zapytaj o dostępność terminu →</button>
         <p class="wide" id="inquiryStatus" role="status"></p>
       </form>
+    </div>
+    <div class="feature-split feature-split-reverse editorial-book" role="region" aria-labelledby="editorial-book-title">
+      <div class="feature-copy">
+        <div class="feature-kicker"><p class="eyebrow">Księga gości</p><p class="feature-package-note">W cenie Exclusive · W Essential +600 zł</p></div>
+        <h2 id="editorial-book-title">Drukowana <span class="serif-accent">księga gości.</span></h2>
+        <p>Po portrecie goście zostawiają odręczne życzenia na iPadzie. Po weselu łączymy zdjęcia i wpisy w drukowanym albumie <strong>42 × 30 cm</strong>.</p>
+      </div>
+      <figure class="editorial-book-photo"><img src="../offers/v1/assets/guestbook-02.webp" loading="lazy" alt="Przykład zdjęcia i odręcznego wpisu w księdze gości"><figcaption>Przykładowa realizacja księgi gości</figcaption></figure>
     </div>
   </section>
   <footer>Sobotki Portraits · Pilotaż P1</footer>
