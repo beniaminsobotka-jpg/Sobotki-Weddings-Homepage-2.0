@@ -10,8 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://use.typekit.net/oiv8gfj.css">
   <link rel="stylesheet" href="../offers/v1/base.css">
-  <link rel="stylesheet" href="./pilot.css">
-  <script src="./pilot.js" defer></script>
+  <link rel="stylesheet" href="./pilot.css?porownanie=2">
+  <script src="./pilot.js?porownanie=2" defer></script>
 </head>
 <body class="portrait-pilot">
 <main class="pilot-main">
@@ -124,21 +124,17 @@
       <p class="eyebrow">Dwie wersje tego samego portretu</p>
       <h2 id="editorial-color-title">Edytorialna <span class="serif-accent">także w kolorze.</span></h2>
       <p>W czerni i bieli uwagę przyciąga światło. W kolorze widać też odcienie tkanin i scenografii. Cyfrowe wersje kolorowe dostarczamy do tygodnia po ślubie — w cenie Exclusive, a w Essential za dodatkowe 300 zł. Na miejscu drukujemy odbitki czarno-białe.</p>
-      <div class="pair editorial-comparison">
-        <figure><figcaption>01 <span>Czerń i biel</span></figcaption><img id="editionBw" src="./photos/editions/01-bw.webp" width="850" height="1275" loading="lazy" alt="Uśmiechnięta gościni — czerń i biel"></figure>
-        <figure><figcaption>02 <span>Kolor</span></figcaption><img id="editionColor" src="./photos/editions/01-color.webp" width="850" height="1275" loading="lazy" alt="Uśmiechnięta gościni — kolor"></figure>
-      </div>
-      <div class="edition-contact">
-        <div class="edition-contact-heading"><span>Wybierzcie kadr do porównania</span><output id="editionNumber" aria-live="polite">01 / 07</output></div>
-        <div class="edition-strip" role="group" aria-label="Portrety do porównania">
-          <button type="button" data-edition="01" data-caption="Uśmiechnięta gościni" aria-label="Kadr 1: uśmiechnięta gościni" aria-pressed="true"><img src="./photos/editions/01-thumb.webp" loading="lazy" alt=""><span>01</span></button>
-          <button type="button" data-edition="02" data-caption="Trzy osoby w scenografii" aria-label="Kadr 2: trzy osoby w scenografii" aria-pressed="false"><img src="./photos/editions/02-thumb.webp" loading="lazy" alt=""><span>02</span></button>
-          <button type="button" data-edition="03" data-caption="Para przy drapowanym tle" aria-label="Kadr 3: para przy drapowanym tle" aria-pressed="false"><img src="./photos/editions/03-thumb.webp" loading="lazy" alt=""><span>03</span></button>
-          <button type="button" data-edition="04" data-caption="Portret gościa przy krześle" aria-label="Kadr 4: portret gościa przy krześle" aria-pressed="false"><img src="./photos/editions/04-thumb.webp" loading="lazy" alt=""><span>04</span></button>
-          <button type="button" data-edition="05" data-caption="Siedząca para" aria-label="Kadr 5: siedząca para" aria-pressed="false"><img src="./photos/editions/05-thumb.webp" loading="lazy" alt=""><span>05</span></button>
-          <button type="button" data-edition="06" data-caption="Uśmiechnięty gość w okularach" aria-label="Kadr 6: uśmiechnięty gość w okularach" aria-pressed="false"><img src="./photos/editions/06-thumb.webp" loading="lazy" alt=""><span>06</span></button>
-          <button type="button" data-edition="07" data-caption="Portret gościa w ciemnym garniturze" aria-label="Kadr 7: portret gościa w ciemnym garniturze" aria-pressed="false"><img src="./photos/editions/07-thumb.webp" loading="lazy" alt=""><span>07</span></button>
+      <div class="editorial-comparison">
+        <div class="edition-pair" data-pair="01">
+          <figure><figcaption>Czerń i biel</figcaption><img data-variant="bw" src="./photos/editions/01-bw.webp" width="850" height="1275" loading="lazy" alt="Portret 1 — czerń i biel"></figure>
+          <figure><figcaption>Kolor</figcaption><img data-variant="color" src="./photos/editions/01-color.webp" width="850" height="1275" loading="lazy" alt="Portret 1 — kolor"></figure>
         </div>
+        <div class="edition-pair" data-pair="04">
+          <figure><figcaption>Kolor</figcaption><img data-variant="color" src="./photos/editions/04-color.webp" width="850" height="1275" loading="lazy" alt="Portret 4 — kolor"></figure>
+          <figure><figcaption>Czerń i biel</figcaption><img data-variant="bw" src="./photos/editions/04-bw.webp" width="850" height="1275" loading="lazy" alt="Portret 4 — czerń i biel"></figure>
+        </div>
+        <button id="editionPause" type="button" class="edition-pause" hidden>Wstrzymaj zmianę zdjęć</button>
+      </div>
         <p id="editionError" role="status" hidden></p>
       </div>
     </div>

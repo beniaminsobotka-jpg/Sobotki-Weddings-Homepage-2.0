@@ -150,40 +150,62 @@ inquiry.addEventListener('submit', async event => {
 
 window.addEventListener('hashchange', route);
 
-const editionButtons = [...document.querySelectorAll('[data-edition]')];
-let editionRequest = 0;
-for (const button of editionButtons) {
-  button.addEventListener('click', async () => {
-    const request = ++editionRequest;
-    const error = byId('editionError');
-    error.hidden = true;
-    if (button.getAttribute('aria-pressed') === 'true') return;
-    const { edition, caption } = button.dataset;
-    const base = edition === '07' ? './photos/comparison' : './photos/editions/' + edition;
-    try {
-      const images = await Promise.all(['bw', 'color'].map(async variant => {
-        const image = new Image();
-        image.src = base + '-' + variant + '.webp';
-        await image.decode();
-        return image;
-      }));
-      if (request !== editionRequest) return;
-      ['editionBw', 'editionColor'].forEach((id, index) => {
-        const target = byId(id);
-        target.src = images[index].src;
-        target.alt = caption + (index === 0 ? ' — czerń i biel' : ' — kolor');
-      });
-      editionButtons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-      byId('editionNumber').textContent = edition + ' / 07';
-    } catch {
-      if (request !== editionRequest) return;
-      error.textContent = 'Nie udało się wczytać kadru. Spróbujcie ponownie.';
-      error.hidden = false;
-    }
-  });
-}
+
 
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const editionRows = [...document.querySelectorAll('.edition-pair')];
+const editionPause = byId('editionPause');
+const editionOrder = ['01', '05', '02', '04', '03', '06', '07'];
+const editionVisible = new Set();
+let editionIndex = 0;
+let editionLoading = false;
+let editionPaused = false;
+const editionCanPlay = () => editionVisible.size > 0 && !editionPaused && !motion.matches && !document.hidden;
+const editionObserver = new IntersectionObserver(entries => {
+  for (const entry of entries) {
+    if (entry.isIntersecting) editionVisible.add(entry.target);
+    else editionVisible.delete(entry.target);
+  }
+});
+editionRows.forEach(row => editionObserver.observe(row));
+const updateEditionButton = () => {
+  editionPause.hidden = motion.matches;
+  editionPause.textContent = editionPaused ? 'Wznów zmianę zdjęć' : 'Wstrzymaj zmianę zdjęć';
+};
+editionPause.addEventListener('click', () => {
+  editionPaused = !editionPaused;
+  updateEditionButton();
+});
+motion.addEventListener('change', updateEditionButton);
+updateEditionButton();
+setInterval(async () => {
+  if (!editionCanPlay() || editionLoading) return;
+  editionLoading = true;
+  const next = (editionIndex + 1) % editionOrder.length;
+  try {
+    const frames = await Promise.all(editionRows.flatMap((row, i) => {
+      const id = editionOrder[(next + 3 * i) % editionOrder.length];
+      const base = id === '07' ? './photos/comparison' : './photos/editions/' + id;
+      return [...row.querySelectorAll('img')].map(async target => {
+        const image = new Image();
+        image.src = base + '-' + target.dataset.variant + '.webp';
+        await image.decode();
+        return { target, src: image.src, id, row };
+      });
+    }));
+    if (editionCanPlay()) {
+      for (const { target, src, id, row } of frames) {
+        target.src = src;
+        target.alt = 'Portret ' + Number(id) + ' — ' + (target.dataset.variant === 'bw' ? 'czerń i biel' : 'kolor');
+        row.dataset.pair = id;
+      }
+    }
+  } catch { /* Keep both versions matched if an image fails to load. */ }
+  finally {
+    editionIndex = next;
+    editionLoading = false;
+  }
+}, 1000);
 const heroFrames = [...document.querySelectorAll('.editorial-hero-frames img')];
 const heroPause = byId('heroPause');
 const heroPairs = [['cover', '12'], ['11', '08'], ['04', '06'], ['02', '14'], ['05', '07']];

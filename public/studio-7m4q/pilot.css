@@ -51,20 +51,13 @@
 .portrait-pilot .editorial-color { margin-bottom: var(--section-space); }
 .portrait-pilot .editorial-color { border-block: 1px solid #0003; padding-block: clamp(26px, 5vw, 64px); text-align: center; }
 .portrait-pilot .editorial-color > p { margin-inline: auto; }
-.portrait-pilot .editorial-comparison { width: min(100%, 800px); margin-inline: auto; gap: clamp(8px, 2vw, 24px); text-align: left; }
-.editorial-comparison figure { margin: 0; }
-.editorial-comparison img { display: block; width: 100%; height: auto; }
-.editorial-comparison figcaption { display: flex; gap: .7em; margin-bottom: 8px; color: #be1515; font-size: clamp(.65rem, 1.5vw, .83rem); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.editorial-comparison figcaption span { color: var(--color-black); }
-.edition-contact { width: min(100%, 800px); margin: clamp(14px, 3vw, 32px) auto 0; }
-.edition-contact-heading { display: flex; justify-content: space-between; gap: 12px; text-align: left; border-top: 1px solid #0003; padding-top: 12px; margin-bottom: 12px; font-size: .78rem; font-weight: 700; }
-.edition-contact-heading output { color: #be1515; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.edition-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: clamp(4px, 1vw, 12px); }
-.edition-strip button { position: relative; background: #e9e6e0; cursor: pointer; min-height: 44px; border: 0; border-bottom: 3px solid transparent; padding: 0; font: inherit; }
-.edition-strip img { width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; }
-.edition-strip button span { display: block; padding-block: 3px; font-size: .68rem; font-weight: 800; }
-.edition-strip button:hover, .edition-strip button[aria-pressed="true"] { border-color: var(--color-red); }
-.edition-strip button[aria-pressed="true"] span { color: #be1515; }
+.portrait-pilot .editorial-comparison { width: min(100%, 820px); margin: 28px auto 0; text-align: left; }
+.edition-pair { display: grid; grid-template-columns: minmax(0, 10fr) minmax(0, 7fr); align-items: center; gap: clamp(10px, 3vw, 36px); }
+.edition-pair + .edition-pair { margin-top: clamp(18px, 4vw, 46px); }
+.edition-pair figure { margin: 0; }
+.edition-pair img { display: block; width: 100%; aspect-ratio: 2 / 3; height: auto; object-fit: contain; }
+.edition-pair figcaption { margin-bottom: 8px; color: #555; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.edition-pause { display: block; margin: 16px auto 0; padding: 10px; border: 0; background: none; color: #555; font: inherit; font-size: .8rem; text-decoration: underline; cursor: pointer; }
 .portrait-pilot .editorial-book { margin: var(--section-space) 0; }
 .portrait-pilot #colorOption { display: flex; align-items: center; gap: 10px; }
 .portrait-pilot #colorOption input { width: 18px; height: 18px; flex: none; accent-color: var(--color-red); }
