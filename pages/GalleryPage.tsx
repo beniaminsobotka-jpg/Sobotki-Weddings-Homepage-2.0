@@ -77,7 +77,6 @@ declare global {
 
 const DEFAULT_REFRESH_INTERVAL = 10_000;
 const WEDDING_GALLERY_BATCH_SIZE = 80;
-const FAVORITE_VISITOR_STORAGE_KEY = 'sobotki-gallery-favorite-visitor';
 const MAX_ZIP_PART_BYTES = 40 * 1024 * 1024;
 const MAX_ZIP_PART_PHOTOS = 80;
 const DEFAULT_COVER_FOCUS = { x: 50, y: 24 };
@@ -293,30 +292,6 @@ export const GalleryPage: React.FC = () => {
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [coverFocus, setCoverFocus] = useState(DEFAULT_COVER_FOCUS);
   const [lightboxHeartBurst, setLightboxHeartBurst] = useState(0);
-  const [favoriteVisitorId] = useState(() => {
-    if (typeof window === 'undefined') {
-      return '';
-    }
-
-    const generatedVisitorId =
-      typeof window.crypto?.randomUUID === 'function'
-        ? window.crypto.randomUUID()
-        : `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
-
-    try {
-      const existingVisitorId = window.localStorage.getItem(FAVORITE_VISITOR_STORAGE_KEY);
-
-      if (existingVisitorId) {
-        return existingVisitorId;
-      }
-
-      window.localStorage.setItem(FAVORITE_VISITOR_STORAGE_KEY, generatedVisitorId);
-    } catch {
-      // Private browsing can block persistent storage; the choice still works for this visit.
-    }
-
-    return generatedVisitorId;
-  });
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const lastLightboxTap = useRef<{ photoId: string; at: number } | null>(null);
@@ -456,7 +431,8 @@ export const GalleryPage: React.FC = () => {
   const photos = data?.photos || [];
   const displayedGallery = data?.gallery || bootstrapGallery;
   const isWeddingGallery = displayedGallery?.kind === 'weddings';
-  const canFavorite = Boolean(displayedGallery) && (!isWeddingGallery || coupleUnlocked);
+  const supportsPrintSelection = isWeddingGallery && !displayedGallery?.photosOnly;
+  const canFavorite = supportsPrintSelection && coupleUnlocked;
   const gallerySegments = displayedGallery?.segments || [];
   const segmentFilteredPhotos =
     isWeddingGallery && activeSegmentKey !== 'all'
@@ -638,7 +614,7 @@ export const GalleryPage: React.FC = () => {
   }, [displayedGallery?.coverPreviewUrl, slug]);
 
   useEffect(() => {
-    if (!slug || !favoriteVisitorId) {
+    if (!slug || !supportsPrintSelection) {
       return;
     }
 
@@ -646,7 +622,7 @@ export const GalleryPage: React.FC = () => {
 
     const loadFavorites = async () => {
       try {
-        const query = new URLSearchParams({ slug, visitorId: favoriteVisitorId });
+        const query = new URLSearchParams({ slug });
         const response = await fetch(`/api/gallery-favorites?${query.toString()}`, {
           headers: { Accept: 'application/json' },
         });
@@ -679,7 +655,7 @@ export const GalleryPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [favoriteVisitorId, slug]);
+  }, [supportsPrintSelection, slug]);
 
   useEffect(() => {
     if (!isWeddingGallery || !coupleUnlocked || pendingFavoritePhotos.size > 0) return;
@@ -731,7 +707,7 @@ export const GalleryPage: React.FC = () => {
 
   const toggleFavorite = useCallback(
     async (photo: GalleryPhoto) => {
-      if (!canFavorite || !favoriteVisitorId || pendingFavoritePhotos.has(photo.name)) {
+      if (!canFavorite || pendingFavoritePhotos.has(photo.name)) {
         return;
       }
 
@@ -762,7 +738,6 @@ export const GalleryPage: React.FC = () => {
           },
           body: JSON.stringify({
             slug,
-            visitorId: favoriteVisitorId,
             photoName: photo.name,
             liked: nextFavorite,
           }),
@@ -813,7 +788,6 @@ export const GalleryPage: React.FC = () => {
     [
       canFavorite,
       favoritePhotoNames,
-      favoriteVisitorId,
       pendingFavoritePhotos,
       selectedPhoto,
       showFavoritesOnly,
@@ -1336,7 +1310,7 @@ export const GalleryPage: React.FC = () => {
           </nav>
         )}
 
-        {favoriteError && (
+        {supportsPrintSelection && favoriteError && (
           <p
             className="mb-5 rounded-xl border border-red-700/15 bg-red-700/[0.06] px-4 py-3 font-sans text-xs text-red-800"
             role="alert"

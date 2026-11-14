@@ -1833,18 +1833,20 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                           ? 'Brak zgody — dodawanie do Best Of zablokowane'
                           : 'Zgoda nieustawiona — dodawanie do Best Of zablokowane'}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowBrowserFavoritesOnly((current) => !current)}
-                      className={`inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 font-sans text-[8px] font-bold uppercase tracking-[0.13em] ${
-                        showBrowserFavoritesOnly
-                          ? 'bg-black text-white'
-                          : 'border border-black/10 text-black/60'
-                      }`}
-                    >
-                      {showBrowserFavoritesOnly ? <Image size={12} /> : <Heart size={12} />}
-                      {showBrowserFavoritesOnly ? 'Pokaż wszystkie' : 'Tylko zaznaczone'}
-                    </button>
+                    {browserGallery.kind === 'weddings' && (
+                      <button
+                        type="button"
+                        onClick={() => setShowBrowserFavoritesOnly((current) => !current)}
+                        className={`inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 font-sans text-[8px] font-bold uppercase tracking-[0.13em] ${
+                          showBrowserFavoritesOnly
+                            ? 'bg-black text-white'
+                            : 'border border-black/10 text-black/60'
+                        }`}
+                      >
+                        {showBrowserFavoritesOnly ? <Image size={12} /> : <Heart size={12} />}
+                        {showBrowserFavoritesOnly ? 'Pokaż wszystkie' : 'Tylko zaznaczone'}
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -2004,7 +2006,7 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
                     )}
                   </div>
                   <div className="flex flex-col gap-2 sm:flex-row">
-                    {browserGallery.fullResolutionFolder && (
+                    {browserGallery.kind === 'weddings' && browserGallery.fullResolutionFolder && (
                       <button
                         type="button"
                         onClick={() => void downloadFavoriteFullResolutionPhotos()}

@@ -172,7 +172,9 @@ export default async function handler(request, response) {
         const [photos, fullResolutionPhotos, favorites] = await Promise.all([
           listPhotosOrEmpty(gallery),
           listGalleryFullResolutionPhotos(gallery).catch(() => []),
-          getGalleryFavoriteSummary(gallery).catch(() => ({ counts: {}, selected: [] })),
+          getGalleryKind(gallery) === 'weddings'
+            ? getGalleryFavoriteSummary(gallery).catch(() => ({ counts: {}, selected: [] }))
+            : { counts: {}, selected: [] },
         ]);
         const fullResolutionByName = new Map(
           fullResolutionPhotos.map((photo) => [photo.name.toLocaleLowerCase('pl-PL'), photo])
