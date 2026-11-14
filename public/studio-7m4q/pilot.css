@@ -26,7 +26,11 @@
 .portrait-pilot :is(input, select, textarea) { width: 100%; min-width: 0; padding: 12px; border: 1px solid #0003; border-radius: 10px; background: white; color: var(--color-black); font: inherit; }
 .portrait-pilot .wide { grid-column: 1/-1; }
 .portrait-pilot .back { display: inline-block; margin-bottom: 28px; }
-.pilot-hero { align-items: center; }
+.pilot-hero { align-items: center; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+.pilot-hero h1 { font-size: clamp(1.9rem, 5vw, 4.9rem); overflow-wrap: anywhere; }
+.editorial-hero-frames { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(8px, 1vw, 16px); }
+.editorial-hero-frames img { display: block; width: 100%; height: auto; aspect-ratio: 2/3; object-fit: cover; border-radius: 0; }
+.editorial-hero-pause { margin-top: 8px; padding: 8px 0; border: 0; background: none; color: #555; text-decoration: underline; cursor: pointer; font: inherit; font-size: .78rem; }
 .pilot-hero p:not(.eyebrow) { margin: 18px 0; }
 .portrait-pilot .portrait-gallery-section { width: 100%; }
 .portrait-pilot .cloud-section { margin: 0 0 var(--section-space); }
@@ -60,6 +64,8 @@
 .pilot-main > footer { border-top: 1px solid #0002; color: #666; font-size: .75rem; padding: 24px 0; margin-top: 48px; }
 @media (max-width: 650px) {
   .portrait-pilot .pilot-hero, .portrait-pilot form, .portrait-pilot .packages { grid-template-columns: 1fr; }
+  .editorial-hero-frames { grid-template-columns: 1fr; }
+  .editorial-hero-frames img:nth-child(2) { display: none; }
   .portrait-pilot #choice h2 { font-size: clamp(1rem, 4.8vw, 2rem); margin-bottom: 10px; }
   .portrait-pilot #choice .eyebrow { font-size: 9px; letter-spacing: .12em; }
   .portrait-pilot #choice article > p { font-size: .85rem; }

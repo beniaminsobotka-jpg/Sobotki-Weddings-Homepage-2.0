@@ -150,6 +150,44 @@ inquiry.addEventListener('submit', async event => {
 window.addEventListener('hashchange', route);
 
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const heroFrames = [...document.querySelectorAll('.editorial-hero-frames img')];
+const heroPause = byId('heroPause');
+const heroPairs = [['cover', '12'], ['11', '08'], ['04', '06'], ['02', '14'], ['05', '07']];
+let heroVisible = false;
+let heroPaused = false;
+let heroIndex = 0;
+let heroLoading = false;
+const heroCanPlay = () => heroVisible && !heroPaused && !motion.matches && !document.hidden;
+new IntersectionObserver(([entry]) => { heroVisible = entry.isIntersecting; })
+  .observe(document.querySelector('.editorial-hero-frames'));
+const updateHeroButton = () => {
+  heroPause.hidden = motion.matches;
+  heroPause.textContent = heroPaused ? 'Wznów zmianę zdjęć' : 'Wstrzymaj zmianę zdjęć';
+};
+heroPause.addEventListener('click', () => {
+  heroPaused = !heroPaused;
+  updateHeroButton();
+});
+motion.addEventListener('change', updateHeroButton);
+updateHeroButton();
+setInterval(async () => {
+  if (!heroCanPlay() || heroLoading) return;
+  heroLoading = true;
+  const next = (heroIndex + 1) % heroPairs.length;
+  try {
+    const sources = await Promise.all(heroPairs[next].map(async name => {
+      const img = new Image();
+      img.src = './photos/' + name + '.webp';
+      await img.decode();
+      return img.src;
+    }));
+    if (heroCanPlay()) sources.forEach((src, i) => { heroFrames[i].src = src; });
+  } catch { /* Keep the current pair if a new image cannot be loaded. */ }
+  finally {
+    heroIndex = next;
+    heroLoading = false;
+  }
+}, 500);
 const mosaic = byId('editorialMosaic');
 const viewport = mosaic.parentElement;
 const tiles = Array.from(mosaic.children);
