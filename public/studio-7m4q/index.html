@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="referrer" content="no-referrer">
+  <title>Wybierzcie Fotostację | Sobotki Portraits</title>
+  <link rel="stylesheet" href="https://use.typekit.net/oiv8gfj.css">
+  <link rel="stylesheet" href="./pilot.css">
+  <script src="./pilot.js" type="module"></script>
+</head>
+<body>
+<main>
+  <header class="mast">Sobotki <em>Portraits</em></header>
+  <p id="status" role="status" hidden></p>
+  <section id="entry" hidden>
+    <p class="eyebrow">Oferta ślubna</p>
+    <h1>Dwa style.<br><em>Wasz wybór.</em></h1>
+    <p>Podajcie kilka szczegółów o weselu. Po wysłaniu formularza porównacie Fotostację Klasyczną i Edytorialną.</p>
+    <form id="lead">
+      <label>Imiona i nazwisko<input name="fullName" autocomplete="name" required></label>
+      <label>Adres e-mail<input name="email" type="email" autocomplete="email" required></label>
+      <label>Data wesela<input name="weddingDate" type="date" required></label>
+      <label>Miejsce wesela<input name="venue" placeholder="Nazwa sali i miejscowość" required></label>
+      <label>Liczba gości<input name="guestCount" type="number" min="1"></label>
+      <label>Skąd o nas wiecie?<select name="source" required>
+        <option value="">Wybierzcie odpowiedź</option><option>Instagram</option><option>Reklama na Instagramie</option><option>TikTok</option><option>Polecenie od znajomych</option><option>Strona WWW</option><option>Inne</option>
+      </select></label>
+      <label class="wide">Dodatkowe informacje<textarea name="message" rows="2"></textarea></label>
+      <button class="wide">Pokażcie mi oba style →</button>
+    </form>
+  </section>
+  <section id="choice" hidden>
+    <p class="eyebrow">Wybierzcie swój styl</p>
+    <h1>Jaka Fotostacja<br><em>pasuje do Was?</em></h1>
+    <div class="pair">
+      <article>
+        <a id="classic" class="cover-link" aria-label="Zobacz ofertę Klasyczną"><img class="cover" src="/offers/v1/assets/mosaic/dv8gj-93.webp" alt="Czarno-biały portret na jasnym tle"></a>
+        <p class="eyebrow">01 / Czyste tło, swobodne portrety</p>
+        <h2>Klasyczna</h2>
+        <p>Czarno-białe portrety na jasnym tle. Goście mogą przychodzić solo, w parach i w większych grupach.</p>
+        <a id="classicCta" class="action">Zobacz Klasyczną →</a>
+      </article>
+      <article>
+        <a class="cover-link" href="#edytorialna" aria-label="Zobacz ofertę Edytorialną"><img class="cover" src="./photos/cover.webp" alt="Pionowy portret na tle drapowanej scenografii"></a>
+        <p class="eyebrow">02 / Portrety jak z sesji modowej</p>
+        <h2>Edytorialna</h2>
+        <p>Drapowana scenografia, wyrazisty błysk i głównie pionowe kadry. Najlepsza solo, w duecie lub w trójkę. Dostępne większe odbitki i cyfrowy kolor w Exclusive.</p>
+        <a class="action" href="#edytorialna">Zobacz Edytorialną →</a>
+      </article>
+    </div>
+  </section>
+  <section id="editorial" hidden>
+    <a class="back" href="#wybor">← Wróć do wyboru stylu</a>
+    <div class="hero">
+      <div><p class="eyebrow">Sobotki Portraits / 02</p><h1>Fotostacja<br><em>Edytorialna.</em></h1>
+      <p>Wyraziste światło, drapowana scenografia i pionowe kadry jak z sesji modowej. Najlepiej sprawdzi się w portretach solo oraz w grupach 2–3 osób.</p><a class="action" href="#pakiety">Zobacz pakiety ↓</a></div>
+      <img class="cover" src="./photos/cover.webp" alt="Portret edytorialny na weselu">
+    </div>
+    <div class="gallery" aria-label="Przykładowe portrety edytorialne">
+      <img src="./photos/01.webp" loading="lazy" alt="Solowy portret w scenografii">
+      <img src="./photos/02.webp" loading="lazy" alt="Mała grupa na tle draperii">
+      <img src="./photos/03.webp" loading="lazy" alt="Portret z wyrazistym światłem">
+      <img src="./photos/04.webp" loading="lazy" alt="Pionowy portret siedzący">
+      <img src="./photos/05.webp" loading="lazy" alt="Bliski portret dwojga gości">
+      <img src="./photos/06.webp" loading="lazy" alt="Solowy portret w garniturze">
+      <img src="./photos/07.webp" loading="lazy" alt="Swobodny portret na tle scenografii">
+      <img src="./photos/08.webp" loading="lazy" alt="Dwie osoby w portrecie edytorialnym">
+    </div>
+    <div id="pakiety">
+      <p class="eyebrow">Cennik</p><h2>Wybierzcie <em>pakiet.</em></h2>
+      <div class="pair packages">
+        <article><h3>Essential</h3><p class="price" id="essential"></p><ul>
+          <li>3 godziny i 2 osoby obsługi</li><li>Autorska scenografia i czarno-białe portrety</li><li>100 odbitek 15 × 20 cm <strong>lub</strong> 200 odbitek 10 × 15 cm</li><li>Galeria czarno-biała dostępna już podczas wesela*</li>
+        </ul></article>
+        <article><h3>Exclusive</h3><p class="price" id="exclusive"></p><ul>
+          <li>Wszystko z Essential, w tym wybór formatu odbitek</li><li>Księga gości 30 × 30 cm</li><li>Kolorowe wersje zdjęć w galerii cyfrowej do 3 dni po weselu</li>
+        </ul></article>
+      </div>
+      <p>Przed weselem wybieracie jeden format. Na miejscu drukujemy wyłącznie czarno-białe odbitki. Odbitki ponad limit: 1,50 zł/szt., rozliczane z organizatorem po weselu. Dodatkowa godzina: 600 zł. Księga gości do Essential: 600 zł. Transport: 1 zł/km od Gliwic, rozliczany osobno.</p>
+      <p class="fine">* Dostęp na miejscu zależy od internetu w obiekcie.</p>
+      <form id="inquiry">
+        <label>Pakiet<select name="package"><option value="essential">Essential</option><option value="exclusive">Exclusive</option></select></label>
+        <label>Format odbitek<select name="prints"><option>100 odbitek 15 × 20 cm</option><option>200 odbitek 10 × 15 cm</option></select></label>
+        <button class="wide">Zapytaj o dostępność terminu →</button>
+        <p class="wide" id="inquiryStatus" role="status"></p>
+      </form>
+    </div>
+  </section>
+  <footer>Sobotki Portraits · Pilotaż P1</footer>
+</main>
+</body>
+</html>

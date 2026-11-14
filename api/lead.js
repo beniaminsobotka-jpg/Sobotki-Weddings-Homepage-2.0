@@ -3,6 +3,7 @@ import { getPricingForTier } from '../server/portrait-pricing.js';
 
 const BREVO_CONTACTS_API_URL = 'https://api.brevo.com/v3/contacts';
 const BREVO_SMTP_API_URL = 'https://api.brevo.com/v3/smtp/email';
+const EDITORIAL_PILOT = Object.freeze({ id: 'editorial-p1', essential: 3900, exclusive: 4800 });
 
 const FORM_TYPE_TO_LIST_ENV = {
   weddings: 'BREVO_LIST_ID_WEDDINGS',
@@ -135,6 +136,11 @@ const buildInternalHtml = (leadData) => `
                 ...(leadData.offerUrl ? [
                   ['Cena Essential', formatPrice(leadData.packagePrices?.essential)],
                   ['Cena Exclusive', formatPrice(leadData.packagePrices?.exclusive)],
+                  ...(leadData.editorialPilot ? [
+                    ['Pilotaż', leadData.editorialPilot.id],
+                    ['Edytorialna Essential', formatPrice(leadData.editorialPilot.essential)],
+                    ['Edytorialna Exclusive', formatPrice(leadData.editorialPilot.exclusive)],
+                  ] : []),
                   ['Link do oferty', leadData.offerUrl],
                   ['Data wyceny', leadData.quotedAt || ''],
                 ] : []),
@@ -169,6 +175,11 @@ const buildInternalText = (leadData) => [
   ...(leadData.offerUrl ? [
     `Cena Essential: ${formatPrice(leadData.packagePrices?.essential)}`,
     `Cena Exclusive: ${formatPrice(leadData.packagePrices?.exclusive)}`,
+    ...(leadData.editorialPilot ? [
+      `Pilotaż: ${leadData.editorialPilot.id}`,
+      `Edytorialna Essential: ${formatPrice(leadData.editorialPilot.essential)}`,
+      `Edytorialna Exclusive: ${formatPrice(leadData.editorialPilot.exclusive)}`,
+    ] : []),
     `Link do oferty: ${leadData.offerUrl}`,
     `Data wyceny: ${leadData.quotedAt || '-'}`,
   ] : []),
@@ -216,6 +227,7 @@ export default async function handler(request, response) {
   const submittedDistanceKm = Number.isFinite(Number(parsedBody.distanceKm)) ? Number(parsedBody.distanceKm) : 0;
   const submittedPricingTier = normalizeString(parsedBody.pricingTier);
   const pricingQuote = normalizeString(parsedBody.pricingQuote);
+  const portraitPilot = formType === 'portraits_wedding' && parsedBody.portraitPilot === 'editorial-p1';
 
   if (!formType) {
     return sendJson(response, 400, { error: 'formType is required' });
@@ -314,9 +326,11 @@ export default async function handler(request, response) {
         packagePrices,
         resolvedLocation,
         quotedAt,
+        ...(portraitPilot ? { editorialPilot: EDITORIAL_PILOT } : {}),
       },
     });
-    offerPath = `/oferta-portrety/?access=${encodeURIComponent(accessToken)}`;
+    const offerRoute = portraitPilot ? '/studio-7m4q/' : '/oferta-portrety/';
+    offerPath = `${offerRoute}?access=${encodeURIComponent(accessToken)}`;
   }
   const offerUrl = offerPath ? `https://www.sobotkiweddings.pl${offerPath}` : '';
 
@@ -394,6 +408,7 @@ export default async function handler(request, response) {
         pricingTier,
         packagePrices,
         offerUrl,
+        editorialPilot: portraitPilot ? EDITORIAL_PILOT : null,
         quotedAt,
         serviceType,
         guestCount,
