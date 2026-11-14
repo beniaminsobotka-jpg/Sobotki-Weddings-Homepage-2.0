@@ -4,6 +4,7 @@ import { getPricingForTier } from '../server/portrait-pricing.js';
 const BREVO_CONTACTS_API_URL = 'https://api.brevo.com/v3/contacts';
 const BREVO_SMTP_API_URL = 'https://api.brevo.com/v3/smtp/email';
 const EDITORIAL_PILOT = Object.freeze({ id: 'editorial-p1', essential: 3900, exclusive: 4800 });
+const EDITORIAL_UPLIFT = new Map([['up-to-150', 0], ['up-to-250', 300], ['up-to-350', 600]]);
 
 const FORM_TYPE_TO_LIST_ENV = {
   weddings: 'BREVO_LIST_ID_WEDDINGS',
@@ -270,6 +271,7 @@ export default async function handler(request, response) {
   let distanceKm = submittedDistanceKm;
   let resolvedLocation = venue;
   let quotedAt = '';
+  let editorialPilot = null;
 
   if (formType === 'portraits_wedding') {
     if (pricingQuote) {
@@ -305,6 +307,19 @@ export default async function handler(request, response) {
       return sendJson(response, 400, { error: 'Nie udało się ustalić ceny oferty. Odśwież stronę i spróbuj ponownie.' });
     }
 
+    if (portraitPilot) {
+      const count = Number(guestCount);
+      if (!Number.isSafeInteger(count) || count < 1) {
+        return sendJson(response, 400, { error: 'Podajcie liczbę gości jako liczbę całkowitą większą od zera.' });
+      }
+      const uplift = EDITORIAL_UPLIFT.get(pricingTier);
+      if (uplift === undefined) return sendJson(response, 400, { error: 'Nie udało się ustalić progu dojazdu.' });
+      editorialPilot = {
+        ...EDITORIAL_PILOT,
+        essential: EDITORIAL_PILOT.essential + uplift,
+        exclusive: EDITORIAL_PILOT.exclusive + uplift,
+      };
+    }
     const weddingTimestamp = Date.parse(`${weddingDate}T23:59:59Z`);
     const fiveYears = 5 * 365 * 24 * 60 * 60 * 1000;
     const expiresAt = Number.isFinite(weddingTimestamp)
@@ -326,7 +341,7 @@ export default async function handler(request, response) {
         packagePrices,
         resolvedLocation,
         quotedAt,
-        ...(portraitPilot ? { editorialPilot: EDITORIAL_PILOT } : {}),
+        ...(editorialPilot ? { editorialPilot } : {}),
       },
     });
     const offerRoute = portraitPilot ? '/studio-7m4q/' : '/oferta-portrety/';
@@ -408,7 +423,7 @@ export default async function handler(request, response) {
         pricingTier,
         packagePrices,
         offerUrl,
-        editorialPilot: portraitPilot ? EDITORIAL_PILOT : null,
+        editorialPilot: Number(guestCount) <= 120 ? editorialPilot : null,
         quotedAt,
         serviceType,
         guestCount,

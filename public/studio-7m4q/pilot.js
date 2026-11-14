@@ -2,6 +2,11 @@ const byId = id => document.getElementById(id);
 const access = new URLSearchParams(location.search).get('access');
 const money = value => value.toLocaleString('pl-PL') + ' zł';
 let lead;
+const COLOR_PRICE = 300;
+const editorialAvailable = () => {
+  const count = Number(lead?.guestsCount);
+  return Number.isSafeInteger(count) && count >= 1 && count <= 120;
+};
 
 async function json(url, body) {
   const options = { headers: { Accept: 'application/json' }, cache: 'no-store' };
@@ -24,10 +29,10 @@ function showStatus(message) {
 function route() {
   if (!lead) return;
   const hash = location.hash;
-  const isEditorial = hash === '#edytorialna' || hash === '#pakiety';
+  const isEditorial = editorialAvailable() && (hash === '#edytorialna' || hash === '#pakiety');
   byId('choice').hidden = isEditorial;
   byId('editorial').hidden = !isEditorial;
-  if (hash === '#pakiety') byId('pakiety').scrollIntoView();
+  if (isEditorial && hash === '#pakiety') byId('pakiety').scrollIntoView();
   else window.scrollTo(0, 0);
   const title = document.querySelector(isEditorial ? '#editorial h1' : '#choice h1');
   title.tabIndex = -1;
@@ -52,6 +57,13 @@ async function unlock() {
     byId('classicCta').href = classic;
     byId('essential').textContent = money(pilot.essential);
     byId('exclusive').textContent = money(pilot.exclusive);
+    byId('editorialCta').hidden = !editorialAvailable();
+    byId('editorialUnavailable').hidden = editorialAvailable();
+    if (!editorialAvailable()) {
+      byId('editorialCover').removeAttribute('href');
+      byId('editorialCover').removeAttribute('aria-label');
+    }
+    updateInquiry();
     showStatus('');
     route();
   } catch (error) {
@@ -86,9 +98,20 @@ byId('lead').addEventListener('submit', async event => {
   }
 });
 
-byId('inquiry').addEventListener('submit', async event => {
-  event.preventDefault();
+const inquiry = byId('inquiry');
+function updateInquiry() {
   if (!lead) return;
+  const exclusive = inquiry.elements.package.value === 'exclusive';
+  byId('colorOption').hidden = exclusive;
+  inquiry.elements.color.disabled = exclusive;
+  const total = lead.editorialPilot[exclusive ? 'exclusive' : 'essential'] +
+    (!exclusive && inquiry.elements.color.checked ? COLOR_PRICE : 0);
+  byId('inquiryTotal').textContent = 'Razem przed kosztem transportu: ' + money(total);
+}
+inquiry.addEventListener('change', updateInquiry);
+inquiry.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!editorialAvailable()) return;
   const form = event.currentTarget;
   const button = form.querySelector('button');
   const status = byId('inquiryStatus');
@@ -96,6 +119,7 @@ byId('inquiry').addEventListener('submit', async event => {
   const pilot = lead.editorialPilot;
   const packageName = data.get('package') === 'exclusive' ? 'Exclusive' : 'Essential';
   const amount = pilot[packageName.toLowerCase()];
+  const hasColorAddon = packageName === 'Essential' && data.has('color');
   const timestamp = new Date().toISOString();
   button.disabled = true;
   status.textContent = 'Wysyłamy zapytanie…';
@@ -109,6 +133,8 @@ byId('inquiry').addEventListener('submit', async event => {
       inquiryMessage: [
         'Fotostacja Edytorialna · Pilotaż P1 · ' + pilot.id,
         packageName + ': ' + money(amount), 'Odbitki: ' + data.get('prints'),
+        'Kolor cyfrowy: ' + (packageName === 'Exclusive' ? 'w cenie' : hasColorAddon ? '+300 zł' : 'nie wybrano'),
+        'Razem bez transportu: ' + money(amount + (hasColorAddon ? COLOR_PRICE : 0)),
         'Essential: ' + money(pilot.essential) + '; Exclusive: ' + money(pilot.exclusive),
         'Link do wyceny: ' + location.origin + location.pathname + location.search + '#edytorialna',
       ].join('\n'),

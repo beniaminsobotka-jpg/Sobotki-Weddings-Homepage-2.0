@@ -26,7 +26,7 @@
       <label>Adres e-mail<input name="email" type="email" autocomplete="email" required></label>
       <label>Data wesela<input name="weddingDate" type="date" required></label>
       <label>Miejsce wesela<input name="venue" placeholder="Nazwa sali i miejscowość" required></label>
-      <label>Liczba gości<input name="guestCount" type="number" min="1"></label>
+      <label>Liczba gości<input name="guestCount" type="number" min="1" step="1" required></label>
       <label>Skąd o nas wiecie?<select name="source" required>
         <option value="">Wybierzcie odpowiedź</option><option>Instagram</option><option>Reklama na Instagramie</option><option>TikTok</option><option>Polecenie od znajomych</option><option>Strona WWW</option><option>Inne</option>
       </select></label>
@@ -46,11 +46,12 @@
         <a id="classicCta" class="button button-primary">Zobacz Klasyczną →</a>
       </article>
       <article>
-        <a class="cover-link" href="#edytorialna" aria-label="Zobacz ofertę Edytorialną"><img class="cover" src="./photos/cover.webp" alt="Pionowy portret na tle drapowanej scenografii"></a>
+        <a id="editorialCover" class="cover-link" href="#edytorialna" aria-label="Zobacz ofertę Edytorialną"><img class="cover" src="./photos/cover.webp" alt="Pionowy portret na tle drapowanej scenografii"></a>
         <p class="eyebrow">02 / Portrety jak z sesji modowej</p>
         <h2>Edytorialna</h2>
-        <p>Drapowana scenografia, wyrazisty błysk i głównie pionowe kadry. Najlepsza solo, w duecie lub w trójkę. Dostępne większe odbitki i cyfrowy kolor w Exclusive.</p>
-        <a class="button button-primary" href="#edytorialna">Zobacz Edytorialną →</a>
+        <p>Drapowana scenografia, wyrazisty błysk i głównie pionowe kadry. Najlepsza solo, w duecie lub w trójkę. Na wesela <strong>do 120 gości</strong>.</p>
+        <p id="editorialUnavailable" hidden>Przy większej liczbie gości wybierzcie Klasyczną. Jeśli nie podaliście liczby gości, uzupełnijcie <a href="./">formularz</a>.</p>
+        <a id="editorialCta" class="button button-primary" href="#edytorialna">Zobacz Edytorialną →</a>
       </article>
     </div>
   </section>
@@ -58,7 +59,7 @@
     <a class="back" href="#wybor">← Wróć do wyboru stylu</a>
     <div class="pilot-hero">
       <div><p class="eyebrow">Sobotki Portraits / 02</p><h1>Fotostacja<br><em class="serif-accent">Edytorialna.</em></h1>
-      <p>Wyraziste światło, drapowana scenografia i pionowe kadry jak z sesji modowej. Najlepiej sprawdzi się w portretach solo oraz w grupach 2–3 osób.</p><a class="button button-primary" href="#pakiety">Zobacz pakiety ↓</a></div>
+      <p>Wyraziste światło, drapowana scenografia i pionowe kadry jak z sesji modowej. Najlepiej sprawdzi się w portretach solo oraz w grupach 2–3 osób.</p><p>Na wesela <strong>do 120 gości</strong>.</p><a class="button button-primary" href="#pakiety">Zobacz pakiety ↓</a></div>
       <img class="cover" src="./photos/cover.webp" alt="Portret edytorialny na weselu">
     </div>
     <div class="portrait-gallery-section">
@@ -93,7 +94,7 @@
         <h2 id="editorial-cloud-title">Zdjęcia od razu <span class="serif-accent">na telefonie.</span></h2>
         <p>Goście skanują kod QR przy Fotostacji i od razu otwierają galerię w chmurze, bez instalowania aplikacji. Mogą przeglądać i pobierać swoje portrety już w trakcie wesela.</p>
         <p class="cloud-included">Czarno-biała galeria w cenie Essential i Exclusive.</p>
-        <p class="cloud-note">Dostęp na miejscu zależy od internetu w obiekcie. Kolorowe wersje w Exclusive trafiają do galerii do 3 dni po weselu.</p>
+        <p class="cloud-note">Dostęp na miejscu zależy od internetu w obiekcie. Cyfrowe wersje kolorowe dostarczamy do tygodnia po ślubie: w cenie Exclusive lub jako dodatek do Essential za 300 zł.</p>
       </div>
       <div class="cloud-visual">
         <div class="iphone-shell"><div class="iphone-screen">
@@ -102,24 +103,14 @@
         <button id="phoneToggle" type="button" class="button button-primary">Odtwórz podgląd</button>
       </div>
     </div>
-    <div id="pakiety" class="pricing-section">
-      <p class="eyebrow">Cennik</p><h2>Wybierzcie <em class="serif-accent">pakiet.</em></h2>
-      <div class="pair packages">
-        <article class="package-card"><h3>Essential</h3><p class="price" id="essential"></p><ul>
-          <li>3 godziny i 2 osoby obsługi</li><li>Autorska scenografia i czarno-białe portrety</li><li>100 odbitek 15 × 20 cm <strong>lub</strong> 200 odbitek 10 × 15 cm</li><li>Galeria czarno-biała dostępna już podczas wesela*</li>
-        </ul></article>
-        <article class="package-card package-featured"><h3>Exclusive</h3><p class="price" id="exclusive"></p><ul>
-          <li>Wszystko z Essential, w tym wybór formatu odbitek</li><li>Księga gości 42 × 30 cm</li><li>Kolorowe wersje zdjęć w galerii cyfrowej do 3 dni po weselu</li>
-        </ul></article>
+    <div class="editorial-color" role="region" aria-labelledby="editorial-color-title">
+      <p class="eyebrow">Dwie wersje tego samego portretu</p>
+      <h2 id="editorial-color-title">Edytorialna <span class="serif-accent">także w kolorze.</span></h2>
+      <p>W czerni i bieli uwagę przyciąga światło. W kolorze widać też odcienie tkanin i scenografii. Cyfrowe wersje kolorowe dostarczamy do tygodnia po ślubie — w cenie Exclusive, a w Essential za dodatkowe 300 zł. Na miejscu drukujemy odbitki czarno-białe.</p>
+      <div class="pair editorial-comparison">
+        <figure><img src="./photos/comparison-bw.webp" width="900" height="1350" loading="lazy" alt="Portret w wersji czarno-białej"><figcaption>Czarno-białe</figcaption></figure>
+        <figure><img src="./photos/comparison-color.webp" width="900" height="1350" loading="lazy" alt="Ten sam portret w wersji kolorowej"><figcaption>Kolor</figcaption></figure>
       </div>
-      <p>Przed weselem wybieracie jeden format. Na miejscu drukujemy wyłącznie czarno-białe odbitki. Odbitki ponad limit: 1,50 zł/szt., rozliczane z organizatorem po weselu. Dodatkowa godzina: 600 zł. Księga gości 42 × 30 cm do Essential: 600 zł. Transport: 1 zł/km od Gliwic, rozliczany osobno.</p>
-      <p class="fine">* Dostęp na miejscu zależy od internetu w obiekcie.</p>
-      <form id="inquiry">
-        <label>Pakiet<select name="package"><option value="essential">Essential</option><option value="exclusive">Exclusive</option></select></label>
-        <label>Format odbitek<select name="prints"><option>100 odbitek 15 × 20 cm</option><option>200 odbitek 10 × 15 cm</option></select></label>
-        <button class="wide button button-primary button-reserve">Zapytaj o dostępność terminu →</button>
-        <p class="wide" id="inquiryStatus" role="status"></p>
-      </form>
     </div>
     <div class="feature-split feature-split-reverse editorial-book" role="region" aria-labelledby="editorial-book-title">
       <div class="feature-copy">
@@ -128,6 +119,27 @@
         <p>Po portrecie goście zostawiają odręczne życzenia na iPadzie. Po weselu łączymy zdjęcia i wpisy w drukowanym albumie <strong>42 × 30 cm</strong>.</p>
       </div>
       <figure class="editorial-book-photo"><img src="../offers/v1/assets/guestbook-02.webp" loading="lazy" alt="Przykład zdjęcia i odręcznego wpisu w księdze gości"><figcaption>Przykładowa realizacja księgi gości</figcaption></figure>
+    </div>
+    <div id="pakiety" class="pricing-section">
+      <p class="eyebrow">Cennik</p><h2>Wybierzcie <em class="serif-accent">pakiet.</em></h2>
+      <div class="pair packages">
+        <article class="package-card"><h3>Essential</h3><p class="price" id="essential"></p><ul>
+          <li>3 godziny i 2 osoby obsługi</li><li>Autorska scenografia i czarno-białe portrety</li><li>100 odbitek 15 × 20 cm <strong>lub</strong> 200 odbitek 10 × 15 cm</li><li>Galeria czarno-biała dostępna już podczas wesela*</li><li>Opcjonalne zdjęcia cyfrowe w kolorze: +300 zł</li>
+        </ul></article>
+        <article class="package-card package-featured"><h3>Exclusive</h3><p class="price" id="exclusive"></p><ul>
+          <li>Wszystko z Essential, w tym wybór formatu odbitek</li><li>Księga gości 42 × 30 cm</li><li>Cyfrowe wersje kolorowe do tygodnia po ślubie — w cenie</li>
+        </ul></article>
+      </div>
+      <p>Przed weselem wybieracie jeden format. Na miejscu drukujemy wyłącznie czarno-białe odbitki. Odbitki ponad limit: 1,50 zł/szt., rozliczane z organizatorem po weselu. Dodatkowa godzina: 600 zł. Księga gości 42 × 30 cm do Essential: 600 zł. Transport: 1 zł/km od Gliwic, rozliczany osobno.</p>
+      <p class="fine">* Dostęp na miejscu zależy od internetu w obiekcie.</p>
+      <form id="inquiry">
+        <label>Pakiet<select name="package"><option value="essential">Essential</option><option value="exclusive">Exclusive</option></select></label>
+        <label>Format odbitek<select name="prints"><option>100 odbitek 15 × 20 cm</option><option>200 odbitek 10 × 15 cm</option></select></label>
+        <label id="colorOption" class="wide"><input type="checkbox" name="color"> Dodaj cyfrowe zdjęcia w kolorze (+300 zł)</label>
+        <p class="wide" id="inquiryTotal" aria-live="polite"></p>
+        <button class="wide button button-primary button-reserve">Zapytaj o dostępność terminu →</button>
+        <p class="wide" id="inquiryStatus" role="status"></p>
+      </form>
     </div>
   </section>
   <footer>Sobotki Portraits · Pilotaż P1</footer>

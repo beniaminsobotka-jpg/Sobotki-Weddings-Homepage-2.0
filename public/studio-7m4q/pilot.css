@@ -32,8 +32,16 @@
 .portrait-pilot .cloud-section { margin: 0 0 var(--section-space); }
 .portrait-pilot .cloud-visual { display: grid; justify-items: center; gap: 12px; }
 .portrait-pilot #phoneToggle { min-height: 44px; }
-.portrait-pilot .iphone-screen video { object-fit: contain; background: #fff; }
-.portrait-pilot .editorial-book { margin-top: var(--section-space); }
+.portrait-pilot .iphone-screen { position: absolute; inset: 5px; width: auto; height: auto; }
+.portrait-pilot .iphone-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; background: #111; }
+.portrait-pilot .editorial-color { margin-bottom: var(--section-space); }
+.portrait-pilot .editorial-comparison { max-width: 960px; gap: clamp(12px, 2vw, 24px); }
+.editorial-comparison figure { margin: 0; }
+.editorial-comparison img { display: block; width: 100%; height: auto; }
+.editorial-comparison figcaption { margin-top: 8px; color: #555; font-size: .85rem; }
+.portrait-pilot .editorial-book { margin: var(--section-space) 0; }
+.portrait-pilot #colorOption { display: flex; align-items: center; gap: 10px; }
+.portrait-pilot #colorOption input { width: 18px; height: 18px; flex: none; accent-color: var(--color-red); }
 .portrait-pilot .editorial-book .feature-copy > p { color: #555; }
 .editorial-book-photo { margin: 0; justify-self: center; max-width: 360px; }
 .editorial-book-photo img { display: block; width: 100%; height: auto; }
