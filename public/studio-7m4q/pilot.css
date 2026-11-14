@@ -27,8 +27,11 @@
 .portrait-pilot .wide { grid-column: 1/-1; }
 .portrait-pilot .back { display: inline-block; margin-bottom: 28px; }
 .editorial-open .mast { display: none; }
+.editorial-open .pilot-main { width: 100%; }
 .portrait-pilot #editorial { padding-top: 0; }
-.portrait-pilot .pilot-hero { display: flex; width: 100vw; margin-inline: calc(50% - 50vw); }
+.portrait-pilot #editorial > :not(.pilot-hero),
+.editorial-open .pilot-main > footer { width: min(var(--content-max), calc(100% - 2 * var(--page-gutter))); margin-inline: auto; }
+.portrait-pilot .pilot-hero { display: flex; width: 100%; }
 .portrait-pilot .pilot-hero h1 { font-size: clamp(2rem, 7vw, 6rem); overflow-wrap: anywhere; }
 .portrait-pilot .pilot-hero p { margin-inline: auto; }
 .editorial-hero-frames { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
@@ -38,7 +41,7 @@
 .editorial-hero-pause { bottom: 18px; cursor: pointer; }
 .portrait-pilot .editorial-process { padding-block: var(--section-space); margin-bottom: var(--section-space); }
 .portrait-pilot .editorial-process .eyebrow { color: var(--color-muted); }
-.pilot-hero p:not(.eyebrow) { margin: 18px 0; }
+.pilot-hero p:not(.eyebrow) { margin-block: 18px; }
 .portrait-pilot .portrait-gallery-section { width: 100%; }
 .portrait-pilot .cloud-section { margin: 0 0 var(--section-space); }
 .portrait-pilot .cloud-visual { display: grid; justify-items: center; gap: 12px; }
