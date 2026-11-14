@@ -32,6 +32,7 @@ function route() {
   const isEditorial = editorialAvailable() && (hash === '#edytorialna' || hash === '#pakiety');
   byId('choice').hidden = isEditorial;
   byId('editorial').hidden = !isEditorial;
+  document.body.classList.toggle('editorial-open', isEditorial);
   if (isEditorial && hash === '#pakiety') byId('pakiety').scrollIntoView();
   else window.scrollTo(0, 0);
   const title = document.querySelector(isEditorial ? '#editorial h1' : '#choice h1');
