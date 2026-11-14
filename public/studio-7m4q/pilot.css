@@ -35,7 +35,7 @@
 .portrait-pilot .iphone-screen { position: absolute; inset: 5px; width: auto; height: auto; }
 .portrait-pilot .iphone-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; background: #111; }
 .portrait-pilot .editorial-color { margin-bottom: var(--section-space); }
-.portrait-pilot .editorial-comparison { max-width: 960px; gap: clamp(12px, 2vw, 24px); }
+.portrait-pilot .editorial-comparison { width: min(92%, 800px); margin-inline: auto; gap: clamp(12px, 2vw, 24px); }
 .editorial-comparison figure { margin: 0; }
 .editorial-comparison img { display: block; width: 100%; height: auto; }
 .editorial-comparison figcaption { margin-top: 8px; color: #555; font-size: .85rem; }
