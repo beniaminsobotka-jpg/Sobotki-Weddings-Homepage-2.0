@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { isGalleryAdmin } from '../server/gallery-admin-auth.js';
+import { getBestOfShareToken, isGalleryAdmin } from '../server/gallery-admin-auth.js';
 import { hashSelectionPin } from '../server/gallery-couple-auth.js';
 import { normalizeGalleryVideos } from '../server/gallery-videos.js';
 import {
@@ -148,6 +148,7 @@ const getAdminData = async () => {
     galleryRoot: getGalleryRoot(),
     bestOf: {
       ...bestOfGallery,
+      shareToken: getBestOfShareToken(),
       photoCount: bestOfPhotos.length,
     },
   };
@@ -186,6 +187,7 @@ export default async function handler(request, response) {
             title: gallery.title,
             photoCount: photos.length,
           },
+          ...(gallery.isBestOf ? { shareToken: getBestOfShareToken() } : {}),
           coverPhoto: gallery.coverPhoto || '',
           photos: photos.map((photo) => {
             const query = new URLSearchParams({

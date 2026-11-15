@@ -14,7 +14,7 @@ root.render(
   <React.StrictMode>
     <App />
     <Analytics
-      beforeSend={(event) => (event.url.includes('/panel/') ? null : event)}
+      beforeSend={(event) => (/\/(?:panel|best-of)\//.test(new URL(event.url, window.location.origin).pathname) ? null : event)}
     />
   </React.StrictMode>
 );

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Check,
@@ -14,13 +15,14 @@ import {
 
 type BestOfPhoto = {
   id: string;
-  name: string;
+  name?: string;
   thumbnailUrl: string;
   largeUrl: string;
-  downloadUrl: string;
+  downloadUrl?: string;
 };
 
 type BestOfData = {
+  shareToken?: string;
   gallery: {
     slug: string;
     title: string;
@@ -39,6 +41,8 @@ const getErrorMessage = async (response: Response) => {
 };
 
 export const BestOfGalleryPage: React.FC = () => {
+  const { shareToken } = useParams();
+  const isShared = Boolean(shareToken);
   const [data, setData] = useState<BestOfData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -51,11 +55,14 @@ export const BestOfGalleryPage: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/admin-galleries?photosFor=best-of', {
+      const endpoint = shareToken
+        ? `/api/best-of-share?token=${encodeURIComponent(shareToken)}`
+        : '/api/admin-galleries?photosFor=best-of';
+      const response = await fetch(endpoint, {
         headers: { Accept: 'application/json' },
       });
 
-      if (response.status === 401) {
+      if (!shareToken && response.status === 401) {
         setNeedsLogin(true);
         setData(null);
         return;
@@ -72,7 +79,7 @@ export const BestOfGalleryPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [shareToken]);
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -129,7 +136,10 @@ export const BestOfGalleryPage: React.FC = () => {
   }, [activePhotoIndex, data?.photos.length]);
 
   const copyLink = async () => {
-    await navigator.clipboard.writeText(window.location.href);
+    if (!data?.shareToken) return;
+    const url = `${window.location.origin}/best-of/${data.shareToken}`;
+    try { await navigator.clipboard.writeText(url); }
+    catch { window.prompt('Skopiuj link do Best Of:', url); return; }
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1800);
   };
@@ -145,20 +155,20 @@ export const BestOfGalleryPage: React.FC = () => {
           aria-hidden="true"
         />
         <div className="relative mx-auto flex max-w-[1500px] items-center justify-between gap-4">
-          <a
+          {!isShared && <a
             href="/panel/galerie"
             className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-5 font-sans text-[9px] font-bold uppercase tracking-[0.17em] transition-colors hover:bg-white hover:text-black"
           >
             <ArrowLeft size={15} aria-hidden="true" />
             Panel galerii
-          </a>
+          </a>}
           <span className="font-serif text-xl font-black uppercase tracking-[-0.04em]">
             Sobotki <span className="font-normal italic">portraits</span>
           </span>
         </div>
         <div className="relative mx-auto max-w-[1500px] pb-10 pt-20 sm:pb-16 sm:pt-28">
           <p className="font-sans text-[9px] font-bold uppercase tracking-[0.3em] text-white/45">
-            Prywatna biblioteka najlepszych kadrów
+            {isShared ? 'Wybrane portrety' : 'Prywatna biblioteka najlepszych kadrów'}
           </p>
           <h1 className="mt-4 font-serif text-[clamp(4rem,14vw,12rem)] font-black uppercase leading-[0.78] tracking-[-0.075em]">
             Best Of
@@ -172,19 +182,19 @@ export const BestOfGalleryPage: React.FC = () => {
             <p className="font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-black/45">
               {data ? `${data.gallery.photoCount} zdjęć w galerii` : 'Biblioteka zdjęć'}
             </p>
-            <p className="mt-1 max-w-xl font-sans text-xs leading-5 text-black/45">
-              Stały, prywatny link. Dostęp wymaga zalogowania do panelu galerii.
-            </p>
+            {!isShared && <p className="mt-1 max-w-xl font-sans text-xs leading-5 text-black/45">
+              Link dla gości otwiera galerię bez logowania.
+            </p>}
           </div>
           <div className="flex items-center gap-2">
-            <button
+            {!isShared && data?.shareToken && <button
               type="button"
               onClick={() => void copyLink()}
               className="inline-flex min-h-11 items-center gap-2 rounded-full border border-black/10 px-5 font-sans text-[9px] font-bold uppercase tracking-[0.15em] transition-colors hover:bg-black hover:text-white"
             >
               {copied ? <Check size={15} /> : <Copy size={15} />}
-              {copied ? 'Skopiowano' : 'Kopiuj link'}
-            </button>
+              {copied ? 'Skopiowano' : 'Kopiuj link dla gości'}
+            </button>}
             <button
               type="button"
               onClick={() => void loadGallery()}
@@ -230,7 +240,7 @@ export const BestOfGalleryPage: React.FC = () => {
             <ImageIcon size={34} className="text-black/25" />
             <h2 className="mt-4 font-serif text-3xl font-black uppercase">Best Of jest jeszcze puste</h2>
             <p className="mt-2 font-sans text-sm text-black/45">
-              Dodaj zdjęcia z galerii klientów w panelu administratora.
+              {isShared ? 'Zdjęcia pojawią się tutaj wkrótce.' : 'Dodaj zdjęcia z galerii klientów w panelu administratora.'}
             </p>
           </div>
         )}
@@ -256,7 +266,7 @@ export const BestOfGalleryPage: React.FC = () => {
                   />
                   <span className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
                 </button>
-                <a
+                {photo.downloadUrl && <a
                   href={photo.downloadUrl}
                   download={photo.name}
                   className="absolute bottom-2 right-2 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-lg transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -264,7 +274,7 @@ export const BestOfGalleryPage: React.FC = () => {
                   title="Pobierz zdjęcie"
                 >
                   <Download size={17} aria-hidden="true" />
-                </a>
+                </a>}
               </div>
             ))}
           </div>
@@ -315,7 +325,7 @@ export const BestOfGalleryPage: React.FC = () => {
             <span className="font-sans text-[9px] font-bold uppercase tracking-[0.16em] text-white/70">
               {activePhotoIndex + 1} / {data.photos.length}
             </span>
-            <a
+            {activePhoto.downloadUrl && <a
               href={activePhoto.downloadUrl}
               download={activePhoto.name}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-black"
@@ -323,7 +333,7 @@ export const BestOfGalleryPage: React.FC = () => {
               title="Pobierz zdjęcie"
             >
               <Download size={15} />
-            </a>
+            </a>}
           </div>
         </div>
       )}

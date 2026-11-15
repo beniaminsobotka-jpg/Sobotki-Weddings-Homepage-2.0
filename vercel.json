@@ -14,7 +14,20 @@
       "maxDuration": 800
     }
   },
+  "headers": [
+    {
+      "source": "/best-of/:shareToken",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Referrer-Policy", "value": "no-referrer" }
+      ]
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/best-of/:shareToken",
+      "destination": "/index.html"
+    },
     {
       "source": "/oferta-warszawianka",
       "destination": "/api/corporate-offer?slug=warszawianka-281026-e14e2a54cd1cf6465b716933"

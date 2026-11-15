@@ -62,7 +62,7 @@ const AppShell: React.FC<{
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ isLoading, setIsLoading }) => {
   const location = useLocation();
-  const isGalleryRoute = location.pathname.startsWith('/galeria/');
+  const isGalleryRoute = location.pathname.startsWith('/galeria/') || location.pathname.startsWith('/best-of/');
   const isGalleryAdminRoute = location.pathname.startsWith('/panel/');
   const isStandaloneRoute = isGalleryRoute || isGalleryAdminRoute;
   const showLiquidBackground =
@@ -141,6 +141,7 @@ const AppShell: React.FC<{
                 <Route path="/portraits/stationary" element={<PortraitsStationaryPage />} />
                 <Route path="/editorial-home" element={<EditorialHomepage />} />
                 <Route path="/galeria/:slug" element={<GalleryPage />} />
+                <Route path="/best-of/:shareToken" element={<BestOfGalleryPage />} />
                 <Route path="/panel/galerie/best-of" element={<BestOfGalleryPage />} />
                 <Route path="/panel/galerie/portraits" element={<GalleryAdminPage mode="portraits" />} />
                 <Route path="/panel/galerie/weddings" element={<GalleryAdminPage mode="weddings" />} />
@@ -164,6 +165,7 @@ const App: React.FC = () => {
 
     if (
       window.location.pathname.startsWith('/galeria/') ||
+      window.location.pathname.startsWith('/best-of/') ||
       window.location.pathname.startsWith('/panel/')
     ) {
       return false;

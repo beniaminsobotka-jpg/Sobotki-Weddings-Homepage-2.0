@@ -1,4 +1,4 @@
-import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 const COOKIE_NAME = 'sw_gallery_admin';
 const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
@@ -118,5 +118,34 @@ export const isGalleryAdmin = (request) => {
     return Number(session.expiresAt) > Date.now();
   } catch {
     return false;
+  }
+};
+
+export const getBestOfShareToken = () =>
+  getSessionSecret() ? sign('best-of-share:v1') : '';
+
+export const isValidBestOfShareToken = (token) =>
+  typeof token === 'string' && /^[\w-]{43}$/.test(token) &&
+  Boolean(getSessionSecret()) && safeEqual(token, getBestOfShareToken());
+
+const bestOfPhotoKey = () => createHmac('sha256', getSessionSecret())
+  .update('best-of-photo-key:v1').digest();
+
+export const encodeBestOfPhoto = (name) => {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv('aes-256-gcm', bestOfPhotoKey(), iv);
+  const encrypted = Buffer.concat([cipher.update(name, 'utf8'), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64url');
+};
+
+export const decodeBestOfPhoto = (reference) => {
+  if (typeof reference !== 'string' || !/^[\w-]{39,400}$/.test(reference)) return null;
+  try {
+    const data = Buffer.from(reference, 'base64url');
+    const decipher = createDecipheriv('aes-256-gcm', bestOfPhotoKey(), data.subarray(0, 12));
+    decipher.setAuthTag(data.subarray(12, 28));
+    return Buffer.concat([decipher.update(data.subarray(28)), decipher.final()]).toString('utf8');
+  } catch {
+    return null;
   }
 };

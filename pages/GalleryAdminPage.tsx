@@ -85,7 +85,7 @@ type AdminData = {
   galleries: GalleryRecord[];
   folders: DropboxFolder[];
   galleryRoot: string;
-  bestOf: GalleryRecord;
+  bestOf: GalleryRecord & { shareToken?: string };
 };
 
 type FormState = {
@@ -541,7 +541,7 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
   }, [form.title, form.originalSlug, mode, showForm, slugTouched]);
 
   const origin = typeof window === 'undefined' ? 'https://www.sobotkiweddings.pl' : window.location.origin;
-  const bestOfUrl = `${origin}/panel/galerie/best-of`;
+  const bestOfUrl = data?.bestOf?.shareToken ? `${origin}/best-of/${data.bestOf.shareToken}` : '';
   const visibleGalleries = useMemo(
     () =>
       data?.galleries.filter(
@@ -1447,15 +1447,17 @@ export const GalleryAdminPage: React.FC<{ mode?: GalleryAdminMode }> = ({
               <div className="flex shrink-0 flex-wrap gap-2">
                 <button
                   type="button"
+                  disabled={!bestOfUrl}
                   onClick={async () => {
-                    await navigator.clipboard.writeText(bestOfUrl);
+                    try { await navigator.clipboard.writeText(bestOfUrl); }
+                    catch { window.prompt('Skopiuj link do Best Of:', bestOfUrl); return; }
                     setBestOfLinkCopied(true);
                     window.setTimeout(() => setBestOfLinkCopied(false), 1800);
                   }}
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/20 px-5 font-sans text-[9px] font-bold uppercase tracking-[0.17em] text-white transition-colors hover:bg-white hover:text-black"
                 >
                   {bestOfLinkCopied ? <Check size={16} /> : <Copy size={16} />}
-                  {bestOfLinkCopied ? 'Skopiowano' : 'Kopiuj link'}
+                  {bestOfLinkCopied ? 'Skopiowano' : 'Kopiuj link dla gości'}
                 </button>
                 <a
                   href="/panel/galerie/best-of"
