@@ -153,21 +153,17 @@ window.addEventListener('hashchange', route);
 
 
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
-const editionRows = [...document.querySelectorAll('.edition-pair')];
+const editionRow = document.querySelector('.edition-pair');
+const editionImages = [...editionRow.querySelectorAll('img')];
 const editionPause = byId('editionPause');
 const editionOrder = ['01', '05', '02', '04', '03', '06', '07'];
-const editionVisible = new Set();
+let editionVisible = false;
 let editionIndex = 0;
+let colorOnLeft = false;
 let editionLoading = false;
 let editionPaused = false;
-const editionCanPlay = () => editionVisible.size > 0 && !editionPaused && !motion.matches && !document.hidden;
-const editionObserver = new IntersectionObserver(entries => {
-  for (const entry of entries) {
-    if (entry.isIntersecting) editionVisible.add(entry.target);
-    else editionVisible.delete(entry.target);
-  }
-});
-editionRows.forEach(row => editionObserver.observe(row));
+const editionCanPlay = () => editionVisible && !editionPaused && !motion.matches && !document.hidden;
+new IntersectionObserver(([entry]) => { editionVisible = entry.isIntersecting; }).observe(editionRow);
 const updateEditionButton = () => {
   editionPause.hidden = motion.matches;
   editionPause.textContent = editionPaused ? 'Wznów zmianę zdjęć' : 'Wstrzymaj zmianę zdjęć';
@@ -182,23 +178,25 @@ setInterval(async () => {
   if (!editionCanPlay() || editionLoading) return;
   editionLoading = true;
   const next = (editionIndex + 1) % editionOrder.length;
+  const id = editionOrder[next];
+  const base = id === '07' ? './photos/comparison' : './photos/editions/' + id;
+  const variants = colorOnLeft ? ['bw', 'color'] : ['color', 'bw'];
   try {
-    const frames = await Promise.all(editionRows.flatMap((row, i) => {
-      const id = editionOrder[(next + 3 * i) % editionOrder.length];
-      const base = id === '07' ? './photos/comparison' : './photos/editions/' + id;
-      return [...row.querySelectorAll('img')].map(async target => {
-        const image = new Image();
-        image.src = base + '-' + target.dataset.variant + '.webp';
-        await image.decode();
-        return { target, src: image.src, id, row };
-      });
+    const frames = await Promise.all(variants.map(async variant => {
+      const image = new Image();
+      image.src = base + '-' + variant + '.webp';
+      await image.decode();
+      return image.src;
     }));
     if (editionCanPlay()) {
-      for (const { target, src, id, row } of frames) {
-        target.src = src;
-        target.alt = 'Portret ' + Number(id) + ' — ' + (target.dataset.variant === 'bw' ? 'czerń i biel' : 'kolor');
-        row.dataset.pair = id;
-      }
+      editionImages.forEach((target, index) => {
+        const variant = variants[index];
+        target.src = frames[index];
+        target.dataset.variant = variant;
+        target.alt = 'Portret ' + Number(id) + ' — ' + (variant === 'bw' ? 'czerń i biel' : 'kolor');
+      });
+      editionRow.dataset.pair = id;
+      colorOnLeft = !colorOnLeft;
     }
   } catch { /* Keep both versions matched if an image fails to load. */ }
   finally {

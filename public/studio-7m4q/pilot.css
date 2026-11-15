@@ -53,10 +53,8 @@
 .portrait-pilot .editorial-color > p { margin-inline: auto; }
 .portrait-pilot .editorial-comparison { width: min(100%, 820px); margin: 28px auto 0; text-align: left; }
 .edition-pair { display: grid; grid-template-columns: minmax(0, 10fr) minmax(0, 7fr); align-items: center; gap: clamp(10px, 3vw, 36px); }
-.edition-pair + .edition-pair { margin-top: clamp(18px, 4vw, 46px); }
 .edition-pair figure { margin: 0; }
 .edition-pair img { display: block; width: 100%; aspect-ratio: 2 / 3; height: auto; object-fit: contain; }
-.edition-pair figcaption { margin-bottom: 8px; color: #555; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .edition-pause { display: block; margin: 16px auto 0; padding: 10px; border: 0; background: none; color: #555; font: inherit; font-size: .8rem; text-decoration: underline; cursor: pointer; }
 .portrait-pilot .editorial-book { margin: var(--section-space) 0; }
 .portrait-pilot #colorOption { display: flex; align-items: center; gap: 10px; }
