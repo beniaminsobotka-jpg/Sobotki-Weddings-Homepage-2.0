@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, MapPin, Calendar, Briefcase } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, Calendar, Briefcase } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
-import { getPortraitTileSrcSet } from '../utils/media';
+import mosaicPhotos from './portrait-mosaic-data.json';
+import './portrait-mosaic.css';
 
-// --- DATA ---
-const portraitsData = Array.from({ length: 9 }, (_, i) => ({
-    id: i + 1,
-    src: `/uploads/2026/02/Fotostacja-Strona-Glowna-kafalek_${i + 1}.avif`,
-    title: `Portrait Session ${i + 1}`,
-    client: "Guest Portrait",
-    alt: 'Czarno-biały portret gościa wykonany w fotostacji Sobotki Portraits',
-}));
+const portraitsData = mosaicPhotos.map((photo) => {
+    const path = `/media/portraits-best-of/${String(photo.id).padStart(3, '0')}`;
+    return { ...photo, src: `${path}.webp`, thumbnail: `${path}-460.webp` };
+});
+// Each spread starts with a large portrait and a stack of two horizontal photos.
+const mosaicSpreads = Array.from(
+    { length: portraitsData.length / 5 },
+    (_, index) => portraitsData.slice(index * 5, index * 5 + 5),
+);
 
 export const PortraitsPage: React.FC = () => {
     const [selectedindex, setSelectedIndex] = useState<number | null>(null);
@@ -84,35 +86,37 @@ export const PortraitsPage: React.FC = () => {
                     </motion.p>
                 </div>
 
-                {/* --- GRID LAYOUT (SHARP CORNERS - 3x3) --- */}
-                <div className="grid grid-cols-3 grid-rows-3 gap-0.5 bg-[#111] w-full max-w-5xl mx-auto h-[60vh] md:h-[80vh] border border-white/5 p-0.5">
-                    <AnimatePresence>
-                        {portraitsData.map((item, index) => (
-                            <motion.div
-                                key={item.id + index}
-                                initial={{ opacity: 0 }}
-                                whileInView={{ opacity: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: index * 0.05 }}
-                                onClick={() => openLightbox(index)}
-                                className="relative w-full h-full group cursor-pointer overflow-hidden bg-[#0a0a0a]"
-                            >
-                                <img
-                                    src={item.src}
-                                    srcSet={getPortraitTileSrcSet(item.src)}
-                                    sizes="33vw"
-                                    alt={item.alt}
-                                    loading={index < 3 ? 'eager' : 'lazy'}
-                                    fetchPriority={index === 0 ? 'high' : 'low'}
-                                    decoding="async"
-                                    width={2048}
-                                    height={1365}
-                                    className="w-full h-full object-cover transition-transform duration-[1s] ease-out group-hover:scale-105 filter grayscale contrast-110 group-hover:grayscale-0"
-                                />
-                            </motion.div>
+                <section className="portrait-mosaic" aria-label="Galeria portretów z Fotostacji">
+                    <div className="portrait-mosaic__veil" aria-hidden="true" />
+                    <div className="portrait-mosaic__tiles">
+                        {mosaicSpreads.map((spread, spreadIndex) => (
+                            <div key={spread[0].id} className="portrait-mosaic__spread">
+                                {spread.map((item, tileIndex) => {
+                                    const index = spreadIndex * 5 + tileIndex;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => openLightbox(index)}
+                                            className="portrait-mosaic__tile"
+                                            aria-label={`Powiększ zdjęcie: ${item.alt}`}
+                                        >
+                                            <img
+                                                src={item.thumbnail}
+                                                srcSet={`${item.thumbnail} 460w, ${item.src} 1080w`}
+                                                sizes="(min-width: 1280px) 300px, (min-width: 640px) 24vw, 47vw"
+                                                alt={item.alt}
+                                                loading={spreadIndex < 2 && tileIndex < 3 ? 'eager' : 'lazy'}
+                                                decoding="async"
+                                                className="portrait-mosaic__image"
+                                            />
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         ))}
-                    </AnimatePresence>
-                </div>
+                    </div>
+                </section>
 
                 {/* --- DETAILED CONTENT SECTION --- */}
                 <div className="mt-32 max-w-5xl mx-auto space-y-24">
@@ -318,7 +322,7 @@ export const PortraitsPage: React.FC = () => {
 
                     </div>
 
-                    {/* --- 3 OFFER TYPES SECTION --- */}
+                    {/* --- OFFER TYPES SECTION --- */}
                     <div className="mt-32 pt-16 border-t border-white/10">
                         <div className="text-center mb-16">
                             <h2 className="font-serif text-3xl md:text-5xl text-white mb-4 leading-tight">
@@ -329,7 +333,7 @@ export const PortraitsPage: React.FC = () => {
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                             {/* CARD 1: WEDDING */}
                             <div className="group relative h-[500px] rounded-[30px] overflow-hidden bg-[#111] border border-white/10 cursor-pointer">
@@ -417,48 +421,6 @@ export const PortraitsPage: React.FC = () => {
                                 />
                             </div>
 
-                            {/* CARD 3: STUDIO */}
-                            <div className="group relative h-[500px] rounded-[30px] overflow-hidden bg-[#111] border border-white/10 cursor-pointer">
-                                {/* Background Image */}
-                                <img
-                                    src="/uploads/2025/07/OlgaxFranek_Fotostacja_-51-min.avif"
-                                    alt="Studio Stacjonarne"
-                                    loading="lazy"
-                                    fetchPriority="low"
-                                    decoding="async"
-                                    className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-700 transform group-hover:scale-105"
-                                />
-                                {/* Gradient Overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
-
-                                {/* Content */}
-                                <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                                    <div className="mb-auto flex justify-end">
-                                        <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/30 text-white transition-all duration-500 group-hover:bg-white group-hover:text-black">
-                                            <ArrowRight size={20} className="transform transition-transform duration-500 group-hover:translate-x-1" />
-                                        </div>
-                                    </div>
-
-                                    <div className="transform transition-transform duration-500 group-hover:-translate-y-2">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <MapPin size={14} className="text-white" />
-                                            <span className="font-sans text-[10px] uppercase tracking-widest text-white/80">Gliwice</span>
-                                        </div>
-                                        <h3 className="font-serif font-black text-3xl text-white mb-2 leading-none">Studio Stacjonarne</h3>
-                                        <p className="font-playfair-italic text-gray-400 text-lg mb-4">Dzień Portretu</p>
-                                        <p className="font-sans text-xs text-gray-500 leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 h-0 group-hover:h-auto overflow-hidden">
-                                            Nie czekaj na okazję. Odwiedź nas w Gliwicach na krótką sesję indywidualną, rodzinną lub pokoleniową.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Click Area Link */}
-                                <Link
-                                    to="/portraits/stationary"
-                                    className="absolute inset-0 z-20"
-                                    aria-label="Przejdź do fotostacji stacjonarnej w Gliwicach"
-                                />
-                            </div>
 
                         </div>
                     </div>
@@ -544,8 +506,7 @@ export const PortraitsPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Three Columns SEO Text */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pt-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-8">
                             <div className="space-y-4">
                                 <h4 className="font-serif text-2xl text-white">Czarno-białe portrety na weselu</h4>
                                 <p className="font-sans text-sm text-gray-400 leading-relaxed">
@@ -556,12 +517,6 @@ export const PortraitsPage: React.FC = () => {
                                 <h4 className="font-serif text-2xl text-white">Fotostacja na eventy firmowe</h4>
                                 <p className="font-sans text-sm text-gray-400 leading-relaxed">
                                     Szukasz nietypowej, ale stylowej atrakcji na event firmowy? Fotostacja doskonale sprawdza się podczas takich okazji jak wieczory galowe, jubileusze firm, świąteczne spotkania, a także dni otwarte i eventy brandingowe.
-                                </p>
-                            </div>
-                            <div className="space-y-4">
-                                <h4 className="font-serif text-2xl text-white">Fotostacja stacjonarna – Gliwice</h4>
-                                <p className="font-sans text-sm text-gray-400 leading-relaxed">
-                                    Nie czekaj na okazję – odwiedź nas w naszym fotostudio w Gliwicach! W każdą środę (i nie tylko), w ramach akcji „Dzień Portretu”, możesz zarezerwować półgodzinne okienko i wykonać rodzinny portret czarno-biały lub zdjęcie z bliskimi.
                                 </p>
                             </div>
                         </div>
