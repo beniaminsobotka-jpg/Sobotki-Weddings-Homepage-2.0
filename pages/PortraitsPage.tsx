@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, Calendar, Briefcase } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { PortraitMasonry, portraitsData } from './PortraitMasonry';
 
+// Echo the opening row of the gallery behind the hero as the page moves.
+const heroPortraits = portraitsData.slice(0, 3);
+
 export const PortraitsPage: React.FC = () => {
     const [selectedindex, setSelectedIndex] = useState<number | null>(null);
+    const backdropRef = useRef<HTMLDivElement>(null);
 
     // --- LIGHTBOX LOGIC ---
     const openLightbox = (index: number) => setSelectedIndex(index);
@@ -47,13 +51,21 @@ export const PortraitsPage: React.FC = () => {
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
 
                 {/* --- HEADER --- */}
-                <div className="flex flex-col items-center text-center mb-24 md:mb-32">
+                <div className="portraits-hero flex flex-col items-center text-center pb-24 md:pb-32">
+                    <div className="portraits-hero__backdrop" ref={backdropRef} aria-hidden="true">
+                        <div className="portraits-hero__photos">
+                            {heroPortraits.map((photo) => (
+                                <img key={photo.id} src={photo.thumbnail} alt="" decoding="async" />
+                            ))}
+                        </div>
+                    </div>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
+                        className="portraits-hero__text"
                     >
-                        <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] text-gray-500 block mb-6 flex items-center justify-center gap-3">
+                        <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] text-gray-400 block mb-6 flex items-center justify-center gap-3">
                             <Star size={10} className="text-white" fill="white" />
                             FOTOSTACJA - NAJLEPSZA ATRAKCJA WESELNA
                             <Star size={10} className="text-white" fill="white" />
@@ -68,14 +80,14 @@ export const PortraitsPage: React.FC = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4, duration: 0.8 }}
-                        className="max-w-2xl font-serif text-lg md:text-xl text-gray-400 leading-relaxed"
+                        className="portraits-hero__text max-w-2xl font-serif text-lg md:text-xl text-gray-300 leading-relaxed"
                     >
                         Eleganckie, czarno-białe portrety wykonywane podczas Waszego przyjęcia.
                         Tworzymy profesjonalne mini-studio, w którym każdy gość czuje się jak gwiazda kina.
                     </motion.p>
                 </div>
 
-                <PortraitMasonry onOpen={openLightbox} />
+                <PortraitMasonry onOpen={openLightbox} backdropRef={backdropRef} />
 
                 {/* --- DETAILED CONTENT SECTION --- */}
                 <div className="mt-32 max-w-5xl mx-auto space-y-24">

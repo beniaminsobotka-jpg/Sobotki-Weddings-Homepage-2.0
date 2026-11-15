@@ -1,3 +1,49 @@
+.portraits-hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.portraits-hero__backdrop {
+  position: absolute;
+  inset: -106px 0 0;
+  width: min(100%, 1200px);
+  margin-inline: auto;
+  overflow: clip;
+  pointer-events: none;
+  opacity: var(--portraits-hero-reveal, 0);
+  mask-image: linear-gradient(transparent, #000 24%, #000 67%, transparent);
+}
+
+.portraits-hero__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #050505, transparent 12%, transparent 88%, #050505);
+}
+
+.portraits-hero__photos {
+  position: absolute;
+  inset: -24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  filter: blur(15px) brightness(.44);
+}
+
+.portraits-hero__photos img {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: cover;
+  object-position: center 38%;
+}
+
+.portraits-hero__photos img:nth-child(3) { display: none; }
+
+.portraits-hero__text {
+  position: relative;
+  z-index: 1;
+}
+
 .portrait-mosaic {
   position: relative;
   width: min(100%, 1200px);
@@ -9,10 +55,10 @@
   --mosaic-columns: 2;
   --veil-height: clamp(40px, 8vh, 88px);
   position: sticky;
-  top: 20vh;
-  top: 20svh;
-  height: 60vh;
-  height: 60svh;
+  top: 15vh;
+  top: 15svh;
+  height: 70vh;
+  height: 70svh;
   overflow: clip;
   isolation: isolate;
   column-gap: clamp(7px, 0.8vw, 12px);
@@ -24,15 +70,21 @@
 }
 
 .portrait-mosaic__veil {
+  --veil-direction: to bottom;
   position: absolute;
   inset: 0 0 auto;
   z-index: 1;
   height: var(--veil-height);
   pointer-events: none;
-  background: linear-gradient(#050505, #050505b3 34%, transparent);
+  background: linear-gradient(var(--veil-direction), #050505, #050505b3 34%, transparent);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  mask-image: linear-gradient(#000 12%, #0009 56%, transparent);
+  mask-image: linear-gradient(var(--veil-direction), #000 12%, #0009 56%, transparent);
+}
+
+.portrait-mosaic__veil--bottom {
+  --veil-direction: to top;
+  inset: auto 0 0;
 }
 
 .portrait-mosaic__tile {
@@ -64,11 +116,14 @@
   object-position: center;
 }
 
-@media (min-width: 640px) { .portrait-mosaic__window { --mosaic-columns: 3; } }
-@media (min-width: 1024px) { .portrait-mosaic__window { --mosaic-columns: 4; } }
-@media (min-width: 1280px) { .portrait-mosaic__window { --mosaic-columns: 5; } }
+@media (min-width: 640px) {
+  .portrait-mosaic__window { --mosaic-columns: 3; }
+  .portraits-hero__photos { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .portraits-hero__photos img:nth-child(3) { display: block; }
+}
 
 @media (prefers-reduced-motion: reduce) {
+  .portraits-hero__backdrop { opacity: 1; }
   .portrait-mosaic__window { position: relative; top: auto; height: auto; overflow: visible; }
   .portrait-mosaic__tiles { will-change: auto; }
   .portrait-mosaic__veil { display: none; }

@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import mosaicPhotos from './portrait-mosaic-data.json';
 import './portrait-mosaic.css';
 
@@ -59,7 +60,13 @@ function buildMasonry(width: number, columns: number, gap: number) {
     return { tiles, tileWidth, stride: tileWidth + gap, height: Math.max(...offsets) - gap };
 }
 
-export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void }) {
+export function PortraitMasonry({
+    onOpen,
+    backdropRef,
+}: {
+    onOpen: (index: number) => void;
+    backdropRef: RefObject<HTMLDivElement>;
+}) {
     const sectionRef = useRef<HTMLElement>(null);
     const viewportRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
@@ -73,8 +80,14 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
         let frame = 0;
         let lastMeasurement = '';
+        let lastReveal = -1;
 
         const sync = () => {
+            const reveal = reduced.matches ? 1 : Math.min(1, Math.max(0, window.scrollY / 96));
+            if (reveal !== lastReveal) {
+                backdropRef.current?.style.setProperty('--portraits-hero-reveal', String(reveal));
+                lastReveal = reveal;
+            }
             const start = parseFloat(getComputedStyle(viewport).top) || 0;
             const max = Math.max(0, track.offsetHeight - viewport.clientHeight);
             const shift = reduced.matches ? 0 : Math.min(max, Math.max(0, start - section.getBoundingClientRect().top));
@@ -115,7 +128,7 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
             window.cancelAnimationFrame(frame);
             syncRef.current = null;
         };
-    }, []);
+    }, [backdropRef]);
 
     useLayoutEffect(() => {
         syncRef.current?.();
@@ -155,7 +168,7 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
                                 <img
                                     src={photo.thumbnail}
                                     srcSet={`${photo.thumbnail} 460w, ${photo.src} 1080w`}
-                                    sizes="(min-width: 1280px) 240px, (min-width: 1024px) 24vw, (min-width: 640px) 31vw, 47vw"
+                                    sizes="(min-width: 1280px) 400px, (min-width: 640px) 32vw, 47vw"
                                     alt={photo.alt}
                                     loading={order < 10 ? 'eager' : 'lazy'}
                                     decoding="async"
@@ -166,6 +179,7 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
                     })}
                 </div>
                 <div className="portrait-mosaic__veil" aria-hidden="true" />
+                <div className="portrait-mosaic__veil portrait-mosaic__veil--bottom" aria-hidden="true" />
             </div>
         </section>
     );
