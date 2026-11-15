@@ -3,18 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, Calendar, Briefcase } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
-import mosaicPhotos from './portrait-mosaic-data.json';
-import './portrait-mosaic.css';
-
-const portraitsData = mosaicPhotos.map((photo) => {
-    const path = `/media/portraits-best-of/${String(photo.id).padStart(3, '0')}`;
-    return { ...photo, src: `${path}.webp`, thumbnail: `${path}-460.webp` };
-});
-// Each spread starts with a large portrait and a stack of two horizontal photos.
-const mosaicSpreads = Array.from(
-    { length: portraitsData.length / 5 },
-    (_, index) => portraitsData.slice(index * 5, index * 5 + 5),
-);
+import { PortraitMasonry, portraitsData } from './PortraitMasonry';
 
 export const PortraitsPage: React.FC = () => {
     const [selectedindex, setSelectedIndex] = useState<number | null>(null);
@@ -86,37 +75,7 @@ export const PortraitsPage: React.FC = () => {
                     </motion.p>
                 </div>
 
-                <section className="portrait-mosaic" aria-label="Galeria portretów z Fotostacji">
-                    <div className="portrait-mosaic__veil" aria-hidden="true" />
-                    <div className="portrait-mosaic__tiles">
-                        {mosaicSpreads.map((spread, spreadIndex) => (
-                            <div key={spread[0].id} className="portrait-mosaic__spread">
-                                {spread.map((item, tileIndex) => {
-                                    const index = spreadIndex * 5 + tileIndex;
-                                    return (
-                                        <button
-                                            key={item.id}
-                                            type="button"
-                                            onClick={() => openLightbox(index)}
-                                            className="portrait-mosaic__tile"
-                                            aria-label={`Powiększ zdjęcie: ${item.alt}`}
-                                        >
-                                            <img
-                                                src={item.thumbnail}
-                                                srcSet={`${item.thumbnail} 460w, ${item.src} 1080w`}
-                                                sizes="(min-width: 1280px) 300px, (min-width: 640px) 24vw, 47vw"
-                                                alt={item.alt}
-                                                loading={spreadIndex < 2 && tileIndex < 3 ? 'eager' : 'lazy'}
-                                                decoding="async"
-                                                className="portrait-mosaic__image"
-                                            />
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                <PortraitMasonry onOpen={openLightbox} />
 
                 {/* --- DETAILED CONTENT SECTION --- */}
                 <div className="mt-32 max-w-5xl mx-auto space-y-24">

@@ -1,54 +1,43 @@
 .portrait-mosaic {
-  --mosaic-gap: clamp(6px, 1vw, 14px);
-  --veil-height: clamp(40px, 8vh, 88px);
   position: relative;
   width: min(100%, 1200px);
   margin-inline: auto;
 }
 
-/* The page scrolls normally. The glass edge stays put as tiles pass under it. */
-.portrait-mosaic__veil {
+/* The section provides the scroll distance. Only this window stays pinned. */
+.portrait-mosaic__window {
+  --mosaic-columns: 2;
+  --veil-height: clamp(40px, 8vh, 88px);
   position: sticky;
-  top: 0;
-  z-index: 2;
-  height: var(--veil-height);
-  margin-bottom: calc(-1 * var(--veil-height));
-  pointer-events: none;
-  background: linear-gradient(#050505, #050505af 45%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  mask-image: linear-gradient(#000 12%, #0009 56%, transparent);
-  -webkit-mask-image: linear-gradient(#000 12%, #0009 56%, transparent);
+  top: 20vh;
+  top: 20svh;
+  height: 60vh;
+  height: 60svh;
+  overflow: clip;
+  isolation: isolate;
+  column-gap: clamp(7px, 0.8vw, 12px);
 }
 
 .portrait-mosaic__tiles {
-  display: grid;
-  gap: var(--mosaic-gap);
+  position: relative;
+  will-change: transform;
 }
 
-.portrait-mosaic__spread {
-  display: grid;
-  gap: var(--mosaic-gap);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-areas: "portrait upper" "portrait lower" "left right";
-  --portrait-ratio: 2 / 3;
-}
-
-.portrait-mosaic__spread:nth-child(even) {
-  grid-template-areas: "upper portrait" "lower portrait" "left right";
-}
-
-.portrait-mosaic__spread:nth-child(4n + 3),
-.portrait-mosaic__spread:nth-child(4n + 4) {
-  --portrait-ratio: 4 / 5;
+.portrait-mosaic__veil {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: var(--veil-height);
+  pointer-events: none;
+  background: linear-gradient(#050505, #050505b3 34%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  mask-image: linear-gradient(#000 12%, #0009 56%, transparent);
 }
 
 .portrait-mosaic__tile {
-  position: relative;
+  position: absolute;
   display: block;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
   border: 0;
   padding: 0;
   overflow: hidden;
@@ -56,16 +45,9 @@
   cursor: zoom-in;
 }
 
-.portrait-mosaic__tile:nth-child(1) { grid-area: portrait; aspect-ratio: var(--portrait-ratio); }
-.portrait-mosaic__tile:nth-child(2) { grid-area: upper; }
-.portrait-mosaic__tile:nth-child(3) { grid-area: lower; }
-.portrait-mosaic__tile:nth-child(4) { grid-area: left; aspect-ratio: 3 / 2; }
-.portrait-mosaic__tile:nth-child(5) { grid-area: right; aspect-ratio: 3 / 2; }
-
 .portrait-mosaic__tile:focus-visible {
   outline: 2px solid white;
   outline-offset: -3px;
-  scroll-margin-top: var(--veil-height);
 }
 
 .portrait-mosaic__image {
@@ -78,13 +60,16 @@
   object-position: center 40%;
 }
 
-/* Keep the whole lit circle in the frame on the landscape film shots. */
-.portrait-mosaic__image:is([src$="/001-460.webp"], [src$="/026-460.webp"], [src$="/029-460.webp"], [src$="/030-460.webp"], [src$="/096-460.webp"]) {
+.portrait-mosaic__tile[data-style="film"] .portrait-mosaic__image {
   object-position: center;
 }
 
-@media (min-width: 640px) {
-  .portrait-mosaic__tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+@media (min-width: 640px) { .portrait-mosaic__window { --mosaic-columns: 3; } }
+@media (min-width: 1024px) { .portrait-mosaic__window { --mosaic-columns: 4; } }
+@media (min-width: 1280px) { .portrait-mosaic__window { --mosaic-columns: 5; } }
 
-@media (prefers-reduced-motion: reduce) { .portrait-mosaic__veil { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .portrait-mosaic__window { position: relative; top: auto; height: auto; overflow: visible; }
+  .portrait-mosaic__tiles { will-change: auto; }
+  .portrait-mosaic__veil { display: none; }
+}
