@@ -54,7 +54,9 @@ export const PortraitsPage: React.FC = () => {
                     </h1>
                     <p className="portraits-hero__caption font-sans">
                         <strong className="font-playfair-italic">Ulubiona atrakcja Twoich gości.</strong>{' '}
-                        <span>Eleganckie, czarno-białe portrety wykonywane podczas przyjęcia.</span>
+                        <span className="portraits-hero__caption-description">
+                            <span>Eleganckie, czarno-białe portrety wykonywane podczas przyjęcia.</span>
+                        </span>
                     </p>
                 </div>
             </header>
