@@ -1,5 +1,4 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import type { RefObject } from 'react';
 import mosaicPhotos from './portrait-mosaic-data.json';
 import './portrait-mosaic.css';
 
@@ -60,13 +59,7 @@ function buildMasonry(width: number, columns: number, gap: number) {
     return { tiles, tileWidth, stride: tileWidth + gap, height: Math.max(...offsets) - gap };
 }
 
-export function PortraitMasonry({
-    onOpen,
-    backdropRef,
-}: {
-    onOpen: (index: number) => void;
-    backdropRef: RefObject<HTMLDivElement>;
-}) {
+export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void }) {
     const sectionRef = useRef<HTMLElement>(null);
     const viewportRef = useRef<HTMLDivElement>(null);
     const trackRef = useRef<HTMLDivElement>(null);
@@ -80,14 +73,8 @@ export function PortraitMasonry({
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
         let frame = 0;
         let lastMeasurement = '';
-        let lastReveal = -1;
 
         const sync = () => {
-            const reveal = reduced.matches ? 1 : Math.min(1, Math.max(0, window.scrollY / 96));
-            if (reveal !== lastReveal) {
-                backdropRef.current?.style.setProperty('--portraits-hero-reveal', String(reveal));
-                lastReveal = reveal;
-            }
             const start = parseFloat(getComputedStyle(viewport).top) || 0;
             const max = Math.max(0, track.offsetHeight - viewport.clientHeight);
             const shift = reduced.matches ? 0 : Math.min(max, Math.max(0, start - section.getBoundingClientRect().top));
@@ -128,7 +115,7 @@ export function PortraitMasonry({
             window.cancelAnimationFrame(frame);
             syncRef.current = null;
         };
-    }, [backdropRef]);
+    }, []);
 
     useLayoutEffect(() => {
         syncRef.current?.();

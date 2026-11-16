@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, Calendar, Briefcase } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { PortraitMasonry, portraitsData } from './PortraitMasonry';
-
-// Echo the opening row of the gallery behind the hero as the page moves.
-const heroPortraits = portraitsData.slice(0, 3);
+import { PortraitHeroBackdrop } from './PortraitHeroBackdrop';
 
 export const PortraitsPage: React.FC = () => {
     const [selectedindex, setSelectedIndex] = useState<number | null>(null);
-    const backdropRef = useRef<HTMLDivElement>(null);
 
     // --- LIGHTBOX LOGIC ---
     const openLightbox = (index: number) => setSelectedIndex(index);
@@ -52,13 +49,7 @@ export const PortraitsPage: React.FC = () => {
 
                 {/* --- HEADER --- */}
                 <div className="portraits-hero flex flex-col items-center text-center pb-24 md:pb-32">
-                    <div className="portraits-hero__backdrop" ref={backdropRef} aria-hidden="true">
-                        <div className="portraits-hero__photos">
-                            {heroPortraits.map((photo) => (
-                                <img key={photo.id} src={photo.thumbnail} alt="" decoding="async" />
-                            ))}
-                        </div>
-                    </div>
+                    <PortraitHeroBackdrop />
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -70,9 +61,9 @@ export const PortraitsPage: React.FC = () => {
                             FOTOSTACJA - NAJLEPSZA ATRAKCJA WESELNA
                             <Star size={10} className="text-white" fill="white" />
                         </span>
-                        <h1 className="font-serif font-black text-6xl md:text-8xl lg:text-9xl uppercase tracking-tighter text-white leading-[0.85] mb-6">
-                            Sobotki<br />
-                            <span className="font-playfair-italic font-light lowercase text-gray-400">portraits</span>
+                        <h1 className="portraits-hero__wordmark font-serif font-black text-6xl md:text-8xl lg:text-9xl uppercase tracking-tighter text-white mb-6">
+                            <span className="block">Sobotki</span>{' '}
+                            <span className="portraits-hero__wordmark-secondary font-playfair-italic font-light lowercase text-gray-400">portraits</span>
                         </h1>
                     </motion.div>
 
@@ -87,7 +78,7 @@ export const PortraitsPage: React.FC = () => {
                     </motion.p>
                 </div>
 
-                <PortraitMasonry onOpen={openLightbox} backdropRef={backdropRef} />
+                <PortraitMasonry onOpen={openLightbox} />
 
                 {/* --- DETAILED CONTENT SECTION --- */}
                 <div className="mt-32 max-w-5xl mx-auto space-y-24">
