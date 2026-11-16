@@ -171,7 +171,6 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
                     })}
                 </div>
                 <div className="portrait-mosaic__veil portrait-mosaic__veil--top" aria-hidden="true" />
-                <div className="portrait-mosaic__veil portrait-mosaic__veil--bottom" aria-hidden="true" />
             </div>
         </section>
     );
