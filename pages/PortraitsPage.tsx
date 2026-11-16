@@ -39,45 +39,27 @@ export const PortraitsPage: React.FC = () => {
     }, [selectedindex]);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-[#F3F2ED] pt-32 pb-24 relative selection:bg-white selection:text-black">
+        <div className="min-h-screen bg-[#050505] text-[#F3F2ED] pb-24 relative selection:bg-white selection:text-black">
             <Seo page="portraits" />
 
             {/* Background Noise for Texture */}
             <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] noise-texture"></div>
 
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
-
-                {/* --- HEADER --- */}
-                <div className="portraits-hero flex flex-col items-center text-center pb-24 md:pb-32">
-                    <PortraitHeroBackdrop />
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="portraits-hero__text"
-                    >
-                        <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] text-gray-400 block mb-6 flex items-center justify-center gap-3">
-                            <Star size={10} className="text-white" fill="white" />
-                            FOTOSTACJA - NAJLEPSZA ATRAKCJA WESELNA
-                            <Star size={10} className="text-white" fill="white" />
-                        </span>
-                        <h1 className="portraits-hero__wordmark font-serif font-black text-6xl md:text-8xl lg:text-9xl uppercase tracking-tighter text-white mb-6">
-                            <span className="block">Sobotki</span>{' '}
-                            <span className="portraits-hero__wordmark-secondary font-playfair-italic font-light lowercase text-gray-400">portraits</span>
-                        </h1>
-                    </motion.div>
-
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
-                        className="portraits-hero__text max-w-2xl font-serif text-lg md:text-xl text-gray-300 leading-relaxed"
-                    >
-                        Eleganckie, czarno-białe portrety wykonywane podczas Waszego przyjęcia.
-                        Tworzymy profesjonalne mini-studio, w którym każdy gość czuje się jak gwiazda kina.
-                    </motion.p>
+            <header className="portraits-hero">
+                <PortraitHeroBackdrop />
+                <div className="portraits-hero__text text-center">
+                    <h1 className="portraits-hero__wordmark font-serif font-black uppercase tracking-tighter text-white">
+                        <span className="block">Sobotki</span>{' '}
+                        <span className="portraits-hero__wordmark-secondary font-playfair-italic font-light lowercase">Portraits</span>
+                    </h1>
+                    <p className="portraits-hero__caption font-sans">
+                        <strong>Ulubiona atrakcja Twoich gości.</strong>{' '}
+                        <span>Eleganckie, czarno-białe portrety wykonywane podczas przyjęcia.</span>
+                    </p>
                 </div>
+            </header>
 
+            <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
                 <PortraitMasonry onOpen={openLightbox} />
 
                 {/* --- DETAILED CONTENT SECTION --- */}

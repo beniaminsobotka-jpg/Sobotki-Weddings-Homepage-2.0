@@ -2,10 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { portraitsData } from './PortraitMasonry';
 
 const scenes = [
-    [7, 29, 12],
-    [79, 26, 71],
-    [5, 96, 19],
-].map((ids) => ids.map((id) => portraitsData.find((photo) => photo.id === id)!));
+    [12, 79],
+    [29, 35],
+    [77, 7],
+    [19, 48],
+].map(([wideId, tallId]) => ({
+    wide: portraitsData.find((photo) => photo.id === wideId)!,
+    tall: portraitsData.find((photo) => photo.id === tallId)!,
+}));
 
 export function PortraitHeroBackdrop() {
     const backdropRef = useRef<HTMLDivElement>(null);
@@ -24,12 +28,11 @@ export function PortraitHeroBackdrop() {
 
             const index = next;
             next = (next + 1) % scenes.length;
-            const images = [...backdrop.children[index].querySelectorAll('img')]
-                .filter((image) => image.getClientRects().length);
+            const image = backdrop.children[index].querySelector('img')!;
             loading = true;
             try {
-                // Let the incoming photos decode before fading them over the previous scene.
-                await Promise.all(images.map((image) => image.decode()));
+                // Never reveal a frame before its responsive source has decoded.
+                await image.decode();
                 if (!stopped && !reduced.matches) {
                     setScene((old) => index === old.current ? old : { current: index, previous: old.current });
                 }
@@ -49,22 +52,15 @@ export function PortraitHeroBackdrop() {
 
     return (
         <div className="portraits-hero__backdrop" ref={backdropRef} aria-hidden="true">
-            {scenes.map((photos, index) => (
-                <div
+            {scenes.map(({ wide, tall }, index) => (
+                <picture
                     className="portraits-hero__photos"
-                    key={index}
+                    key={wide.id}
                     data-scene={index === scene.current ? 'current' : index === scene.previous ? 'previous' : 'waiting'}
                 >
-                    {photos.map((photo) => (
-                        <img
-                            key={photo.id}
-                            src={photo.thumbnail}
-                            alt=""
-                            decoding="async"
-                            fetchPriority={index === 0 ? 'auto' : 'low'}
-                        />
-                    ))}
-                </div>
+                    <source media="(max-width: 639px)" srcSet={tall.src} />
+                    <img src={wide.src} alt="" decoding="async" fetchPriority={index === 0 ? 'high' : 'low'} />
+                </picture>
             ))}
         </div>
     );
