@@ -40,7 +40,7 @@ export function PortraitHeroBackdrop() {
             }
         };
 
-        const timer = window.setInterval(advance, 4600);
+        const timer = window.setInterval(advance, 1000);
         return () => {
             stopped = true;
             window.clearInterval(timer);

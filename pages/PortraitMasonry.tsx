@@ -73,11 +73,16 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
         let frame = 0;
         let lastMeasurement = '';
+        let lastScreenY: number | undefined;
 
         const sync = () => {
-            const start = parseFloat(getComputedStyle(viewport).top) || 0;
+            const screenY = viewport.getBoundingClientRect().top;
+            if (screenY !== lastScreenY) {
+                viewport.style.setProperty('--mosaic-screen-y', `${screenY}px`);
+                lastScreenY = screenY;
+            }
             const max = Math.max(0, track.offsetHeight - viewport.clientHeight);
-            const shift = reduced.matches ? 0 : Math.min(max, Math.max(0, start - section.getBoundingClientRect().top));
+            const shift = reduced.matches ? 0 : Math.min(max, Math.max(0, -section.getBoundingClientRect().top));
             track.style.transform = shift ? `translateY(${-shift}px)` : '';
         };
         syncRef.current = sync;
@@ -125,13 +130,13 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
         if (!button.matches(':focus-visible') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const viewport = viewportRef.current!;
         const section = sectionRef.current!;
-        const top = parseFloat(getComputedStyle(viewport).top) || 0;
+        const glassHeight = viewport.querySelector<HTMLElement>('.portrait-mosaic__veil--top')?.offsetHeight ?? 0;
         const bounds = button.getBoundingClientRect();
         const windowBounds = viewport.getBoundingClientRect();
-        if (bounds.top >= windowBounds.top + 40 && bounds.bottom <= windowBounds.bottom) return;
+        if (bounds.top >= Math.max(windowBounds.top, glassHeight) && bounds.bottom <= windowBounds.bottom) return;
         const max = Math.max(0, trackRef.current!.offsetHeight - viewport.clientHeight);
-        const shift = Math.min(max, Math.max(0, tile.top - 56));
-        window.scrollTo({ top: window.scrollY + section.getBoundingClientRect().top - top + shift, behavior: 'instant' });
+        const shift = Math.min(max, Math.max(0, tile.top - glassHeight - 12));
+        window.scrollTo({ top: window.scrollY + section.getBoundingClientRect().top + shift, behavior: 'instant' });
         syncRef.current?.();
     }
 
@@ -165,7 +170,7 @@ export function PortraitMasonry({ onOpen }: { onOpen: (index: number) => void })
                         );
                     })}
                 </div>
-                <div className="portrait-mosaic__veil" aria-hidden="true" />
+                <div className="portrait-mosaic__veil portrait-mosaic__veil--top" aria-hidden="true" />
                 <div className="portrait-mosaic__veil portrait-mosaic__veil--bottom" aria-hidden="true" />
             </div>
         </section>
