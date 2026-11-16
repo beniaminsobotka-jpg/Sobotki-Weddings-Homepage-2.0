@@ -53,7 +53,7 @@ export const PortraitsPage: React.FC = () => {
                         <span className="portraits-hero__wordmark-secondary font-playfair-italic font-light lowercase">Portraits</span>
                     </h1>
                     <p className="portraits-hero__caption font-sans">
-                        <strong>Ulubiona atrakcja Twoich gości.</strong>{' '}
+                        <strong className="font-playfair-italic">Ulubiona atrakcja Twoich gości.</strong>{' '}
                         <span>Eleganckie, czarno-białe portrety wykonywane podczas przyjęcia.</span>
                     </p>
                 </div>
