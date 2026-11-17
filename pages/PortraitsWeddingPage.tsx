@@ -4,6 +4,7 @@ import { ArrowUpRight, Camera, Check, ChevronDown, Download, Loader2, Printer, S
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { subscribeToBrevo } from '../utils/brevo';
+import { WeddingPortraitStyles } from './WeddingPortraitStyles';
 
 const galleryImages = [
   '/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
@@ -546,6 +547,8 @@ export const PortraitsWeddingPage: React.FC = () => {
           </div>
         </section>
 
+        <WeddingPortraitStyles />
+
         <GuestbookScrollAnimation />
 
         {/* FOTOBUDKA VS FOTOSTACJA */}
@@ -873,31 +876,16 @@ export const PortraitsWeddingPage: React.FC = () => {
         </section>
 
         {/* BOTTOM LINKS */}
-        <section className="grid gap-6 md:grid-cols-2">
-          {[
-            {
-              eyebrow: 'Następne doświadczenie',
-              title: 'Fotostacja Eventowa',
-              subtitle: 'Wizerunek i marka',
-              href: '/portraits/event',
-            },
-            {
-              eyebrow: 'Również w portraits',
-              title: 'Studio Stacjonarne',
-              subtitle: 'Dzień portretu',
-              href: '/portraits/stationary',
-            },
-          ].map((item) => (
-            <Link key={item.title} to={item.href} className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group block">
-              <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-gray-500">{item.eyebrow}</span>
-              <h3 className="mt-5 font-serif text-3xl">{item.title}</h3>
-              <p className="mt-2 font-playfair-italic text-xl text-gray-400 mb-8">{item.subtitle}</p>
-              <div className="flex items-center gap-3 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-gray-500 transition-colors duration-300 group-hover:text-white">
-                Zobacz
-                <ArrowUpRight size={15} />
-              </div>
-            </Link>
-          ))}
+        <section className="max-w-[740px]">
+          <Link to="/portraits/event" className="rounded-[24px] border border-white/5 bg-[#111] p-8 text-white shadow-2xl cursor-pointer hover:bg-[#1a1a1a] transition-colors group block">
+            <span className="font-sans text-[10px] uppercase tracking-[0.28em] text-gray-500">Następne doświadczenie</span>
+            <h3 className="mt-5 font-serif text-3xl">Fotostacja Eventowa</h3>
+            <p className="mt-2 font-playfair-italic text-xl text-gray-400 mb-8">Wizerunek i marka</p>
+            <div className="flex items-center gap-3 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-gray-500 transition-colors duration-300 group-hover:text-white">
+              Zobacz
+              <ArrowUpRight size={15} />
+            </div>
+          </Link>
         </section>
       </div>
     </div>
