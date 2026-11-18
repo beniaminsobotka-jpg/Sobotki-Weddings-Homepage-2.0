@@ -43,6 +43,9 @@ export function WeddingPortraitStyles() {
 
   useEffect(() => {
     if (!visible || paused || reduceMotion) return;
+    // On mobile the cards form a longer stack. Load the entire set once any
+    // card is visible so an off-screen lazy image cannot block the shared clock.
+    sectionRef.current?.querySelectorAll('img').forEach((image) => { image.loading = 'eager'; });
     const next = (slide.current % frameNumbers.length) + 1;
     let cancelled = false;
     let decoding = false;
@@ -71,9 +74,9 @@ export function WeddingPortraitStyles() {
       ref={sectionRef}
       id="style-fotostacji"
       aria-labelledby="wedding-portrait-styles-title"
-      className="scroll-mt-28 rounded-[24px] border border-white/5 bg-[#111] px-3 py-8 text-white shadow-2xl sm:rounded-[30px] sm:px-6 md:px-10 md:py-14"
+      className="scroll-mt-28 text-white md:rounded-[30px] md:border md:border-white/5 md:bg-[#111] md:px-10 md:py-14 md:shadow-2xl"
     >
-      <div className="mb-6 flex items-end justify-between gap-3 md:mb-9">
+      <div className="mb-6 flex items-end justify-between gap-4 px-2 md:mb-9 md:px-0">
         <h2 id="wedding-portrait-styles-title" className="font-serif text-3xl uppercase leading-[0.93] sm:text-4xl md:text-5xl">
           Trzy style <span className="font-playfair-italic lowercase text-[#ff0000]">fotostacji.</span>
         </h2>
@@ -86,10 +89,10 @@ export function WeddingPortraitStyles() {
           {paused ? <Play size={15} aria-hidden="true" /> : <Pause size={15} aria-hidden="true" />}
         </button>
       </div>
-      <div className="grid grid-cols-3 gap-2.5 sm:gap-4 md:gap-6">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
         {portraitStyles.map((style) => (
-          <figure key={style.key} className="min-w-0">
-            <div className="relative isolate aspect-square overflow-hidden rounded-[10px] bg-[#1a1a1a] ring-1 ring-inset ring-white/10 md:rounded-[18px]">
+          <figure key={style.key} className="min-w-0 rounded-[24px] border border-white/5 bg-[#111] p-3 pb-5 md:rounded-none md:border-0 md:bg-transparent md:p-0">
+            <div className="relative isolate aspect-[4/3] overflow-hidden rounded-[16px] bg-[#1a1a1a] ring-1 ring-inset ring-white/10 md:aspect-square md:rounded-[18px]">
               {frameNumbers.map((number) => {
                 const active = number === slide.current;
                 const stem = `/media/portraits-wedding-styles/${style.key}-${number}`;
@@ -101,23 +104,23 @@ export function WeddingPortraitStyles() {
                     src={`${stem}-480.webp`}
                     srcSet={`${stem}-480.webp 480w, ${stem}-840.webp 840w`}
                     sizes={style.key === 'spotlight' && number < 3
-                      ? '(min-width: 1500px) 655px, (min-width: 768px) 44vw, 45vw'
-                      : '(min-width: 1500px) 435px, (min-width: 768px) 29vw, 30vw'}
+                      ? '(min-width: 1500px) 655px, (min-width: 768px) 44vw, 110vw'
+                      : '(min-width: 1500px) 435px, (min-width: 768px) 29vw, 90vw'}
                     alt={style.alts[number - 1]}
                     aria-hidden={!active}
                     loading="lazy"
                     decoding="async"
-                    style={{ objectPosition: style.position }}
+                    style={{ objectPosition: style.key === 'classic' ? `center ${number === 3 ? 12 : 20}%` : style.position }}
                     className={`absolute inset-0 h-full w-full object-cover ${active ? 'z-20 opacity-100 transition-opacity duration-300 motion-reduce:transition-none' : number === slide.previous ? 'z-10 opacity-100' : 'opacity-0'}`}
                   />
                 );
               })}
             </div>
-            <figcaption className="pt-3 sm:pt-4">
-              <h3 className="min-h-[2.2em] text-balance font-serif text-[13px] leading-[1.1] sm:text-lg md:min-h-0 md:text-2xl lg:text-3xl">
+            <figcaption className="px-2 pt-4 md:px-0">
+              <h3 className="text-balance font-serif text-2xl leading-[1.1] lg:text-3xl">
                 {style.title}
               </h3>
-              <p className="mt-1.5 hyphens-auto font-sans text-[11px] leading-[1.45] text-gray-300 [overflow-wrap:anywhere] sm:text-sm md:mt-2 md:max-w-xs md:text-base">
+              <p className="mt-2 max-w-prose font-sans text-sm leading-relaxed text-gray-300 md:max-w-xs md:text-base">
                 {style.description}
               </p>
             </figcaption>
