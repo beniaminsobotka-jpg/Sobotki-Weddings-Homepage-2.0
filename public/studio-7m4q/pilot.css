@@ -115,3 +115,7 @@
   .portrait-pilot #choice h1, .portrait-pilot #choice > p { margin-inline: auto; }
   .portrait-pilot .choice-pair { margin-inline: auto; text-align: left; }
 }
+
+/* Editorial enquiry: package select, colour option, total and button centred on the page. */
+.portrait-pilot #inquiry { margin-inline: auto; }
+.portrait-pilot #inquiryTotal, .portrait-pilot #inquiryStatus { text-align: center; }
