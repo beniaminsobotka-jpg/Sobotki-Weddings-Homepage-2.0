@@ -27,15 +27,13 @@ export const PortraitsStationaryPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-transparent pt-32 text-brand-black selection:bg-white selection:text-black">
       <Seo page="portraitsStationary" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] noise-texture" />
 
       <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-16 md:gap-24 px-4 pb-16 md:px-8 md:pb-32">
         
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
+        <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-white shadow-2xl">
           <img
             src="/uploads/2025/07/AgnieszkaxJakub_Fotostacja_-119-min-1024x683.avif"
             alt="Fotostacja stacjonarna hero"
@@ -63,7 +61,7 @@ export const PortraitsStationaryPage: React.FC = () => {
                 className="font-serif text-[11vw] sm:text-6xl font-black leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem] flex flex-col items-start"
               >
                 <span className="uppercase">Fotostacja</span>
-                <span className="font-playfair-italic font-light text-[#d42929] -mt-1 md:-mt-6 lg:-mt-8">
+                <span className="font-playfair-italic font-light text-[#FF0000] -mt-1 md:-mt-6 lg:-mt-8">
                   w Gliwicach
                 </span>
               </motion.h1>
@@ -89,7 +87,7 @@ export const PortraitsStationaryPage: React.FC = () => {
 
                 <Link
                   to="/portraits"
-                  className="hidden sm:flex justify-center items-center rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
+                  className="hidden sm:flex justify-center items-center rounded-full glass-pill px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
                   Wszystkie usługi
                 </Link>
@@ -99,14 +97,14 @@ export const PortraitsStationaryPage: React.FC = () => {
         </section>
 
         {/* INFO CARDS */}
-        <section className="grid gap-8 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
+        <section className="grid gap-8 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
           <div className="rounded-[24px] border border-white/10 bg-black/40 p-8 md:p-10">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
               Szybka sesja studyjna
             </span>
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Portret 
-              <span className="ml-2 font-playfair-italic lowercase text-[#d42929]">
+              <span className="ml-2 font-playfair-italic lowercase text-[#FF0000]">
                 w 15 minut
               </span>
             </h2>
@@ -165,11 +163,11 @@ export const PortraitsStationaryPage: React.FC = () => {
         </section>
 
         {/* DLA KOGO ORAZ JAK SIĘ ZAPISAĆ */}
-        <section className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[1fr_1fr] md:px-10 md:py-14">
+        <section className="grid gap-10 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[1fr_1fr] md:px-10 md:py-14">
             <div className="rounded-[24px] border border-white/5 bg-[#0a0a0a] p-8 md:p-10">
               <div className="mb-6 inline-flex items-center gap-3">
                 <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5">
-                  <Star size={14} className="text-[#d42929]" />
+                  <Star size={14} className="text-[#FF0000]" />
                 </div>
                 <h3 className="font-serif text-3xl text-gray-200">Dla kogo?</h3>
               </div>
@@ -195,7 +193,7 @@ export const PortraitsStationaryPage: React.FC = () => {
               </span>
               <h3 className="font-serif text-3xl md:text-5xl text-white mb-6 uppercase">
                 Tylko po
-                <span className="ml-2 font-playfair-italic lowercase text-[#d42929]">
+                <span className="ml-2 font-playfair-italic lowercase text-[#FF0000]">
                     umówieniu
                 </span>
               </h3>
@@ -216,12 +214,12 @@ export const PortraitsStationaryPage: React.FC = () => {
         </section>
 
         {/* GALERIA */}
-        <section className="overflow-hidden rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl md:px-10 md:py-14">
+        <section className="overflow-hidden rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl md:px-10 md:py-14">
           <div className="mb-12 max-w-2xl">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">Galeria</span>
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Minimalizm
-              <span className="ml-3 font-playfair-italic lowercase text-[#d42929]">
+              <span className="ml-3 font-playfair-italic lowercase text-[#FF0000]">
                 i emocja
               </span>
             </h2>

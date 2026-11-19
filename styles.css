@@ -102,100 +102,108 @@ body {
   scrollbar-width: none;
 }
 
-.liquid-glass {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 100%);
-  backdrop-filter: blur(12px) saturate(110%);
-  -webkit-backdrop-filter: blur(12px) saturate(110%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+/* Liquid glass: frosted, saturated backdrop with a specular rim and a soft inner
+   caustic. Built from layered gradients and inset shadows only, so it works in
+   every browser and needs no extra DOM. */
+.liquid-glass,
+.liquid-glass-dark,
+.glass-noir,
+.glass-pill {
+  --glass-tint: rgba(255, 255, 255, 0.28);
+  --glass-rim: rgba(255, 255, 255, 0.7);
+  --glass-edge: rgba(255, 255, 255, 0.35);
+  --glass-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+  --glass-blur: 18px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.35) 0%, transparent 42%),
+    radial-gradient(90% 120% at 100% 100%, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+    var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-edge);
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.05),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
-    inset 0 2px 10px rgba(255, 255, 255, 0.5);
-  transform: translateZ(0);
+    inset 0 1px 0 var(--glass-rim),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 24px rgba(255, 255, 255, 0.08),
+    var(--glass-shadow);
+  transition: background-color 0.5s, box-shadow 0.5s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.liquid-glass-dark {
-  background: linear-gradient(145deg, rgba(30, 30, 30, 0.6) 0%, rgba(0, 0, 0, 0.2) 100%);
-  backdrop-filter: blur(12px) saturate(110%);
-  -webkit-backdrop-filter: blur(12px) saturate(110%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.3),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 0 2px 10px rgba(255, 255, 255, 0.05);
-  transform: translateZ(0);
+.liquid-glass-dark,
+.glass-noir,
+.glass-pill {
+  --glass-tint: rgba(8, 8, 8, 0.42);
+  --glass-rim: rgba(255, 255, 255, 0.22);
+  --glass-edge: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.09) 0%, transparent 40%),
+    radial-gradient(80% 120% at 100% 100%, rgba(255, 0, 0, 0.05) 0%, transparent 55%),
+    var(--glass-tint);
 }
 
+/* Large panels: lighter blur, and phones get an opaque tint instead of a blur
+   that would be recomputed on every frame of the animated background. */
+.glass-noir {
+  --glass-tint: rgba(10, 10, 10, 0.55);
+  --glass-blur: 14px;
+}
+
+@media (max-width: 767px), (pointer: coarse) {
+  .glass-noir {
+    --glass-tint: rgba(10, 10, 10, 0.86);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.glass-pill {
+  --glass-blur: 12px;
+  color: #fff;
+}
+
+.glass-pill:hover,
 .liquid-glass-interactive:hover {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
-  box-shadow:
-    0 15px 50px rgba(0, 0, 0, 0.1),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
-    inset 0 2px 20px rgba(255, 255, 255, 0.8);
   transform: translateY(-2px);
+  --glass-rim: rgba(255, 255, 255, 0.45);
 }
 
-.liquid-orb {
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-timing-function: ease-in-out;
-  animation-fill-mode: both;
-  transform: translate3d(0, 0, 0);
+.glass-pill:hover {
+  --glass-edge: rgba(255, 0, 0, 0.55);
 }
 
-.liquid-orb-1 {
-  animation-duration: 20s;
-  animation-name: liquid-float-1;
-}
-
-.liquid-orb-2 {
-  animation-duration: 25s;
-  animation-name: liquid-float-2;
-}
-
-.liquid-orb-3 {
-  animation-duration: 18s;
-  animation-name: liquid-float-3;
-}
-
-@keyframes liquid-float-1 {
-  0% {
-    transform: translate3d(-80px, -40px, 0) scale(1);
-  }
-  50% {
-    transform: translate3d(40px, 60px, 0) scale(1.08);
-  }
-  100% {
-    transform: translate3d(-24px, -72px, 0) scale(1);
-  }
-}
-
-@keyframes liquid-float-2 {
-  0% {
-    transform: translate3d(48px, 72px, 0) scale(1.08);
-  }
-  50% {
-    transform: translate3d(-64px, -32px, 0) scale(1);
-  }
-  100% {
-    transform: translate3d(72px, 24px, 0) scale(1.04);
-  }
-}
-
-@keyframes liquid-float-3 {
-  0% {
-    transform: translate3d(-28px, 36px, 0);
-  }
-  50% {
-    transform: translate3d(24px, -48px, 0);
-  }
-  100% {
-    transform: translate3d(-60px, 24px, 0);
-  }
+body.theme-noir {
+  background-color: #030303;
+  color: #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .liquid-orb {
-    animation: none;
+  .liquid-glass,
+  .liquid-glass-dark,
+  .glass-noir,
+  .glass-pill {
+    transition: none;
+  }
+}
+
+/* Scroll-driven reveal for glass panels: runs on the compositor, no JS. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .glass-noir {
+      animation: glass-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+}
+
+@keyframes glass-rise {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

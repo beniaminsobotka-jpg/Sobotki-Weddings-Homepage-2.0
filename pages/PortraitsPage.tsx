@@ -39,11 +39,8 @@ export const PortraitsPage: React.FC = () => {
     }, [selectedindex]);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-[#F3F2ED] pb-24 relative selection:bg-white selection:text-black">
+        <div className="min-h-screen bg-transparent text-white pb-24 relative selection:bg-white selection:text-black">
             <Seo page="portraits" />
-
-            {/* Background Noise for Texture */}
-            <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] noise-texture"></div>
 
             <header className="portraits-hero">
                 <PortraitHeroBackdrop />
@@ -71,7 +68,7 @@ export const PortraitsPage: React.FC = () => {
                     <div className="text-center">
                         <h2 className="font-serif text-white mb-8 leading-none flex flex-col items-center">
                             <span className="uppercase tracking-widest text-2xl md:text-4xl">Więcej niż fotobudka.</span>
-                            <span className="font-playfair-italic font-light lowercase text-[#d42929] tracking-normal text-2xl md:text-4xl -mt-2">To ponadczasowe portrety z charakterem.</span>
+                            <span className="font-playfair-italic font-light lowercase text-[#FF0000] tracking-normal text-2xl md:text-4xl -mt-2">To ponadczasowe portrety z charakterem.</span>
                         </h2>
                         <div className="w-24 h-[1px] bg-white/20 mx-auto mb-8"></div>
                         <p className="font-sans text-gray-400 leading-loose tracking-wide text-sm md:text-base max-w-3xl mx-auto">
@@ -378,7 +375,7 @@ export const PortraitsPage: React.FC = () => {
                         <div className="text-center space-y-6">
                             <h2 className="font-serif text-3xl md:text-5xl text-white uppercase tracking-widest flex flex-col items-center">
                                 <span>Tworzymy pamiątki</span>
-                                <span className="font-playfair-italic font-light lowercase text-[#d42929] tracking-normal text-4xl md:text-6xl -mt-2 md:-mt-4">
+                                <span className="font-playfair-italic font-light lowercase text-[#FF0000] tracking-normal text-4xl md:text-6xl -mt-2 md:-mt-4">
                                     na całe życie
                                 </span>
                             </h2>

@@ -68,15 +68,13 @@ export const PortraitsEventPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-transparent pt-32 text-brand-black selection:bg-white selection:text-black">
       <Seo page="portraitsEvent" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] noise-texture" />
 
       <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-16 md:gap-24 px-4 pb-16 md:px-8 md:pb-32">
 
         {/* HERO SECTION - REVERTED TO ORIGINAL LAYOUT BUT WITH NEW FONTS/COLORS */}
-        <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
+        <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-white shadow-2xl">
           <img
             src="/uploads/2025/07/MartynaxMichal_Fotostacja_-48-min.avif"
             alt="Fotostacja eventowa hero"
@@ -104,7 +102,7 @@ export const PortraitsEventPage: React.FC = () => {
                 className="font-serif text-[14vw] sm:text-6xl font-black uppercase leading-[0.84] tracking-tight text-white md:text-8xl lg:text-[7rem] flex flex-col"
               >
                 <span>Eventy</span>
-                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-1 md:-mt-4">
+                <span className="font-playfair-italic font-light lowercase text-[#FF0000] -mt-1 md:-mt-4">
                   firmowe
                 </span>
               </motion.h1>
@@ -131,7 +129,7 @@ export const PortraitsEventPage: React.FC = () => {
 
                 <Link
                   to="/portraits"
-                  className="hidden sm:flex justify-center items-center rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
+                  className="hidden sm:flex justify-center items-center rounded-full glass-pill px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
                   Wszystkie usługi
                 </Link>
@@ -141,14 +139,14 @@ export const PortraitsEventPage: React.FC = () => {
         </section>
 
         {/* DLACZEGO TO DZIAŁA - PLAIN DARK BOXES (NO LIQUID GLASS) */}
-        <section className="grid gap-8 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
+        <section className="grid gap-8 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
           <div className="rounded-[24px] border border-white/10 bg-black/40 p-8 md:p-10">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
               Dlaczego to działa?
             </span>
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Więcej niż
-              <span className="ml-2 font-playfair-italic lowercase text-[#d42929]">
+              <span className="ml-2 font-playfair-italic lowercase text-[#FF0000]">
                 fotobudka
               </span>
             </h2>
@@ -194,7 +192,7 @@ export const PortraitsEventPage: React.FC = () => {
         </section>
 
         {/* REALIZACJA - LIQUID GLASS ON IMAGE ONLY */}
-        <section className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[1.12fr_0.88fr] lg:items-center md:px-10 md:py-14">
+        <section className="grid gap-10 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[1.12fr_0.88fr] lg:items-center md:px-10 md:py-14">
           <div className="order-1 relative rounded-[24px] bg-[#050505] lg:order-1 overflow-hidden group">
             <img
               src="/uploads/2025/07/IMG_0485-min-kopia-3-1024x768.avif"
@@ -219,7 +217,7 @@ export const PortraitsEventPage: React.FC = () => {
             <h2 className="mt-4 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-8">
               Szybko, płynnie,
               <br />
-              <span className="font-playfair-italic lowercase text-[#d42929]">
+              <span className="font-playfair-italic lowercase text-[#FF0000]">
                 bez chaosu
               </span>
             </h2>
@@ -241,14 +239,14 @@ export const PortraitsEventPage: React.FC = () => {
         </section>
 
         {/* DLA JAKICH WYDARZEŃ - NORMAL SHARP BOXES */}
-        <section className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14">
+        <section className="grid gap-10 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14">
           <div className="p-4">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
               Dla jakich wydarzeń?
             </span>
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Zbuduj scenę
-              <span className="ml-2 font-playfair-italic lowercase text-[#d42929]">
+              <span className="ml-2 font-playfair-italic lowercase text-[#FF0000]">
                 na event
               </span>
             </h2>
@@ -305,7 +303,7 @@ export const PortraitsEventPage: React.FC = () => {
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-6">
               Elastyczne opcje
               <br />
-              <span className="font-playfair-italic lowercase text-[#d42929]">
+              <span className="font-playfair-italic lowercase text-[#FF0000]">
                 dla biznesu
               </span>
             </h2>
@@ -318,7 +316,7 @@ export const PortraitsEventPage: React.FC = () => {
                 Możesz zdecydować się na pakiet z limitem odbitek, np. 300, albo postawić
                 na nielimitowany druk, co świetnie sprawdza się w przypadku dużych wydarzeń.
               </p>
-              <div className="mt-8 inline-block rounded-2xl border border-[#d42929] px-5 py-3">
+              <div className="mt-8 inline-block rounded-2xl border border-[#FF0000] px-5 py-3">
                 <p className="font-sans text-xs text-gray-300 m-0">
                   Cena fotostacji na event firmowy zaczyna się od 4000 zł.
                 </p>
@@ -330,7 +328,7 @@ export const PortraitsEventPage: React.FC = () => {
         {/* FORMULARZ KONTAKTOWY - NORMAL DARK THEME FORM */}
         <section
           id="event-offer-form"
-          className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14"
+          className="grid gap-10 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14"
         >
           <div className="p-4">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
@@ -339,7 +337,7 @@ export const PortraitsEventPage: React.FC = () => {
             <h2 className="mt-5 font-serif text-4xl md:text-6xl uppercase leading-none text-white mb-6">
               Otrzymaj
               <br />
-              <span className="font-playfair-italic lowercase text-[#d42929]">
+              <span className="font-playfair-italic lowercase text-[#FF0000]">
                 wycenę
               </span>
             </h2>

@@ -65,10 +65,14 @@ const AppShell: React.FC<{
   const isGalleryRoute = location.pathname.startsWith('/galeria/') || location.pathname.startsWith('/best-of/');
   const isGalleryAdminRoute = location.pathname.startsWith('/panel/');
   const isStandaloneRoute = isGalleryRoute || isGalleryAdminRoute;
+  const isPortraitsRoute = location.pathname.startsWith('/portraits');
   const showLiquidBackground =
     !isStandaloneRoute &&
-    ['/', '/film', '/kontakt'].includes(location.pathname) &&
-    location.pathname !== '/editorial-home';
+    (isPortraitsRoute || ['/', '/film', '/kontakt'].includes(location.pathname));
+
+  useEffect(() => {
+    document.body.classList.toggle('theme-noir', isPortraitsRoute);
+  }, [isPortraitsRoute]);
 
   useEffect(() => {
     if (isLoading || typeof window === 'undefined') {
@@ -115,7 +119,7 @@ const AppShell: React.FC<{
         {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
 
-      {showLiquidBackground && <LiquidBackground />}
+      {showLiquidBackground && <LiquidBackground variant={isPortraitsRoute ? 'noir' : 'paper'} />}
 
       {!isLoading && (
         <>

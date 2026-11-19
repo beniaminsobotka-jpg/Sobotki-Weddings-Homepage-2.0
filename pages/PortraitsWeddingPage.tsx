@@ -208,7 +208,7 @@ const GuestbookScrollAnimation: React.FC = () => {
               opacity: useTransform(scrollYProgress, [0, 0.1, 0.3, 1], [0, 0, 1, 1]),
           }}
         >
-          <p className="font-playfair-italic text-3xl md:text-[3.5rem] lowercase text-[#d42929] text-center drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-tight">
+          <p className="font-playfair-italic text-3xl md:text-[3.5rem] lowercase text-[#FF0000] text-center drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] leading-tight">
             prawdziwa pamiątka na lata
           </p>
         </motion.div>
@@ -405,15 +405,13 @@ export const PortraitsWeddingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] pt-32 text-brand-black selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-transparent pt-32 text-brand-black selection:bg-white selection:text-black">
       <Seo page="portraitsWedding" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.03] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_24%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.05),transparent_20%)]" />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-[0.05] noise-texture" />
 
       <div className="relative z-10 mx-auto flex max-w-[1500px] flex-col gap-16 md:gap-24 px-4 pb-16 md:px-8 md:pb-32">
         
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-[#F3F2ED] shadow-2xl">
+        <section className="relative overflow-hidden rounded-[30px] bg-[#090909] border border-white/5 text-white shadow-2xl">
           <img
             src="/uploads/2026/03/NataliaxMateusz_Fotostacja_-123.avif"
             alt="Fotostacja ślubna hero"
@@ -441,7 +439,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                 className="font-serif text-[3.2rem] md:text-8xl lg:text-[7rem] font-black uppercase leading-[0.75] md:leading-[0.84] tracking-tight text-white flex flex-col items-start"
               >
                 <span>Portrety</span>
-                <span className="font-playfair-italic font-light lowercase text-[#d42929] -mt-2 md:-mt-3 lg:-mt-4">
+                <span className="font-playfair-italic font-light lowercase text-[#FF0000] -mt-2 md:-mt-3 lg:-mt-4">
                   na weselu
                 </span>
               </motion.h1>
@@ -467,7 +465,7 @@ export const PortraitsWeddingPage: React.FC = () => {
 
                 <Link
                   to="/portraits"
-                  className="hidden sm:flex justify-center items-center rounded-full border border-white/20 bg-transparent px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
+                  className="hidden sm:flex justify-center items-center rounded-full glass-pill px-7 py-4 font-sans text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all duration-300 hover:bg-white/5"
                 >
                   Wszystkie usługi
                 </Link>
@@ -477,14 +475,14 @@ export const PortraitsWeddingPage: React.FC = () => {
         </section>
 
         {/* CZYM JEST FOTOSTACJA */}
-        <section className="grid gap-8 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
+        <section className="grid gap-8 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.92fr_1.08fr] lg:items-center md:px-10 md:py-14">
           <div className="rounded-[24px] border border-white/10 bg-black/40 p-8 md:p-10">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
               Czym jest fotostacja portretowa?
             </span>
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Prawdziwe mini studio
-              <span className="ml-2 font-playfair-italic lowercase text-[#d42929]">
+              <span className="ml-2 font-playfair-italic lowercase text-[#FF0000]">
                 wśród gości
               </span>
             </h2>
@@ -552,7 +550,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         <GuestbookScrollAnimation />
 
         {/* FOTOBUDKA VS FOTOSTACJA */}
-        <section className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] lg:items-center md:px-10 md:py-14">
+        <section className="grid gap-10 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] lg:items-center md:px-10 md:py-14">
           <div>
             <span className="font-sans text-[10px] uppercase font-bold tracking-[0.4em] text-gray-500">
               Fotobudka vs Fotostacja
@@ -560,7 +558,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Podobna obietnica,
               <br/>
-              <span className="font-playfair-italic lowercase text-[#d42929]">
+              <span className="font-playfair-italic lowercase text-[#FF0000]">
                 zupełnie inny efekt
               </span>
             </h2>
@@ -574,7 +572,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             <div className="rounded-[24px] border border-white/5 bg-[#0a0a0a] p-7">
               <div className="mb-6 inline-flex items-center gap-3">
                 <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5">
-                  <X size={14} className="text-[#d42929]" />
+                  <X size={14} className="text-[#FF0000]" />
                 </div>
                 <h3 className="font-serif text-2xl text-gray-500">Fotobudka</h3>
               </div>
@@ -590,7 +588,7 @@ export const PortraitsWeddingPage: React.FC = () => {
 
             <div className="rounded-[24px] border border-white/10 bg-black/40 p-7 shadow-2xl">
               <div className="mb-6 inline-flex items-center gap-3">
-                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#d42929]">
+                <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#FF0000]">
                   <Check size={14} className="text-white" />
                 </div>
                 <h3 className="font-serif text-2xl text-white">Fotostacja</h3>
@@ -598,7 +596,7 @@ export const PortraitsWeddingPage: React.FC = () => {
               <div className="space-y-4">
                 {comparisonPortraits.map((item) => (
                   <div key={item} className="flex items-start gap-3 text-gray-300">
-                    <Check size={14} className="mt-1 shrink-0 text-[#d42929]" />
+                    <Check size={14} className="mt-1 shrink-0 text-[#FF0000]" />
                     <p className="font-sans text-sm leading-relaxed">{item}</p>
                   </div>
                 ))}
@@ -608,13 +606,13 @@ export const PortraitsWeddingPage: React.FC = () => {
         </section>
 
         {/* GALERIA */}
-        <section className="overflow-hidden rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl md:px-10 md:py-14">
+        <section className="overflow-hidden rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl md:px-10 md:py-14">
           <div className="mb-12 max-w-2xl">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">Galeria</span>
             <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white">
               Kadry, które mają
               <br/>
-              <span className="font-playfair-italic lowercase text-[#d42929]">
+              <span className="font-playfair-italic lowercase text-[#FF0000]">
                 zostać z Wami
               </span>
             </h2>
@@ -682,7 +680,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                 <h2 className="mt-5 font-serif text-3xl md:text-5xl uppercase leading-tight text-white mb-6">
                   Pakiety i
                   <br/>
-                  <span className="font-playfair-italic lowercase text-[#d42929]">
+                  <span className="font-playfair-italic lowercase text-[#FF0000]">
                     wycena
                   </span>
                 </h2>
@@ -696,7 +694,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                   <p>
                     W przypadku kameralnych przyjęć do 60 osób przygotowujemy indywidualną, odpowiednio niższą wycenę. Na większe wydarzenia możemy zaproponować także rozszerzone warianty, dopasowane do skali wesela i liczby gości.
                   </p>
-                  <div className="mt-8 inline-block rounded-2xl border border-[#d42929] px-5 py-3">
+                  <div className="mt-8 inline-block rounded-2xl border border-[#FF0000] px-5 py-3">
                     <p className="font-sans text-xs text-gray-300 m-0">
                       Cena fotostacji ślubnej zaczyna się od 3200 zł w wersji standardowego przyjęcia.
                     </p>
@@ -708,7 +706,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         {/* FORMULARZ KONTAKTOWY */}
         <section
           id="wedding-offer-form"
-          className="grid gap-10 rounded-[30px] bg-[#111] border border-white/5 px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14"
+          className="grid gap-10 rounded-[30px] glass-noir px-6 py-12 text-white shadow-2xl lg:grid-cols-[0.9fr_1.1fr] md:px-10 md:py-14"
         >
           <div className="p-4">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
@@ -717,7 +715,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             <h2 className="mt-5 font-serif text-4xl md:text-6xl uppercase leading-none text-white mb-6">
               Opowiedzcie nam
               <br/>
-              <span className="font-playfair-italic lowercase text-[#d42929]">
+              <span className="font-playfair-italic lowercase text-[#FF0000]">
                 o swoim dniu
               </span>
             </h2>
@@ -730,7 +728,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             {status === 'success' ? (
               <div className="py-10 text-center">
                 <div role="status" aria-live="polite">
-                <Sparkles size={28} className="mx-auto text-[#d42929] mb-6" strokeWidth={1} />
+                <Sparkles size={28} className="mx-auto text-[#FF0000] mb-6" strokeWidth={1} />
                 <h3 className="font-serif text-3xl text-white mb-4 uppercase">Wiadomość wysłana</h3>
                 <p className="font-sans text-sm md:text-base text-gray-400 mb-8 max-w-sm mx-auto leading-relaxed">
                   Dziękujemy. Wrócimy do Was z ofertą najszybciej jak to możliwe.
@@ -796,7 +794,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                       autoComplete="address-level2"
                       className="rounded-xl border border-white/10 bg-[#1a1a1a] px-5 py-4 font-sans text-sm text-white placeholder-gray-600 focus:outline-none focus:border-white/30 focus:bg-[#222] transition-colors"
                     />
-                    <span className="pl-2 font-sans text-[11px] leading-relaxed text-[#d42929]">
+                    <span className="pl-2 font-sans text-[11px] leading-relaxed text-[#FF0000]">
                       Uwaga, standardowo dojeżdżamy do 300 km od Gliwic (woj. śląskie)
                     </span>
                   </label>
@@ -854,7 +852,7 @@ export const PortraitsWeddingPage: React.FC = () => {
                 </label>
 
                 {status === 'error' && (
-                  <p className="font-sans text-sm text-[#d42929] text-center" role="alert">{errorMessage}</p>
+                  <p className="font-sans text-sm text-[#FF0000] text-center" role="alert">{errorMessage}</p>
                 )}
 
                 <button
