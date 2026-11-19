@@ -54,13 +54,22 @@ const { tiles, radius: EXTENT } = circularMasonry();
 // The range is fitted to the stage size on every resize.
 const range = { min: 0.5, max: 3 };
 
-/** Radial fisheye: identity up to half the radius, then increasingly compressed. */
+/**
+ * Radial fisheye: identity up to half the radius, then increasingly compressed.
+ * Returns the moved point and a single local scale (weighted towards the
+ * tangential squeeze, which keeps neighbours touching) so every photo keeps its
+ * own aspect ratio.
+ */
+const LENS = 0.9;
 const lens = (x: number, y: number, radius: number) => {
     const r = Math.hypot(x, y);
     const n = r / radius;
-    if (n <= 0.5) return [x, y];
-    const k = (radius * (0.5 + (n - 0.5) / (1 + 1.25 * (n - 0.5)))) / r;
-    return [x * k, y * k];
+    if (n <= 0.5) return [x, y, 1];
+    const u = n - 0.5;
+    const mapped = 0.5 + u / (1 + LENS * u);
+    const tangential = mapped / n;
+    const radial = 1 / (1 + LENS * u) ** 2;
+    return [x * tangential, y * tangential, tangential ** 0.75 * radial ** 0.25];
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -99,28 +108,19 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
         const height = stage.clientHeight;
         const radius = Math.min(width, height) / 2;
         return tiles.map((tile) => {
-            // Map the tile's corners through the lens so neighbours stay packed.
-            const x0 = tile.x * v.zoom + v.x;
-            const y0 = tile.y * v.zoom + v.y;
-            const x1 = x0 + tile.w * v.zoom;
-            const y1 = y0 + tile.h * v.zoom;
-            const [ax, ay] = lens(x0, y0, radius);
-            const [bx, by] = lens(x1, y0, radius);
-            const [cx, cy] = lens(x0, y1, radius);
-            const [dx, dy] = lens(x1, y1, radius);
-            const left = Math.min(ax, bx, cx, dx);
-            const right = Math.max(ax, bx, cx, dx);
-            const top = Math.min(ay, by, cy, dy);
-            const bottom = Math.max(ay, by, cy, dy);
-            // A slight inset hides the overlap the lens adds between bounding boxes.
-            const insetX = (right - left) * 0.03;
-            const insetY = (bottom - top) * 0.03;
-            const distance = Math.hypot((x0 + x1) / 2, (y0 + y1) / 2) / radius;
+            // Move the photo's centre through the lens and scale it uniformly, so it is
+            // never stretched; a small gap absorbs the packing drift near the edge.
+            const cx = (tile.x + tile.w / 2) * v.zoom + v.x;
+            const cy = (tile.y + tile.h / 2) * v.zoom + v.y;
+            const [mx, my, scale] = lens(cx, cy, radius);
+            const w = tile.w * v.zoom * scale * 0.96;
+            const h = tile.h * v.zoom * scale * 0.96;
+            const distance = Math.hypot(cx, cy) / radius;
             return {
-                x: width / 2 + left + insetX,
-                y: height / 2 + top + insetY,
-                w: right - left - 2 * insetX,
-                h: bottom - top - 2 * insetY,
+                x: width / 2 + mx - w / 2,
+                y: height / 2 + my - h / 2,
+                w,
+                h,
                 distance,
                 opacity: clamp(2.2 - distance, 0, 1),
             };
@@ -144,7 +144,13 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
             const wantFull = rect.w > 300;
             if (image && wantFull !== (item.dataset.full === '1')) {
                 item.dataset.full = wantFull ? '1' : '';
-                image.src = wantFull ? portraitsData[index].src : portraitsData[index].thumbnail;
+                const next = wantFull ? portraitsData[index].src : portraitsData[index].thumbnail;
+                // Decode off-screen first so the swap never flashes an empty tile.
+                const loader = new Image();
+                loader.src = next;
+                loader.decode().then(() => {
+                    if (item.dataset.full === (wantFull ? '1' : '')) image.src = next;
+                }).catch(() => undefined);
             }
         });
     };
@@ -176,7 +182,7 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
                 committed.current[index] = { w: rect.w, h: rect.h };
             }
             const from = committed.current[index]!;
-            item.style.transform = `translate3d(${rect.x.toFixed(2)}px, ${rect.y.toFixed(2)}px, 0) scale(${(rect.w / from.w).toFixed(4)}, ${(rect.h / from.h).toFixed(4)})`;
+            item.style.transform = `translate3d(${rect.x.toFixed(2)}px, ${rect.y.toFixed(2)}px, 0) scale(${(rect.w / from.w).toFixed(4)})`;
             item.style.opacity = rect.opacity.toFixed(3);
             item.style.zIndex = String(Math.round(1000 - rect.distance * 100));
         });
