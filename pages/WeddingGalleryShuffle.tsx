@@ -13,27 +13,10 @@ const bestOf = Array.from({ length: 47 }, (_, i) => {
 const pool = [...startPhotos, ...bestOf];
 
 const TILES = 9;
-const HOLD = 800; // base hold; neighbour waits and decoding bring the average to ~1 s
+const HOLD = 1000; // roughly how long each photo stays
 const JITTER = 450; // ± spread so tiles fall out of step
-const FADE = 420;
 const TICK = 110;
 const MAX_PER_TICK = 2;
-
-/** Neighbours in a 3×3 grid, diagonals included; in one column, the tiles above and below. */
-const neighbours = (index: number, columns: number) => {
-    const row = Math.floor(index / columns);
-    const column = index % columns;
-    const result: number[] = [];
-    for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-            if (!dr && !dc) continue;
-            const r = row + dr;
-            const c = column + dc;
-            if (r >= 0 && c >= 0 && c < columns && r * columns + c < TILES) result.push(r * columns + c);
-        }
-    }
-    return result;
-};
 
 const shuffle = <T,>(items: T[]) => {
     const copy = [...items];
@@ -48,7 +31,7 @@ type Layer = { photo: number; previous: number | null; key: number };
 
 /**
  * A 3×3 photo grid whose tiles change on their own clocks: a couple at a time,
- * scattered at random, never two touching tiles together, each photo ~1 s.
+ * scattered at random, each photo for about a second.
  */
 export function WeddingGalleryShuffle() {
     const gridRef = useRef<HTMLDivElement>(null);
@@ -66,7 +49,6 @@ export function WeddingGalleryShuffle() {
         const now = performance.now();
         // Each tile gets its own first deadline so they never start in sync.
         const due = Array.from({ length: TILES }, () => now + 600 + Math.random() * 1600);
-        const lastChange = Array.from({ length: TILES }, () => 0);
         const pending = new Set<number>();
         let bag: number[] = [];
 
@@ -84,7 +66,6 @@ export function WeddingGalleryShuffle() {
             const photo = nextPhoto();
             if (photo === null) return;
             pending.add(index);
-            lastChange[index] = at;
             due[index] = at + HOLD + (Math.random() * 2 - 1) * JITTER;
             const image = new Image();
             const { src, srcSet } = pool[photo];
@@ -103,20 +84,11 @@ export function WeddingGalleryShuffle() {
         const tick = () => {
             if (!visible || document.hidden || reduced.matches) return;
             const at = performance.now();
-            const columns = wide.matches ? 3 : 1;
-            const ready = shuffle(Array.from({ length: TILES }, (_, i) => i)).filter((i) => due[i] <= at && !pending.has(i));
-            const chosen: number[] = [];
-            for (const index of ready) {
-                if (chosen.length >= MAX_PER_TICK) break;
-                const near = neighbours(index, columns);
-                // Skip a tile whose neighbour is changing now or is still mid-fade.
-                const clash = near.some((n) => chosen.includes(n) || pending.has(n) || at - lastChange[n] < FADE + 120);
-                if (clash) {
-                    due[index] = at + TICK + Math.random() * 200;
-                    continue;
-                }
-                chosen.push(index);
-            }
+            // Tiles past their deadline change in random order, at most two per tick;
+            // the rest roll over to the next tick, which keeps the grid out of step.
+            const chosen = shuffle(Array.from({ length: TILES }, (_, i) => i))
+                .filter((i) => due[i] <= at && !pending.has(i))
+                .slice(0, MAX_PER_TICK);
             chosen.forEach((index) => change(index, at));
         };
 
