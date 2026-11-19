@@ -1,0 +1,22 @@
+/* Each new photo fades in over the one it replaces. */
+.wedding-shuffle__image {
+  animation: wedding-shuffle-in 420ms ease-out both;
+}
+
+/* The very first photos are already in place: no fade on load. */
+.wedding-shuffle__tile > .wedding-shuffle__image:only-child {
+  animation: none;
+}
+
+@keyframes wedding-shuffle-in {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wedding-shuffle__image {
+    animation: none;
+  }
+}

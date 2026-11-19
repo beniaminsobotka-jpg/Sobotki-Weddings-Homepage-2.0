@@ -1,22 +1,11 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowUpRight, Camera, Check, ChevronDown, Download, Loader2, Printer, Sparkles, Star, Users, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { subscribeToBrevo } from '../utils/brevo';
+import { WeddingGalleryShuffle } from './WeddingGalleryShuffle';
 import { WeddingPortraitStyles } from './WeddingPortraitStyles';
-
-const galleryImages = [
-  '/uploads/2026/03/Portraits_Wybrane_www_1.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_2.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_3.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_11.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_5.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_6.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_7.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_8.jpg',
-  '/uploads/2026/03/Portraits_Wybrane_www_9.jpg',
-];
 
 const comparisonPhotobooth = [
   'Niska jakość drukowanych zdjęć',
@@ -329,15 +318,6 @@ export const PortraitsWeddingPage: React.FC = () => {
     notes: '',
   });
 
-  const galleryColumns = useMemo(
-    () => [
-      galleryImages.filter((_, index) => index % 3 === 0),
-      galleryImages.filter((_, index) => index % 3 === 1),
-      galleryImages.filter((_, index) => index % 3 === 2),
-    ],
-    []
-  );
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -618,31 +598,7 @@ export const PortraitsWeddingPage: React.FC = () => {
             </h2>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {galleryColumns.map((column, columnIndex) => (
-              <div key={columnIndex} className="grid gap-4">
-                {column.map((src, imageIndex) => (
-                  <motion.div
-                    key={src}
-                    initial={{ opacity: 0, y: 22 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-10%' }}
-                    transition={{ duration: 0.6, delay: imageIndex * 0.06 }}
-                    className="overflow-hidden bg-[#050505] border border-white/5"
-                  >
-                    <img
-                      src={src}
-                      alt="Fotostacja ślubna - galeria"
-                      loading="lazy"
-                      fetchPriority="low"
-                      decoding="async"
-                      className="w-full object-cover grayscale transition-all duration-700 hover:scale-[1.02] hover:grayscale-0"
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            ))}
-          </div>
+          <WeddingGalleryShuffle />
         </section>
 
         {/* PAKIETY I WYCENA - FULL WIDTH IMAGE WITH LIQUID GLASS PANEL AND ANIMATION */}
