@@ -319,6 +319,15 @@ export const PortraitsWeddingPage: React.FC = () => {
     notes: '',
   });
 
+  // Links such as /portraits/wedding#wedding-offer-form land on the enquiry once the page has rendered.
+  React.useEffect(() => {
+    if (window.location.hash !== '#wedding-offer-form') return;
+    const timer = window.setTimeout(() => {
+      document.getElementById('wedding-offer-form')?.scrollIntoView({ block: 'start' });
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   // A couple who already sent the form gets straight back to their offer instead.
   const [savedOffer, setSavedOffer] = useState(() => readSavedOffer());
 

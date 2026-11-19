@@ -12,7 +12,6 @@ export const Contact: React.FC = () => {
     date: '',
     location: '',
     message: '',
-    offer: 'JESZCZE NIE WIEMY'
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -32,12 +31,12 @@ export const Contact: React.FC = () => {
         phone: '',
         weddingDate: formData.date,
         venue: formData.location,
-        serviceType: formData.offer,
+        serviceType: 'Reportaż ślubny',
         message: formData.message,
       });
 
       setStatus('success');
-      setFormData({ fullname: '', email: '', date: '', location: '', message: '', offer: 'JESZCZE NIE WIEMY' });
+      setFormData({ fullname: '', email: '', date: '', location: '', message: '' });
     } catch (error) {
       console.error('Error:', error);
       if (error instanceof Error) {
@@ -90,6 +89,21 @@ export const Contact: React.FC = () => {
                 </motion.div>
             ) : (
                 <form className="space-y-3 md:space-y-12" onSubmit={handleSubmit}>
+                {/* This form is for wedding photography; Fotostacja has its own enquiry. */}
+                <div className="flex flex-col gap-3 rounded-2xl border border-brand-black/10 bg-white/55 px-5 py-4 md:flex-row md:items-center md:justify-between md:gap-6 md:px-6">
+                    <p className="flex items-start gap-3 font-sans text-xs md:text-sm leading-relaxed text-brand-black/75">
+                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#FF0000]" aria-hidden="true" />
+                        <span>
+                            Ten formularz dotyczy <strong className="text-brand-black">reportażu ślubnego</strong>. Interesuje Was Fotostacja — portrety gości podczas przyjęcia? Zapytajcie o nią w osobnym formularzu.
+                        </span>
+                    </p>
+                    <a
+                        href="/portraits/wedding#wedding-offer-form"
+                        className="inline-flex shrink-0 items-center justify-center self-start rounded-full bg-brand-black px-5 py-3 font-sans text-[10px] font-bold uppercase tracking-[0.18em] text-white transition-colors hover:bg-[#FF0000] md:self-auto"
+                    >
+                        Formularz Fotostacji →
+                    </a>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-12">
                     <div className="group relative">
                         <label className="block font-sans text-[10px] md:text-xs text-gray-500 uppercase tracking-widest mb-2 ml-1">Imię i Nazwisko</label>
@@ -154,30 +168,6 @@ export const Contact: React.FC = () => {
                     className="w-full bg-white/30 rounded-lg px-4 py-3 border border-white/40 text-brand-black font-playfair-italic text-lg md:text-xl focus:outline-none focus:bg-white/50 focus:border-brand-black/20 transition-all resize-none placeholder-gray-400 backdrop-blur-sm" 
                     placeholder="Opowiedzcie nam o sobie..."
                     ></textarea>
-                </div>
-
-                <div className="space-y-4">
-                    <label className="block font-sans text-[10px] md:text-xs text-gray-500 uppercase tracking-widest ml-1">Interesuje nas...</label>
-                    <div className="flex flex-wrap gap-3">
-                    {['Zdjęcia', 'Jeszcze nie wiemy'].map((opt) => (
-                        <label
-                            key={opt}
-                            className="relative flex-shrink-0 group cursor-pointer"
-                        >
-                        <input 
-                            type="radio" 
-                            name="offer" 
-                            value={opt}
-                            checked={formData.offer === opt}
-                            onChange={handleChange}
-                            className="peer sr-only" 
-                        />
-                        <span className="block px-4 py-2 border rounded-full font-sans text-[10px] md:text-xs uppercase tracking-widest transition-all duration-300 backdrop-blur-sm border-brand-black/10 bg-white/40 hover:bg-white/60 peer-checked:bg-brand-black peer-checked:text-white peer-checked:shadow-lg">
-                            {opt}
-                        </span>
-                        </label>
-                    ))}
-                    </div>
                 </div>
 
                 {status === 'error' && (
