@@ -18,6 +18,8 @@ type BrevoLeadInput = {
   distanceKm?: number;
   pricingTier?: string;
   pricingQuote?: string;
+  // Routes a wedding Fotostacja lead to the Classic / Editorial style choice.
+  portraitPilot?: 'editorial-p1';
 };
 
 const buildReadableError = async (response: Response) => {

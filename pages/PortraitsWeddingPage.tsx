@@ -357,6 +357,8 @@ export const PortraitsWeddingPage: React.FC = () => {
         distanceKm: distanceData.distanceKm,
         pricingTier: distanceData.tier,
         pricingQuote: distanceData.pricingQuote,
+        // Every enquiry now opens the Classic / Editorial choice before an offer.
+        portraitPilot: 'editorial-p1',
       });
 
       setStatus('success');
@@ -757,9 +759,14 @@ export const PortraitsWeddingPage: React.FC = () => {
                 </div>
 
                 <label className="grid gap-2">
-                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Liczba gości</span>
+                  <span className="font-sans text-[10px] font-bold uppercase tracking-[0.24em] text-gray-500 pl-2">Liczba gości *</span>
                   <input
                     name="guests"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    step={1}
+                    required
                     value={formData.guests}
                     onChange={handleChange}
                     placeholder="Ile gości planujecie na swoim przyjęciu?"

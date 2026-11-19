@@ -132,7 +132,7 @@ inquiry.addEventListener('submit', async event => {
       source: 'hidden_offer_portraits', eventName: 'zapytanie_o_termin',
       timestamp, eventTimestamp: timestamp, interestedOffers: ['Fotostacja portretowa'],
       inquiryMessage: [
-        'Fotostacja Edytorialna · Pilotaż P1 · ' + pilot.id,
+        'Fotostacja Edytorialna · ' + pilot.id,
         packageName + ': ' + money(amount), 'Format odbitek: do wyboru w ankiecie przed weselem',
         'Kolor cyfrowy: ' + (packageName === 'Exclusive' ? 'w cenie' : hasColorAddon ? '+300 zł' : 'nie wybrano'),
         'Razem bez transportu: ' + money(amount + (hasColorAddon ? COLOR_PRICE : 0)),
