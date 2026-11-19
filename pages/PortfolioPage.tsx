@@ -322,6 +322,113 @@ const generatePortfolio = () => {
     },
   ];
 
+  const additions: PortfolioItem[] = [
+    {
+      id: 2022,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-22-reception-cheer.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-22-reception-cheer-preview.avif',
+      title: 'Wszyscy w górę',
+      category: 'Black & White',
+      location: 'Przyjęcie',
+      alt: 'Goście wiwatujący przy stole podczas przyjęcia w ogrodzie',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2023,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-23-rings-golden-frame.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-23-rings-golden-frame-preview.avif',
+      title: 'Obrączki w złotej ramie',
+      category: 'Editorial',
+      location: 'Detale',
+      alt: 'Dłonie pary młodej z obrączkami na tle obrazu w złotej ramie',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2024,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-24-guest-laughter.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-24-guest-laughter-preview.avif',
+      title: 'Najlepsze życzenia',
+      category: 'Black & White',
+      location: 'Ceremonia',
+      alt: 'Roześmiany gość składający życzenia parze młodej',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2025,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-25-church-ceremony.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-25-church-ceremony-preview.avif',
+      title: 'Przed ołtarzem',
+      category: 'Black & White',
+      location: 'Ceremonia',
+      alt: 'Para młoda klęcząca przed ołtarzem podczas ceremonii w kościele',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2026,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-26-masquerade-guests.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-26-masquerade-guests-preview.avif',
+      title: 'Bal maskowy',
+      category: 'Editorial',
+      location: 'Przyjęcie',
+      alt: 'Goście w maskach na schodach przed wejściem do sali',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2027,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-27-masquerade-couple.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-27-masquerade-couple-preview.avif',
+      title: 'Maskarada',
+      category: 'Editorial',
+      location: 'Przyjęcie',
+      alt: 'Para młoda w czarnych maskach wśród czerwonej dekoracji',
+      aspectRatio: '2 / 3',
+      width: 1200,
+      height: 1800,
+    },
+    {
+      id: 2028,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-28-sparkler-exit.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-28-sparkler-exit-preview.avif',
+      title: 'Wielkie wyjście',
+      category: 'Wedding',
+      location: 'Przyjęcie',
+      alt: 'Para młoda w kabriolecie wśród gości z zimnymi ogniami',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+    {
+      id: 2029,
+      type: 'image',
+      src: '/uploads/2026/07/portfolio/portfolio-2026-29-veil-close.avif',
+      previewSrc: '/uploads/2026/07/portfolio/portfolio-2026-29-veil-close-preview.avif',
+      title: 'Bliżej',
+      category: 'Editorial',
+      location: 'Plener',
+      alt: 'Para młoda twarzą w twarz pod welonem',
+      aspectRatio: '3 / 2',
+      width: 1800,
+      height: 1200,
+    },
+  ];
+
   const combined = [...images];
 
   // 2. Distribute the newest photographs through the full story instead of
@@ -339,6 +446,11 @@ const generatePortfolio = () => {
   const newestInsertPositions = [8, 20, 32, 43, 52];
   newestImages.forEach((image, index) => {
     combined.splice(newestInsertPositions[index], 0, image);
+  });
+
+  const additionInsertPositions = [3, 11, 19, 26, 34, 41, 49, 57];
+  additions.forEach((image, index) => {
+    combined.splice(additionInsertPositions[index], 0, image);
   });
 
   return combined;
@@ -408,7 +520,7 @@ export const PortfolioPage: React.FC = () => {
        <div className="max-w-[1800px] mx-auto relative z-10">
             
             {/* --- HEADER --- */}
-            <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-24 gap-8 border-b border-brand-black/10 pb-12">
+            <header className="mx-auto flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-24 gap-8 border-b border-brand-black/10 pb-12 md:w-[88%] lg:w-[80%]">
                 <div className="w-full md:w-auto text-left">
                     <span className="font-sans text-[10px] md:text-xs font-bold uppercase tracking-[0.3em] text-gray-500 block mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-brand-black rounded-full"></span>
@@ -421,8 +533,8 @@ export const PortfolioPage: React.FC = () => {
                 </div>
             </header>
 
-            {/* --- MASONRY LAYOUT (CSS COLUMNS) --- */}
-            <section aria-labelledby="portfolio-gallery-heading" className="columns-1 md:columns-2 lg:columns-3 gap-3 space-y-3">
+            {/* --- MASONRY LAYOUT (CSS COLUMNS), at most 80% of the page width on desktop --- */}
+            <section aria-labelledby="portfolio-gallery-heading" className="mx-auto columns-1 gap-3 sm:columns-2 md:w-[88%] lg:w-[80%] lg:columns-3 xl:columns-4">
                 <h2 id="portfolio-gallery-heading" className="sr-only">
                     Galeria portfolio Sobotki Weddings
                 </h2>
@@ -430,7 +542,7 @@ export const PortfolioPage: React.FC = () => {
                         <div
                             key={item.id}
                             onClick={() => openLightbox(index)}
-                            className="break-inside-avoid mb-2 relative group overflow-hidden cursor-zoom-in bg-gray-200"
+                            className="break-inside-avoid mb-3 relative group overflow-hidden cursor-zoom-in bg-gray-200"
                         >
                             <div
                                 className="relative w-full overflow-hidden bg-gray-200/80"
@@ -462,7 +574,7 @@ export const PortfolioPage: React.FC = () => {
                                     !failedImages.has(item.id) ? (
                                         <img 
                                             src={item.previewSrc ?? item.src}
-                                            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                                            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 27vw, (min-width: 640px) 50vw, 100vw"
                                             alt={item.alt}
                                             loading="lazy"
                                             decoding="async"
