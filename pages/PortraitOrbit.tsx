@@ -74,8 +74,15 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
     const pointers = useRef(new Map<number, { x: number; y: number }>());
     const gesture = useRef<{ moved: boolean; pinch: number; zoom: number } | null>(null);
     const frame = useRef(0);
-    const [zoomLevel, setZoomLevel] = useState(toSlider(range.min));
     const [zoomed, setZoomed] = useState(false);
+    const zoomedRef = useRef(false);
+    const sliderRef = useRef<HTMLDivElement>(null);
+    // Size each tile was last laid out at. Frames in between only scale from it on
+    // the GPU; the real width/height (and a sharp re-raster) follow once motion stops.
+    const committed = useRef<Array<{ w: number; h: number } | null>>([]);
+    const direct = useRef(false);
+    const lastFrame = useRef(0);
+    const commitTimer = useRef(0);
     const [hintGone, setHintGone] = useState(false);
 
     const clampPan = () => {
@@ -85,65 +92,104 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
         v.ty = clamp(v.ty, -limit, limit);
     };
 
-    const render = () => {
-        const stage = stageRef.current;
-        if (!stage) return;
+    /** Where every tile sits for the current view, after the lens. */
+    const layout = (stage: HTMLDivElement) => {
         const v = view.current;
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const ease = reduced ? 1 : 0.2;
-        v.zoom += (v.tZoom - v.zoom) * ease;
-        v.x += (v.tx - v.x) * ease;
-        v.y += (v.ty - v.y) * ease;
-
         const width = stage.clientWidth;
         const height = stage.clientHeight;
         const radius = Math.min(width, height) / 2;
-
-        tiles.forEach((tile, index) => {
-            const item = itemsRef.current[index];
-            if (!item) return;
+        return tiles.map((tile) => {
             // Map the tile's corners through the lens so neighbours stay packed.
             const x0 = tile.x * v.zoom + v.x;
             const y0 = tile.y * v.zoom + v.y;
             const x1 = x0 + tile.w * v.zoom;
             const y1 = y0 + tile.h * v.zoom;
-            const corners = [lens(x0, y0, radius), lens(x1, y0, radius), lens(x0, y1, radius), lens(x1, y1, radius)];
-            const left = Math.min(...corners.map((c) => c[0]));
-            const right = Math.max(...corners.map((c) => c[0]));
-            const top = Math.min(...corners.map((c) => c[1]));
-            const bottom = Math.max(...corners.map((c) => c[1]));
+            const [ax, ay] = lens(x0, y0, radius);
+            const [bx, by] = lens(x1, y0, radius);
+            const [cx, cy] = lens(x0, y1, radius);
+            const [dx, dy] = lens(x1, y1, radius);
+            const left = Math.min(ax, bx, cx, dx);
+            const right = Math.max(ax, bx, cx, dx);
+            const top = Math.min(ay, by, cy, dy);
+            const bottom = Math.max(ay, by, cy, dy);
             // A slight inset hides the overlap the lens adds between bounding boxes.
             const insetX = (right - left) * 0.03;
             const insetY = (bottom - top) * 0.03;
-            const w = right - left - 2 * insetX;
             const distance = Math.hypot((x0 + x1) / 2, (y0 + y1) / 2) / radius;
-            const opacity = clamp(2.2 - distance, 0, 1);
-            const hidden = opacity < 0.02 || w < 3;
+            return {
+                x: width / 2 + left + insetX,
+                y: height / 2 + top + insetY,
+                w: right - left - 2 * insetX,
+                h: bottom - top - 2 * insetY,
+                distance,
+                opacity: clamp(2.2 - distance, 0, 1),
+            };
+        });
+    };
 
-            item.style.visibility = hidden ? 'hidden' : '';
-            item.tabIndex = opacity < 0.4 ? -1 : 0;
-            if (hidden) return;
-            // Real width/height, not a scale(): Safari then rasterises each tile at the
-            // size it is shown, which keeps GPU memory small on phones.
-            item.style.transform = `translate3d(${(width / 2 + left + insetX).toFixed(1)}px, ${(height / 2 + top + insetY).toFixed(1)}px, 0)`;
-            item.style.width = `${w.toFixed(1)}px`;
-            item.style.height = `${(bottom - top - 2 * insetY).toFixed(1)}px`;
-            item.style.opacity = String(opacity);
-            item.style.zIndex = String(Math.round(1000 - distance * 100));
-
+    /** Lay tiles out at their real size and swap image resolution: only when still. */
+    const commit = () => {
+        const stage = stageRef.current;
+        if (!stage) return;
+        layout(stage).forEach((rect, index) => {
+            const item = itemsRef.current[index];
+            if (!item || rect.opacity < 0.02 || rect.w < 3) return;
+            item.style.width = `${rect.w.toFixed(1)}px`;
+            item.style.height = `${rect.h.toFixed(1)}px`;
+            item.style.transform = `translate3d(${rect.x.toFixed(1)}px, ${rect.y.toFixed(1)}px, 0)`;
+            committed.current[index] = { w: rect.w, h: rect.h };
             // Full-resolution photo only while a tile is shown large; swap back when it
-            // shrinks so decoded images do not pile up in memory.
+            // shrinks so decoded images do not pile up in memory (the iOS black screen).
             const image = item.querySelector('img');
-            if (!image) return;
-            const wantFull = w > 300;
-            if (wantFull !== (item.dataset.full === '1')) {
+            const wantFull = rect.w > 300;
+            if (image && wantFull !== (item.dataset.full === '1')) {
                 item.dataset.full = wantFull ? '1' : '';
                 image.src = wantFull ? portraitsData[index].src : portraitsData[index].thumbnail;
             }
         });
+    };
 
-        const settled = Math.abs(v.tZoom - v.zoom) < 0.001 && Math.abs(v.tx - v.x) < 0.3 && Math.abs(v.ty - v.y) < 0.3;
-        frame.current = settled ? 0 : requestAnimationFrame(render);
+    const render = (now: number) => {
+        const stage = stageRef.current;
+        if (!stage) return;
+        const v = view.current;
+        const dt = Math.min(64, now - (lastFrame.current || now - 16));
+        lastFrame.current = now;
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // Fingers and the slider move the view 1:1; buttons and taps glide (frame-rate independent).
+        const ease = reduced || direct.current ? 1 : 1 - Math.exp(-dt / 85);
+        v.zoom += (v.tZoom - v.zoom) * ease;
+        v.x += (v.tx - v.x) * ease;
+        v.y += (v.ty - v.y) * ease;
+
+        layout(stage).forEach((rect, index) => {
+            const item = itemsRef.current[index];
+            if (!item) return;
+            const hidden = rect.opacity < 0.02 || rect.w < 3;
+            item.style.visibility = hidden ? 'hidden' : '';
+            item.tabIndex = rect.opacity < 0.4 ? -1 : 0;
+            if (hidden) return;
+            const base = committed.current[index];
+            if (!base) {
+                item.style.width = `${rect.w}px`;
+                item.style.height = `${rect.h}px`;
+                committed.current[index] = { w: rect.w, h: rect.h };
+            }
+            const from = committed.current[index]!;
+            item.style.transform = `translate3d(${rect.x.toFixed(2)}px, ${rect.y.toFixed(2)}px, 0) scale(${(rect.w / from.w).toFixed(4)}, ${(rect.h / from.h).toFixed(4)})`;
+            item.style.opacity = rect.opacity.toFixed(3);
+            item.style.zIndex = String(Math.round(1000 - rect.distance * 100));
+        });
+
+        const settled = Math.abs(v.tZoom - v.zoom) < 0.0005 && Math.abs(v.tx - v.x) < 0.2 && Math.abs(v.ty - v.y) < 0.2;
+        window.clearTimeout(commitTimer.current);
+        if (settled) {
+            frame.current = 0;
+            lastFrame.current = 0;
+            commitTimer.current = window.setTimeout(commit, 140);
+        } else {
+            frame.current = requestAnimationFrame(render);
+        }
     };
 
     const kick = () => {
@@ -151,7 +197,16 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
     };
 
     /** Zoom to `next`, keeping the point at (px, py) – relative to the centre – still. */
-    const zoomTo = (next: number, px = 0, py = 0) => {
+    const showLevel = (zoom: number) => {
+        const slider = sliderRef.current;
+        if (!slider) return;
+        const level = clamp(toSlider(zoom), 0, 1);
+        slider.style.setProperty('--level', level.toFixed(4));
+        slider.setAttribute('aria-valuenow', String(Math.round(level * 100)));
+    };
+
+    const zoomTo = (next: number, px = 0, py = 0, immediate = false) => {
+        direct.current = immediate;
         const v = view.current;
         const target = clamp(next, range.min, range.max);
         const ratio = target / v.tZoom;
@@ -163,8 +218,13 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
             v.ty = 0;
         }
         clampPan();
-        setZoomLevel(toSlider(target));
-        setZoomed(target > range.min * 1.08);
+        // Direct DOM updates: re-rendering 40 tiles per gesture step is what made it stutter.
+        showLevel(target);
+        const isZoomed = target > range.min * 1.08;
+        if (isZoomed !== zoomedRef.current) {
+            zoomedRef.current = isZoomed;
+            setZoomed(isZoomed);
+        }
         kick();
     };
 
@@ -180,24 +240,43 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
                 v.tZoom = range.min;
                 v.zoom = range.min;
             }
-            setZoomLevel(toSlider(v.tZoom));
+            showLevel(v.tZoom);
+            committed.current = [];
             kick();
         };
         const observer = new ResizeObserver(fit);
         observer.observe(stage);
+        fit();
 
-        // The wheel acts as the crown. At either end of the range it hands the
-        // scroll back to the page, so the section never traps the visitor.
+        // Plain wheel and two-finger trackpad scrolling belong to the page. Only a
+        // trackpad pinch zooms: browsers report it as wheel + ctrlKey (Chrome, Edge,
+        // Firefox) or as gesture events (Safari).
         const onWheel = (event: WheelEvent) => {
-            const v = view.current;
-            const zoomingIn = event.deltaY < 0;
-            if ((zoomingIn && v.tZoom >= range.max - 0.001) || (!zoomingIn && v.tZoom <= range.min + 0.001)) return;
+            if (!event.ctrlKey) return;
             event.preventDefault();
             setHintGone(true);
             const rect = stage.getBoundingClientRect();
             const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-            zoomTo(v.tZoom * Math.exp(-delta * 0.0012), event.clientX - rect.left - rect.width / 2, event.clientY - rect.top - rect.height / 2);
+            zoomTo(view.current.tZoom * Math.exp(-delta * 0.01), event.clientX - rect.left - rect.width / 2, event.clientY - rect.top - rect.height / 2, true);
         };
+        let gestureStart = 1;
+        type SafariGesture = Event & { scale: number; clientX: number; clientY: number };
+        const onGestureStart = (event: Event) => {
+            // On iPhone the pointer handlers already pinch; this is for Safari on a Mac trackpad.
+            if (pointers.current.size) return;
+            event.preventDefault();
+            gestureStart = view.current.tZoom;
+        };
+        const onGestureChange = (event: Event) => {
+            if (pointers.current.size) return;
+            event.preventDefault();
+            setHintGone(true);
+            const gesture = event as SafariGesture;
+            const rect = stage.getBoundingClientRect();
+            zoomTo(gestureStart * gesture.scale, gesture.clientX - rect.left - rect.width / 2, gesture.clientY - rect.top - rect.height / 2, true);
+        };
+        stage.addEventListener('gesturestart', onGestureStart);
+        stage.addEventListener('gesturechange', onGestureChange);
         stage.addEventListener('wheel', onWheel, { passive: false });
 
         // iOS Safari does not reliably honour touch-action changes made after load,
@@ -210,6 +289,9 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
         return () => {
             observer.disconnect();
             stage.removeEventListener('wheel', onWheel);
+            stage.removeEventListener('gesturestart', onGestureStart);
+            stage.removeEventListener('gesturechange', onGestureChange);
+            window.clearTimeout(commitTimer.current);
             stage.removeEventListener('touchmove', onTouchMove);
             cancelAnimationFrame(frame.current);
         };
@@ -242,7 +324,7 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
         if (pointers.current.size >= 2) {
             const [a, b] = [...pointers.current.values()];
             const mid = relative((a.x + b.x) / 2, (a.y + b.y) / 2);
-            zoomTo(g.zoom * (Math.hypot(a.x - b.x, a.y - b.y) / g.pinch), mid.x, mid.y);
+            zoomTo(g.zoom * (Math.hypot(a.x - b.x, a.y - b.y) / g.pinch), mid.x, mid.y, true);
             setHintGone(true);
             return;
         }
@@ -253,6 +335,7 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
         // In the overview a vertical swipe belongs to the page (touch-action: pan-y).
         if (!g.moved) event.currentTarget.setPointerCapture(event.pointerId);
         g.moved = true;
+        direct.current = true;
         v.tx += dx;
         v.ty += v.tZoom > range.min * 1.08 || event.pointerType === 'mouse' ? dy : 0;
         clampPan();
@@ -275,17 +358,17 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
     };
 
     // Vertical "crown" on the right: drag along the track to zoom.
-    const sliderRef = useRef<HTMLDivElement>(null);
+    const level = () => toSlider(view.current.tZoom);
     const dragSlider = (clientY: number) => {
         const rect = sliderRef.current!.getBoundingClientRect();
-        zoomTo(fromSlider(1 - (clientY - rect.top) / rect.height));
+        zoomTo(fromSlider(1 - (clientY - rect.top) / rect.height), 0, 0, true);
         setHintGone(true);
     };
     const onSliderKey = (event: ReactKeyboardEvent<HTMLDivElement>) => {
         const steps: Record<string, number> = { ArrowUp: 0.08, ArrowRight: 0.08, ArrowDown: -0.08, ArrowLeft: -0.08, PageUp: 0.25, PageDown: -0.25 };
         if (event.key === 'Home') zoomTo(range.min);
         else if (event.key === 'End') zoomTo(range.max);
-        else if (event.key in steps) zoomTo(fromSlider(zoomLevel + steps[event.key]));
+        else if (event.key in steps) zoomTo(fromSlider(level() + steps[event.key]));
         else return;
         event.preventDefault();
     };
@@ -296,7 +379,6 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
                 className="portrait-orbit__stage"
                 ref={stageRef}
                 data-zoomed={zoomed}
-                data-lenis-prevent
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
@@ -318,6 +400,7 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
                             // Keyboard focus brings the photo to the centre.
                             const v = view.current;
                             const tile = tiles[index];
+                            direct.current = false;
                             v.tx = -(tile.x + tile.w / 2) * v.tZoom;
                             v.ty = -(tile.y + tile.h / 2) * v.tZoom;
                             clampPan();
@@ -331,7 +414,7 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
             </div>
 
             <div className="portrait-orbit__crown" aria-label="Powiększenie galerii">
-                <button type="button" onClick={() => zoomTo(fromSlider(zoomLevel + 0.18))} aria-label="Powiększ">
+                <button type="button" onClick={() => zoomTo(fromSlider(level() + 0.18))} aria-label="Powiększ">
                     <Plus size={16} aria-hidden="true" />
                 </button>
                 <div
@@ -343,7 +426,6 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
                     aria-label="Powiększenie zdjęć"
                     aria-valuemin={0}
                     aria-valuemax={100}
-                    aria-valuenow={Math.round(zoomLevel * 100)}
                     onKeyDown={onSliderKey}
                     onPointerDown={(event) => {
                         event.currentTarget.setPointerCapture(event.pointerId);
@@ -352,12 +434,11 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
                     onPointerMove={(event) => {
                         if (event.currentTarget.hasPointerCapture(event.pointerId)) dragSlider(event.clientY);
                     }}
-                    style={{ '--level': zoomLevel } as CSSProperties}
                 >
                     <span className="portrait-orbit__fill" aria-hidden="true" />
                     <span className="portrait-orbit__knob" aria-hidden="true" />
                 </div>
-                <button type="button" onClick={() => zoomTo(fromSlider(zoomLevel - 0.18))} aria-label="Pomniejsz">
+                <button type="button" onClick={() => zoomTo(fromSlider(level() - 0.18))} aria-label="Pomniejsz">
                     <Minus size={16} aria-hidden="true" />
                 </button>
                 <button
@@ -373,7 +454,7 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
             </div>
 
             <p className="portrait-orbit__hint" data-gone={hintGone} aria-hidden="true">
-                <span className="portrait-orbit__hint-desktop">Przewiń kółkiem nad zdjęciami lub użyj suwaka, aby je powiększyć</span>
+                <span className="portrait-orbit__hint-desktop">Użyj suwaka lub rozsuń palce na gładziku, aby powiększyć</span>
                 <span className="portrait-orbit__hint-touch">Rozsuń dwa palce lub użyj suwaka, aby powiększyć</span>
             </p>
         </section>
