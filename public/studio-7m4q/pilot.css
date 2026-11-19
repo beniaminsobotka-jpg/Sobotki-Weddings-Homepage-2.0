@@ -108,3 +108,10 @@
 @media (prefers-reduced-motion: reduce) {
   .choice-pair article, .cover-frames img { transition: none; }
 }
+
+/* Centre the style choice on wider screens: heading above, the pair beneath it. */
+@media (min-width: 641px) {
+  .portrait-pilot #choice { text-align: center; }
+  .portrait-pilot #choice h1, .portrait-pilot #choice > p { margin-inline: auto; }
+  .portrait-pilot .choice-pair { margin-inline: auto; text-align: left; }
+}
