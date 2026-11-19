@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { PortraitMasonry, portraitsData } from './PortraitMasonry';
 import { PortraitHeroBackdrop } from './PortraitHeroBackdrop';
+import { PortraitStylePicker } from './PortraitStylePicker';
 
 export const PortraitsPage: React.FC = () => {
     const [selectedindex, setSelectedIndex] = useState<number | null>(null);
@@ -153,6 +154,11 @@ export const PortraitsPage: React.FC = () => {
                                 </p>
                             </div>
                         </div>
+                    </div>
+
+                    {/* --- STYLE PICKER --- */}
+                    <div className="border-t border-white/10 pt-16">
+                        <PortraitStylePicker />
                     </div>
 
                     {/* --- COMPARISON SECTION --- */}
