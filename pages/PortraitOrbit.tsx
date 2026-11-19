@@ -4,41 +4,64 @@ import { Minus, Plus, RotateCcw } from 'lucide-react';
 import { portraitsData } from './PortraitMasonry';
 import './portrait-orbit.css';
 
-// Apple Watch–style honeycomb: round thumbnails packed in rings around the centre.
-// Photos shrink and pull inward towards the edge (a fisheye), and the "crown"
-// (wheel, slider, pinch) zooms the whole field in and out.
+// Watch-style zoomable gallery: the photos keep their own aspect ratio and are
+// packed into a masonry whose column heights trace a circle. A radial fisheye
+// squeezes everything past mid-radius, and the "crown" (wheel, slider, pinch)
+// zooms the whole field in and out.
 
-const BUBBLE = 132; // bubble diameter at zoom 1, in px
-const MAX_SIZE = 320; // rendered element size; bubbles are scaled down from this
-// The overview is the most zoomed-out state (the whole honeycomb fits the stage),
-// so scrolling down past the gallery never gets caught zooming out first.
-// The range is fitted to the stage size on every resize.
-const range = { min: 0.5, max: 2.6 };
+const COLUMN = 150; // column width at zoom 1, in world px
+const GAP = 10;
 
-/** Axial hex coordinates in a spiral: centre, then ring 1, ring 2… */
-function spiral(count: number) {
-    const directions = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
-    const cells: Array<[number, number]> = [[0, 0]];
-    for (let ring = 1; cells.length < count; ring++) {
-        let q = -ring;
-        let r = ring;
-        for (const [dq, dr] of directions) {
-            for (let step = 0; step < ring && cells.length < count; step++) {
-                cells.push([q, r]);
-                q += dq;
-                r += dr;
-            }
-        }
-    }
-    return cells;
+type Tile = { x: number; y: number; w: number; h: number };
+
+/** Masonry inside a circle: fill whichever column is furthest below its circular target height. */
+function circularMasonry(): { tiles: Tile[]; radius: number } {
+    const area = portraitsData.reduce((sum, photo) => sum + (COLUMN + GAP) * (COLUMN / photo.ratio + GAP), 0);
+    const radius = Math.sqrt(area / Math.PI) * 1.04;
+    let columns = Math.max(3, Math.round((2 * radius) / (COLUMN + GAP)));
+    if (columns % 2 === 0) columns += 1;
+    const centres = Array.from({ length: columns }, (_, i) => (i - (columns - 1) / 2) * (COLUMN + GAP));
+    const targets = centres.map((x) => 2 * Math.sqrt(Math.max(radius * radius - x * x, (COLUMN * 0.8) ** 2)));
+    const stacks: number[][] = centres.map(() => []);
+    const filled = centres.map(() => 0);
+
+    portraitsData.forEach((photo, index) => {
+        let best = 0;
+        centres.forEach((_, column) => {
+            if (filled[column] / targets[column] < filled[best] / targets[best]) best = column;
+        });
+        stacks[best].push(index);
+        filled[best] += COLUMN / photo.ratio + GAP;
+    });
+
+    const tiles: Tile[] = [];
+    stacks.forEach((stack, column) => {
+        // Centre each column vertically so the outline stays round.
+        let y = -(filled[column] - GAP) / 2;
+        stack.forEach((index) => {
+            const h = COLUMN / portraitsData[index].ratio;
+            tiles[index] = { x: centres[column] - COLUMN / 2, y, w: COLUMN, h };
+            y += h + GAP;
+        });
+    });
+    return { tiles, radius };
 }
 
-// Centre-to-centre spacing leaves a small gap between neighbouring bubbles.
-const cells = spiral(portraitsData.length).map(([q, r]) => ({
-    x: (q + r / 2) * BUBBLE * 1.1,
-    y: r * BUBBLE * 1.1 * (Math.sqrt(3) / 2),
-}));
-const EXTENT = Math.max(...cells.map(({ x, y }) => Math.hypot(x, y))) + BUBBLE / 2;
+const { tiles, radius: EXTENT } = circularMasonry();
+
+// The overview is the most zoomed-out state (the whole circle fits the stage),
+// so scrolling down past the gallery never gets caught zooming out first.
+// The range is fitted to the stage size on every resize.
+const range = { min: 0.5, max: 3 };
+
+/** Radial fisheye: identity up to half the radius, then increasingly compressed. */
+const lens = (x: number, y: number, radius: number) => {
+    const r = Math.hypot(x, y);
+    const n = r / radius;
+    if (n <= 0.5) return [x, y];
+    const k = (radius * (0.5 + (n - 0.5) / (1 + 1.25 * (n - 0.5)))) / r;
+    return [x * k, y * k];
+};
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const toSlider = (zoom: number) => Math.log(zoom / range.min) / Math.log(range.max / range.min);
@@ -76,27 +99,46 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
         const height = stage.clientHeight;
         const radius = Math.min(width, height) / 2;
 
-        cells.forEach((cell, index) => {
+        tiles.forEach((tile, index) => {
             const item = itemsRef.current[index];
             if (!item) return;
-            const dx = cell.x * v.zoom + v.x;
-            const dy = cell.y * v.zoom + v.y;
-            const distance = Math.hypot(dx, dy) / radius;
-            // Fisheye: past ~half the radius bubbles shrink and slide towards the centre.
-            const pull = 1 / (1 + 0.45 * Math.max(0, distance - 0.45));
-            const size = BUBBLE * v.zoom * clamp(1.08 - 0.62 * distance * distance, 0.18, 1.08);
-            const scale = size / MAX_SIZE;
-            const opacity = clamp(2.1 - distance, 0, 1);
-            item.style.transform = `translate3d(${width / 2 + dx * pull - MAX_SIZE / 2}px, ${height / 2 + dy * pull - MAX_SIZE / 2}px, 0) scale(${scale})`;
+            // Map the tile's corners through the lens so neighbours stay packed.
+            const x0 = tile.x * v.zoom + v.x;
+            const y0 = tile.y * v.zoom + v.y;
+            const x1 = x0 + tile.w * v.zoom;
+            const y1 = y0 + tile.h * v.zoom;
+            const corners = [lens(x0, y0, radius), lens(x1, y0, radius), lens(x0, y1, radius), lens(x1, y1, radius)];
+            const left = Math.min(...corners.map((c) => c[0]));
+            const right = Math.max(...corners.map((c) => c[0]));
+            const top = Math.min(...corners.map((c) => c[1]));
+            const bottom = Math.max(...corners.map((c) => c[1]));
+            // A slight inset hides the overlap the lens adds between bounding boxes.
+            const insetX = (right - left) * 0.03;
+            const insetY = (bottom - top) * 0.03;
+            const w = right - left - 2 * insetX;
+            const distance = Math.hypot((x0 + x1) / 2, (y0 + y1) / 2) / radius;
+            const opacity = clamp(2.2 - distance, 0, 1);
+            const hidden = opacity < 0.02 || w < 3;
+
+            item.style.visibility = hidden ? 'hidden' : '';
+            item.tabIndex = opacity < 0.4 ? -1 : 0;
+            if (hidden) return;
+            // Real width/height, not a scale(): Safari then rasterises each tile at the
+            // size it is shown, which keeps GPU memory small on phones.
+            item.style.transform = `translate3d(${(width / 2 + left + insetX).toFixed(1)}px, ${(height / 2 + top + insetY).toFixed(1)}px, 0)`;
+            item.style.width = `${w.toFixed(1)}px`;
+            item.style.height = `${(bottom - top - 2 * insetY).toFixed(1)}px`;
             item.style.opacity = String(opacity);
             item.style.zIndex = String(Math.round(1000 - distance * 100));
-            item.style.visibility = opacity < 0.02 ? 'hidden' : '';
-            item.tabIndex = opacity < 0.4 ? -1 : 0;
-            // Swap to the full photo once a bubble is shown large.
-            if (size > 230 && !item.dataset.full) {
-                item.dataset.full = '1';
-                const image = item.querySelector('img');
-                if (image) image.src = portraitsData[index].src;
+
+            // Full-resolution photo only while a tile is shown large; swap back when it
+            // shrinks so decoded images do not pile up in memory.
+            const image = item.querySelector('img');
+            if (!image) return;
+            const wantFull = w > 300;
+            if (wantFull !== (item.dataset.full === '1')) {
+                item.dataset.full = wantFull ? '1' : '';
+                image.src = wantFull ? portraitsData[index].src : portraitsData[index].thumbnail;
             }
         });
 
@@ -132,8 +174,8 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
             const v = view.current;
             const atOverview = v.tZoom <= range.min + 0.001;
             const radius = Math.min(stage.clientWidth, stage.clientHeight) / 2;
-            range.min = clamp((radius * 1.05) / EXTENT, 0.28, 1.1);
-            range.max = Math.max(2.6, range.min * 4);
+            range.min = clamp((radius * 1.08) / EXTENT, 0.25, 1.2);
+            range.max = Math.max(2.4, range.min * 4.5);
             if (atOverview) {
                 v.tZoom = range.min;
                 v.zoom = range.min;
@@ -157,10 +199,18 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
             zoomTo(v.tZoom * Math.exp(-delta * 0.0012), event.clientX - rect.left - rect.width / 2, event.clientY - rect.top - rect.height / 2);
         };
         stage.addEventListener('wheel', onWheel, { passive: false });
+
+        // iOS Safari does not reliably honour touch-action changes made after load,
+        // so block page scrolling directly while zoomed in or pinching.
+        const onTouchMove = (event: TouchEvent) => {
+            if (event.touches.length > 1 || view.current.tZoom > range.min * 1.08) event.preventDefault();
+        };
+        stage.addEventListener('touchmove', onTouchMove, { passive: false });
         kick();
         return () => {
             observer.disconnect();
             stage.removeEventListener('wheel', onWheel);
+            stage.removeEventListener('touchmove', onTouchMove);
             cancelAnimationFrame(frame.current);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -204,7 +254,7 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
         if (!g.moved) event.currentTarget.setPointerCapture(event.pointerId);
         g.moved = true;
         v.tx += dx;
-        v.ty += zoomed || event.pointerType === 'mouse' ? dy : 0;
+        v.ty += v.tZoom > range.min * 1.08 || event.pointerType === 'mouse' ? dy : 0;
         clampPan();
         kick();
     };
@@ -261,20 +311,21 @@ export function PortraitOrbit({ onOpen }: { onOpen: (index: number) => void }) {
                         key={photo.id}
                         ref={(node) => { itemsRef.current[index] = node; }}
                         type="button"
-                        className="portrait-orbit__bubble"
-                        style={{ width: MAX_SIZE, height: MAX_SIZE, '--i': index } as CSSProperties}
+                        className="portrait-orbit__tile"
+                        style={{ '--i': index } as CSSProperties}
                         onClick={() => onOpen(index)}
                         onFocus={() => {
                             // Keyboard focus brings the photo to the centre.
                             const v = view.current;
-                            v.tx = -cells[index].x * v.tZoom;
-                            v.ty = -cells[index].y * v.tZoom;
+                            const tile = tiles[index];
+                            v.tx = -(tile.x + tile.w / 2) * v.tZoom;
+                            v.ty = -(tile.y + tile.h / 2) * v.tZoom;
                             clampPan();
                             kick();
                         }}
                         aria-label={`Powiększ zdjęcie: ${photo.alt}`}
                     >
-                        <img src={photo.thumbnail} alt="" draggable={false} loading={index < 19 ? 'eager' : 'lazy'} decoding="async" />
+                        <img src={photo.thumbnail} alt="" draggable={false} decoding="async" />
                     </button>
                 ))}
             </div>
