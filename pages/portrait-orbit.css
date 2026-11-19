@@ -1,0 +1,246 @@
+/* Watch-style circular gallery: full-bleed black stage with round photos. */
+.portrait-orbit {
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  isolation: isolate;
+}
+
+.portrait-orbit__stage {
+  position: relative;
+  height: min(100svh, 920px);
+  min-height: 560px;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.05), transparent 75%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 82%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 82%, transparent 100%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* Once zoomed in, one finger pans the photos instead of scrolling the page. */
+.portrait-orbit__stage[data-zoomed="true"] {
+  touch-action: none;
+}
+
+.portrait-orbit__stage:active {
+  cursor: grabbing;
+}
+
+.portrait-orbit__bubble {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 30px 60px rgba(0, 0, 0, 0.55);
+  will-change: transform, opacity;
+  -webkit-tap-highlight-color: transparent;
+  animation: portrait-orbit-in 0.9s var(--ease) backwards;
+  animation-delay: calc(var(--i) * 18ms);
+}
+
+.portrait-orbit__bubble img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  pointer-events: none;
+  transition: transform 0.6s var(--ease);
+}
+
+@media (hover: hover) {
+  .portrait-orbit__bubble:hover img {
+    transform: scale(1.06);
+  }
+}
+
+.portrait-orbit__bubble:focus-visible {
+  outline: 6px solid #ff0000;
+  outline-offset: 6px;
+}
+
+@keyframes portrait-orbit-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The crown: a liquid-glass pill with + / − and a vertical track. */
+.portrait-orbit__crown {
+  position: absolute;
+  top: 50%;
+  right: clamp(12px, 3vw, 40px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, 0.16), transparent 45%),
+    rgba(14, 14, 14, 0.5);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 16px 50px rgba(0, 0, 0, 0.5);
+}
+
+.portrait-orbit__crown button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #fff;
+  transition: background-color 0.3s, transform 0.3s var(--ease);
+}
+
+.portrait-orbit__crown button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.portrait-orbit__crown button:active {
+  transform: scale(0.9);
+}
+
+.portrait-orbit__track {
+  --level: 0;
+  position: relative;
+  width: 36px;
+  height: clamp(140px, 22vh, 220px);
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.portrait-orbit__track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.portrait-orbit__fill {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  height: calc(var(--level) * 100%);
+  margin-left: -2px;
+  border-radius: 4px;
+  background: #ff0000;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
+}
+
+.portrait-orbit__knob {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--level) * 100%);
+  width: 26px;
+  height: 26px;
+  margin: 0 0 -13px -13px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.portrait-orbit__track:focus-visible {
+  outline: 2px solid #ff0000;
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.portrait-orbit__reset {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.portrait-orbit__reset[data-visible="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.portrait-orbit__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  z-index: 2;
+  max-width: calc(100% - 32px);
+  padding: 9px 16px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background: rgba(10, 10, 10, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+
+.portrait-orbit__hint[data-gone="true"] {
+  opacity: 0;
+}
+
+.portrait-orbit__hint-touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .portrait-orbit__hint-desktop {
+    display: none;
+  }
+  .portrait-orbit__hint-touch {
+    display: inline;
+  }
+}
+
+@media (max-width: 767px) {
+  .portrait-orbit__stage {
+    height: min(118vw, 640px);
+    min-height: 420px;
+  }
+  .portrait-orbit__crown {
+    right: 10px;
+    padding: 8px 6px;
+    gap: 6px;
+  }
+  .portrait-orbit__crown button,
+  .portrait-orbit__track {
+    width: 32px;
+  }
+  .portrait-orbit__track {
+    height: 120px;
+  }
+  .portrait-orbit__hint {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait-orbit__bubble {
+    animation: none;
+  }
+}

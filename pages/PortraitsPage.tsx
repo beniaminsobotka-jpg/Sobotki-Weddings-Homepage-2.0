@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Star, Camera, Sparkles, Users, MonitorPlay, Check, ArrowRight, ArrowUpRight, Calendar, Briefcase } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
-import { PortraitMasonry, portraitsData } from './PortraitMasonry';
+import { portraitsData } from './PortraitMasonry';
+import { PortraitOrbit } from './PortraitOrbit';
 import { PortraitHeroBackdrop } from './PortraitHeroBackdrop';
 import { PortraitStylePicker } from './PortraitStylePicker';
 
@@ -60,7 +61,7 @@ export const PortraitsPage: React.FC = () => {
             </header>
 
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
-                <PortraitMasonry onOpen={openLightbox} />
+                <PortraitOrbit onOpen={openLightbox} />
 
                 {/* --- DETAILED CONTENT SECTION --- */}
                 <div className="mt-32 max-w-5xl mx-auto space-y-24">

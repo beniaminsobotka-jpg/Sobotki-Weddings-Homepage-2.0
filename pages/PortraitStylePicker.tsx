@@ -161,7 +161,7 @@ export function PortraitStylePicker() {
         // Swallow the click that follows a drag so it does not also rotate the fan.
         const swallow = (click: MouseEvent) => { click.stopPropagation(); click.preventDefault(); };
         window.addEventListener('click', swallow, { capture: true, once: true });
-        window.setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0);
+        window.setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 400);
     };
 
     const spread = narrow ? 40 : 46;
