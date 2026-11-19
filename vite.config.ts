@@ -18,7 +18,6 @@ export default defineConfig({
         notFound: new URL('./404.html', import.meta.url).pathname,
         main: new URL('./index.html', import.meta.url).pathname,
         portfolio: new URL('./portfolio/index.html', import.meta.url).pathname,
-        film: new URL('./film/index.html', import.meta.url).pathname,
         kontakt: new URL('./kontakt/index.html', import.meta.url).pathname,
         portraits: new URL('./portraits/index.html', import.meta.url).pathname,
         portraitsWedding: new URL('./portraits/wedding/index.html', import.meta.url).pathname,

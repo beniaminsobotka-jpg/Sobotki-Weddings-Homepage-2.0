@@ -18,8 +18,14 @@
     {
       "source": "/best-of/:shareToken",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "Referrer-Policy", "value": "no-referrer" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
       ]
     }
   ],
@@ -43,6 +49,13 @@
     {
       "source": "/panel/:path*",
       "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/film",
+      "destination": "/portfolio",
+      "permanent": true
     }
   ]
 }

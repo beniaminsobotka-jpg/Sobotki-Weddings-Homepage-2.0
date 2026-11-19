@@ -8,7 +8,6 @@ const TODAY = new Date().toISOString().slice(0, 10);
 const ROUTES = [
   '/',
   '/portfolio',
-  '/film',
   '/portraits',
   '/portraits/wedding',
   '/portraits/event',

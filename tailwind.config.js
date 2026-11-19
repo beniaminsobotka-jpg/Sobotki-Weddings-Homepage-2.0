@@ -3,7 +3,6 @@ export default {
   content: [
     './index.html',
     './portfolio/index.html',
-    './film/index.html',
     './kontakt/index.html',
     './portraits/index.html',
     './portraits/wedding/index.html',

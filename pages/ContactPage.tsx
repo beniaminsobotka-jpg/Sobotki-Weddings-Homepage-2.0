@@ -10,8 +10,8 @@ export const ContactPage: React.FC = () => {
       <header className="sr-only">
         <h1>Kontakt z Sobotki Weddings</h1>
         <p>
-          Formularz kontaktowy dla par i klientów biznesowych zainteresowanych fotografią ślubną,
-          filmem i fotostacją premium.
+          Formularz kontaktowy dla par i klientów biznesowych zainteresowanych fotografią ślubną
+          i fotostacją premium.
         </p>
       </header>
       <div className="pt-24 md:pt-28">

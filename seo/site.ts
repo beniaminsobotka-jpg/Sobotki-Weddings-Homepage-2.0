@@ -15,7 +15,6 @@ export const SITE_DEFAULT_IMAGE =
 export type SeoPageKey =
   | 'home'
   | 'portfolio'
-  | 'film'
   | 'portraits'
   | 'portraitsWedding'
   | 'portraitsEvent'
@@ -43,18 +42,10 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
   },
   portfolio: {
     path: '/portfolio',
-    title: 'Portfolio ślubne | Zdjęcia i filmy - Sobotki Weddings',
+    title: 'Portfolio ślubne | Zdjęcia ślubne - Sobotki Weddings',
     description:
-      'Portfolio Sobotki Weddings: reportaż ślubny, kadry editorialowe i filmowe historie. Zobacz realizacje zdjęciowe i video w autorskim stylu.',
+      'Portfolio Sobotki Weddings: reportaż ślubny, kadry editorialowe i naturalne historie. Zobacz nasze realizacje zdjęciowe w autorskim stylu.',
     image: '/uploads/2026/03/Karuzela_homepage_1.jpg',
-    ogType: 'website',
-  },
-  film: {
-    path: '/film',
-    title: 'Film ślubny | Emocjonalne filmy ślubne - Sobotki Weddings',
-    description:
-      'Tworzymy poruszające filmy ślubne, które zachowują emocje, rytm dnia i autentyczne relacje. Poznaj nasze podejście do video ślubnego.',
-    image: '/uploads/2026/03/AdaxMarcin-miniaturka-www.avif',
     ogType: 'website',
   },
   portraits: {
@@ -93,7 +84,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     path: '/kontakt',
     title: 'Kontakt | Sobotki Weddings i Sobotki Portraits',
     description:
-      'Skontaktuj się z Sobotki Weddings w sprawie fotografii ślubnej, filmu lub fotostacji Sobotki Portraits. Napisz do nas i zapytaj o termin.',
+      'Skontaktuj się z Sobotki Weddings w sprawie fotografii ślubnej lub fotostacji Sobotki Portraits. Napisz do nas i zapytaj o termin.',
     image: '/uploads/2026/03/O-Nas_compressed_2.webp',
     ogType: 'website',
   },
@@ -101,7 +92,7 @@ export const seoPages: Record<SeoPageKey, PageSeo> = {
     path: '/404',
     title: '404 | Sobotki Weddings',
     description:
-      'Ta podstrona nie istnieje. Wróć do strony głównej Sobotki Weddings i przejdź do portfolio, filmu, portraits lub kontaktu.',
+      'Ta podstrona nie istnieje. Wróć do strony głównej Sobotki Weddings i przejdź do portfolio, portraits lub kontaktu.',
     image: '/uploads/2026/03/Karuzela_homepage_2.jpg',
     ogType: 'website',
     robots: 'noindex,follow',

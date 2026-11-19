@@ -17,7 +17,6 @@ const PortraitsPage = lazy(async () => ({ default: (await import('./pages/Portra
 const PortraitsEventPage = lazy(async () => ({ default: (await import('./pages/PortraitsEventPage')).PortraitsEventPage }));
 const PortraitsWeddingPage = lazy(async () => ({ default: (await import('./pages/PortraitsWeddingPage')).PortraitsWeddingPage }));
 const PortraitsStationaryPage = lazy(async () => ({ default: (await import('./pages/PortraitsStationaryPage')).PortraitsStationaryPage }));
-const FilmPage = lazy(async () => ({ default: (await import('./pages/FilmPage')).FilmPage }));
 const ContactPage = lazy(async () => ({ default: (await import('./pages/ContactPage')).ContactPage }));
 const EditorialHomepage = lazy(async () => ({ default: (await import('./pages/EditorialHomepage')).EditorialHomepage }));
 const GalleryPage = lazy(async () => ({ default: (await import('./pages/GalleryPage')).GalleryPage }));
@@ -68,7 +67,7 @@ const AppShell: React.FC<{
   const isPortraitsRoute = location.pathname.startsWith('/portraits');
   const showLiquidBackground =
     !isStandaloneRoute &&
-    (isPortraitsRoute || ['/', '/film', '/kontakt'].includes(location.pathname));
+    (isPortraitsRoute || ['/', '/kontakt'].includes(location.pathname));
 
   useEffect(() => {
     document.body.classList.toggle('theme-noir', isPortraitsRoute);
@@ -137,7 +136,7 @@ const AppShell: React.FC<{
                 <Route path="/home" element={<Navigate to="/" replace />} />
                 <Route path="/contact" element={<Navigate to="/kontakt" replace />} />
                 <Route path="/portfolio" element={<PortfolioPage />} />
-                <Route path="/film" element={<FilmPage />} />
+                <Route path="/film" element={<Navigate to="/portfolio" replace />} />
                 <Route path="/kontakt" element={<ContactPage />} />
                 <Route path="/portraits" element={<PortraitsPage />} />
                 <Route path="/portraits/event" element={<PortraitsEventPage />} />

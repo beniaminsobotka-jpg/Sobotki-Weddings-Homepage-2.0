@@ -13,7 +13,7 @@ export const NotFoundPage: React.FC = () => {
         </h1>
         <p className="mt-6 max-w-xl font-sans text-sm leading-relaxed text-brand-black/70 md:text-base">
           Link jest nieaktualny albo ścieżka została wpisana błędnie. Wróć na stronę główną albo
-          przejdź bezpośrednio do portfolio, filmu, portraits lub kontaktu.
+          przejdź bezpośrednio do portfolio, portraits lub kontaktu.
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Link

@@ -322,34 +322,9 @@ const generatePortfolio = () => {
     },
   ];
 
-  // 2. Generate Videos
-  // Explicitly defining URLs to handle case sensitivity differences (e.g. 3rd video has lowercase 'd')
-  const videoUrls = [
-      "/uploads/2026/02/Do-portfolio-1.mp4",
-      "/uploads/2026/02/Do-portfolio-2.mp4",
-      "/uploads/2026/02/do-Portfolio-3.mp4"
-  ];
-
-  const videos: PortfolioItem[] = videoUrls.map((src, i) => ({
-    id: 1000 + i + 1, // Unique IDs for videos
-    type: 'video',
-    src: src,
-    title: `Motion Story ${i + 1}`,
-    category: 'Wedding', // Assign to a category (or make a new one 'Video')
-    location: 'Film',
-    alt: `Film ślubny Sobotki Weddings - realizacja ${i + 1}`,
-    aspectRatio: '4 / 5',
-    width: 1080,
-    height: 1350,
-  }));
-
-  // 3. Weave them together (Insert videos at specific indices for visual balance)
   const combined = [...images];
-  combined.splice(4, 0, videos[0]);  // Insert near top
-  combined.splice(14, 0, videos[1]); // Insert middle
-  combined.splice(24, 0, videos[2]); // Insert lower
 
-  // 4. Distribute the newest photographs through the full story instead of
+  // 2. Distribute the newest photographs through the full story instead of
   // grouping them at the end. This keeps colour and black-and-white frames balanced.
   const insertPositions = [2, 7, 11, 16, 20, 25, 29, 34, 38, 42, 46, 49];
   recentImages.forEach((image, index) => {
