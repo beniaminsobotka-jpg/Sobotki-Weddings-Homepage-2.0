@@ -85,3 +85,26 @@
   .portrait-pilot #choice article > p { font-size: .85rem; }
   .portrait-pilot #choice .button { padding: 10px 8px; letter-spacing: .07em; min-height: 44px; font-size: 9px; }
 }
+
+/* Style choice: smaller cards with rotating photos, a gentle lift and a red frame on hover. */
+.choice-eyebrow { display: inline-flex; align-items: center; gap: 10px; }
+.choice-eyebrow span { width: 7px; height: 7px; border-radius: 50%; background: var(--color-red); box-shadow: 0 0 10px rgba(240, 25, 25, .6); }
+.portrait-pilot .choice-pair { max-width: 940px; gap: clamp(16px, 3.4vw, 48px); }
+.choice-pair article { transition: transform .6s cubic-bezier(.16, 1, .3, 1); }
+.choice-pair .cover-link { position: relative; margin-bottom: 18px; border-radius: 22px; outline: 3px solid transparent; outline-offset: 0; transition: outline-color .3s, box-shadow .6s cubic-bezier(.16, 1, .3, 1); }
+.portrait-pilot .choice-pair .cover { position: relative; aspect-ratio: 4/5; margin: 0; overflow: hidden; border-radius: 22px; background: #111; }
+.cover-frames img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; opacity: 0; transform: scale(1.04); transition: opacity .7s ease, transform 1.6s cubic-bezier(.16, 1, .3, 1); }
+.cover-frames img.is-active { opacity: 1; transform: none; }
+.cover-tag { position: absolute; left: 14px; bottom: 14px; padding: 7px 14px; border-radius: 999px; background: rgba(5, 5, 5, .55); -webkit-backdrop-filter: blur(12px) saturate(160%); backdrop-filter: blur(12px) saturate(160%); border: 1px solid rgba(255, 255, 255, .18); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+@media (hover: hover) {
+  .choice-pair article:has(.cover-link[href]:hover), .choice-pair article:has(.button:hover) { transform: scale(1.03); }
+  .choice-pair article:has(.cover-link[href]:hover) .cover-link, .choice-pair article:has(.button:hover) .cover-link { outline-color: var(--color-red); box-shadow: 0 24px 60px rgba(240, 25, 25, .18); }
+}
+.choice-pair .cover-link[href]:focus-visible { outline-color: var(--color-red); }
+@media (max-width: 640px) {
+  .choice-pair .cover-link, .portrait-pilot .choice-pair .cover { border-radius: 16px; }
+  .cover-tag { left: 8px; bottom: 8px; padding: 5px 9px; font-size: 8px; letter-spacing: .12em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .choice-pair article, .cover-frames img { transition: none; }
+}

@@ -2020,3 +2020,47 @@ legend,
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Back to the Classic / Editorial choice, shown only for leads that came from it. */
+.style-choice-back {
+  position: absolute;
+  top: clamp(20px, 3vw, 34px);
+  left: max(var(--page-gutter, 24px), 24px);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(16, 16, 16, 0.32);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.style-choice-back:hover,
+.style-choice-back:focus-visible {
+  border-color: var(--color-red);
+  background: var(--color-red);
+}
+
+@media (max-width: 760px) {
+  /* Under the centred logo on phones, so the two never collide. */
+  .style-choice-back {
+    top: 96px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+}

@@ -10,8 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://use.typekit.net/oiv8gfj.css">
   <link rel="stylesheet" href="../offers/v1/base.css">
-  <link rel="stylesheet" href="./pilot.css?porownanie=4">
-  <script src="./pilot.js?porownanie=4" defer></script>
+  <link rel="stylesheet" href="./pilot.css?porownanie=5">
+  <script src="./pilot.js?porownanie=5" defer></script>
 </head>
 <body class="portrait-pilot">
 <main class="pilot-main">
@@ -35,18 +35,28 @@
     </form>
   </section>
   <section id="choice" hidden>
-    <p class="eyebrow">Wybierzcie swój styl</p>
+    <p class="eyebrow choice-eyebrow"><span aria-hidden="true"></span>Wybierzcie swój styl</p>
     <h1>Jaka Fotostacja<br><em class="serif-accent">pasuje do Was?</em></h1>
-    <div class="pair">
+    <div class="pair choice-pair">
       <article>
-        <a id="classic" class="cover-link" aria-label="Zobacz ofertę Klasyczną"><img class="cover" src="../offers/v1/assets/mosaic/dv8gj-93.webp" alt="Czarno-biały portret na jasnym tle"></a>
+        <a id="classic" class="cover-link" aria-label="Zobacz ofertę Klasyczną">
+          <span class="cover cover-frames" data-frames="../offers/v1/assets/mosaic/dv8gj-93.webp,/media/portraits-wedding-styles/classic-1-840.webp,/media/portraits-best-of/079.webp,/media/portraits-wedding-styles/classic-2-840.webp,/media/portraits-best-of/048.webp,/media/portraits-wedding-styles/classic-3-840.webp">
+            <img class="is-active" src="../offers/v1/assets/mosaic/dv8gj-93.webp" alt="Czarno-biały portret na jasnym tle">
+          </span>
+          <span class="cover-tag">Klasyczna</span>
+        </a>
         <p class="eyebrow">01 / Czyste tło, swobodne portrety</p>
         <h2>Klasyczna</h2>
         <p>Czarno-białe portrety na jasnym tle. Goście mogą przychodzić solo, w parach i w większych grupach.</p>
         <a id="classicCta" class="button button-primary">Zobacz Klasyczną →</a>
       </article>
       <article>
-        <a id="editorialCover" class="cover-link" href="#edytorialna" aria-label="Zobacz ofertę Edytorialną"><img class="cover" src="./photos/cover.webp" alt="Pionowy portret na tle drapowanej scenografii"></a>
+        <a id="editorialCover" class="cover-link" href="#edytorialna" aria-label="Zobacz ofertę Edytorialną">
+          <span class="cover cover-frames" data-frames="./photos/cover.webp,./photos/12.webp,./photos/08.webp,./photos/14.webp,./photos/06.webp,./photos/11.webp">
+            <img class="is-active" src="./photos/cover.webp" alt="Pionowy portret na tle drapowanej scenografii">
+          </span>
+          <span class="cover-tag">Edytorialna</span>
+        </a>
         <p class="eyebrow">02 / Portrety jak z sesji modowej</p>
         <h2>Edytorialna</h2>
         <p>Drapowana scenografia, wyrazisty błysk i głównie pionowe kadry. Najlepsza solo, w duecie lub w trójkę. Na wesela <strong>do 120 gości</strong>.</p>

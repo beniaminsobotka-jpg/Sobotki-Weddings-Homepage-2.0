@@ -322,3 +322,33 @@ document.addEventListener('visibilitychange', syncPhone);
 motion.addEventListener('change', syncPhone);
 
 unlock();
+
+// Style choice covers: each card cycles through its own photos, the two out of step.
+document.querySelectorAll('.cover-frames').forEach((frame, index) => {
+  const sources = frame.dataset.frames.split(',');
+  const alt = frame.querySelector('img').alt;
+  let current = 0;
+  let busy = false;
+  let visible = false;
+  new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; }).observe(frame);
+  const advance = async () => {
+    if (busy || !visible || document.hidden || motion.matches || byId('choice').hidden) return;
+    busy = true;
+    const next = (current + 1) % sources.length;
+    const image = new Image();
+    image.src = sources[next];
+    image.alt = alt;
+    try {
+      // Reveal only a decoded photo so a card never flashes empty.
+      await image.decode();
+      frame.append(image);
+      void image.offsetWidth; // commit the hidden state first so the fade runs
+      frame.querySelectorAll('img.is-active').forEach(old => old.classList.remove('is-active'));
+      image.classList.add('is-active');
+      setTimeout(() => frame.querySelectorAll('img').forEach(old => { if (old !== image) old.remove(); }), 900);
+      current = next;
+    } catch { /* Skip a photo that fails to load. */ }
+    finally { busy = false; }
+  };
+  setTimeout(() => setInterval(advance, 1800), index * 900);
+});
