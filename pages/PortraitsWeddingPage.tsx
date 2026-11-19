@@ -4,6 +4,7 @@ import { ArrowUpRight, Camera, Check, ChevronDown, Download, Loader2, Printer, S
 import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { subscribeToBrevo } from '../utils/brevo';
+import { clearSavedOffer, readSavedOffer, saveOffer } from '../utils/savedOffer';
 import { WeddingGalleryShuffle } from './WeddingGalleryShuffle';
 import { WeddingPortraitStyles } from './WeddingPortraitStyles';
 
@@ -318,6 +319,9 @@ export const PortraitsWeddingPage: React.FC = () => {
     notes: '',
   });
 
+  // A couple who already sent the form gets straight back to their offer instead.
+  const [savedOffer, setSavedOffer] = useState(() => readSavedOffer());
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -377,6 +381,7 @@ export const PortraitsWeddingPage: React.FC = () => {
         resolvedLocation: distanceData.resolvedLocation,
       }));
 
+      saveOffer(leadResponse.offerPath);
       window.location.href = leadResponse.offerPath || '/oferta-portrety/';
     } catch (error) {
       if (error instanceof Error) {
@@ -683,7 +688,31 @@ export const PortraitsWeddingPage: React.FC = () => {
           </div>
 
           <div className="rounded-[24px] border border-white/10 bg-black/40 p-8 shadow-2xl md:p-10">
-            {status === 'success' ? (
+            {savedOffer && status !== 'success' ? (
+              <div className="py-8 text-center">
+                <Sparkles size={28} className="mx-auto text-[#FF0000] mb-6" strokeWidth={1} />
+                <h3 className="font-serif text-3xl md:text-4xl text-white mb-4 uppercase">Wasza oferta czeka</h3>
+                <p className="font-sans text-sm md:text-base text-gray-400 mb-8 max-w-sm mx-auto leading-relaxed">
+                  Formularz został już wysłany. Waszą ofertę z wyborem Fotostacji Klasycznej i Edytorialnej otworzycie jednym kliknięciem.
+                </p>
+                <a
+                  href={savedOffer.path}
+                  className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF0000] px-9 py-4 font-sans text-[11px] font-bold uppercase tracking-[0.22em] text-white shadow-[0_12px_40px_rgba(255,0,0,0.35)] transition-transform hover:-translate-y-0.5"
+                >
+                  Przejdź do oferty →
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearSavedOffer();
+                    setSavedOffer(null);
+                  }}
+                  className="mt-6 block w-full font-sans text-[11px] uppercase tracking-[0.18em] text-gray-500 underline-offset-4 transition-colors hover:text-white hover:underline"
+                >
+                  Wyślij nowe zapytanie
+                </button>
+              </div>
+            ) : status === 'success' ? (
               <div className="py-10 text-center">
                 <div role="status" aria-live="polite">
                 <Sparkles size={28} className="mx-auto text-[#FF0000] mb-6" strokeWidth={1} />

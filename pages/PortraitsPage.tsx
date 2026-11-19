@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Seo } from '../components/Seo';
 import { portraitsData } from './PortraitMasonry';
 import { PortraitOrbit } from './PortraitOrbit';
+import { SavedOfferPill } from './SavedOfferPill';
 import { PortraitHeroBackdrop } from './PortraitHeroBackdrop';
 import { PortraitStylePicker } from './PortraitStylePicker';
 
@@ -43,6 +44,7 @@ export const PortraitsPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-transparent text-white pb-24 relative selection:bg-white selection:text-black">
             <Seo page="portraits" />
+            <SavedOfferPill />
 
             <header className="portraits-hero">
                 <PortraitHeroBackdrop />

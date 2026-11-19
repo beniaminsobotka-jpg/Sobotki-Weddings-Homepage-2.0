@@ -53,6 +53,10 @@ async function unlock() {
       throw new Error('Ten link nie odblokowuje pilotażowej oferty.');
     }
     lead = result.lead;
+    // Remember this offer so /portraits shows "Przejdź do oferty" instead of the form (60 days).
+    try {
+      localStorage.setItem('sobotki_portraits_offer', JSON.stringify({ path: location.pathname + location.search, expiresAt: Date.now() + 60 * 864e5 }));
+    } catch { /* Storage unavailable: the form shows again next time. */ }
     const classic = '/oferta-portrety/?access=' + encodeURIComponent(access);
     byId('classic').href = classic;
     byId('classicCta').href = classic;

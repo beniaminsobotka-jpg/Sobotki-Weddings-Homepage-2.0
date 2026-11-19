@@ -545,6 +545,17 @@ function populateAndRevealSavedLead(parsed, { trackView = false } = {}) {
   return true;
 }
 
+// Remember the couple's offer so /portraits shows "Przejdź do oferty" instead of the form (60 days).
+function rememberOffer(lead, accessToken) {
+  const route = lead?.editorialPilot?.id === "editorial-p1" ? "/studio-7m4q/" : "/oferta-portrety/";
+  try {
+    localStorage.setItem("sobotki_portraits_offer", JSON.stringify({
+      path: `${route}?access=${encodeURIComponent(accessToken)}`,
+      expiresAt: Date.now() + 60 * 864e5,
+    }));
+  } catch { /* Storage unavailable: the form shows again next time. */ }
+}
+
 // Couples who reached this offer from the Classic / Editorial choice get a way back to it.
 function showStyleChoiceBack(lead, accessToken) {
   if (lead?.editorialPilot?.id !== "editorial-p1" || document.querySelector(".style-choice-back")) return;
@@ -570,6 +581,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       localStorage.setItem("sobotki_lead_portraits", JSON.stringify(result.lead));
       showStyleChoiceBack(result.lead, accessToken);
+      rememberOffer(result.lead, accessToken);
       if (populateAndRevealSavedLead(result.lead, { trackView: true })) return;
     }
 
