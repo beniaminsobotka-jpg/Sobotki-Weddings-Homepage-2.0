@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, ImageOff } from 'lucide-react';
-import { LiquidBackground } from '../components/LiquidBackground';
 import { Seo } from '../components/Seo';
 
 type PortfolioItem = {
@@ -23,9 +22,11 @@ const generatePortfolio = () => {
   const categories = ["Wedding", "Elopement", "Editorial", "Black & White"];
   const locations = ["Toskania", "Warszawa", "Tatry", "Sycylia", "Mazury", "Kraków", "Islandia"];
 
-  // 1. Generate Images
+  // 1. Generate Images. Most of the original set is landscape, so each keeps its real size.
+  const landscapeIds = new Set([2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 17, 19, 22, 23, 24, 26, 29, 30, 33, 34, 35]);
   const images: PortfolioItem[] = Array.from({ length: 35 }, (_, i) => {
     const id = i + 1;
+    const landscape = landscapeIds.has(id);
     return {
       id,
       type: 'image',
@@ -34,9 +35,9 @@ const generatePortfolio = () => {
       category: categories[id % categories.length],
       location: locations[id % locations.length],
       alt: `Fotografia ślubna Sobotki Weddings - ${categories[id % categories.length]} w ${locations[id % locations.length]}`,
-      aspectRatio: '2 / 3',
-      width: 1365,
-      height: 2048,
+      aspectRatio: landscape ? '3 / 2' : '2 / 3',
+      width: landscape ? 2048 : 1365,
+      height: landscape ? 1365 : 2048,
     };
   });
 
@@ -453,8 +454,29 @@ const generatePortfolio = () => {
     combined.splice(additionInsertPositions[index], 0, image);
   });
 
-  return combined;
+  return mixOrientations(combined);
 };
+
+/**
+ * Interleave portrait and landscape frames evenly (keeping each group's own
+ * order), so the masonry never stacks a run of the same shape.
+ */
+const mixOrientations = (items: PortfolioItem[]) => {
+  const portraits = items.filter((item) => item.height > item.width);
+  const landscapes = items.filter((item) => item.height <= item.width);
+  const mixed: PortfolioItem[] = [];
+  let p = 0;
+  let l = 0;
+  while (p < portraits.length || l < landscapes.length) {
+    // Take from whichever group is further behind its fair share.
+    const portraitShare = portraits.length ? p / portraits.length : 1;
+    const landscapeShare = landscapes.length ? l / landscapes.length : 1;
+    mixed.push(portraitShare <= landscapeShare ? portraits[p++] : landscapes[l++]);
+  }
+  return mixed;
+};
+
+const columnCountFor = (width: number) => (width >= 1280 ? 4 : width >= 1024 ? 3 : width >= 640 ? 2 : 1);
 
 const portfolioItems = generatePortfolio();
 
@@ -465,6 +487,34 @@ export const PortfolioPage: React.FC = () => {
 
   // Filter Logic removed
   const filteredItems = portfolioItems;
+
+  // Masonry: each frame goes to one of the shortest columns, in reading order,
+  // preferring a column that does not already end with a frame of the same shape.
+  const [columnCount, setColumnCount] = useState(() => (typeof window === 'undefined' ? 3 : columnCountFor(window.innerWidth)));
+  useEffect(() => {
+    const update = () => setColumnCount(columnCountFor(window.innerWidth));
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  const columns = React.useMemo(() => {
+    const result = Array.from({ length: columnCount }, () => [] as Array<{ item: PortfolioItem; index: number }>);
+    const heights = Array.from({ length: columnCount }, () => 0);
+    const isPortrait = (item: PortfolioItem) => item.height > item.width;
+    filteredItems.forEach((item, index) => {
+      const lowest = Math.min(...heights);
+      const order = heights.map((height, column) => ({ height, column })).sort((a, b) => a.height - b.height);
+      // Within roughly half a tile of the shortest column, alternate shapes.
+      const alternating = order.find(({ height, column }) => {
+        if (height > lowest + 0.55) return false;
+        const last = result[column][result[column].length - 1]?.item;
+        return !last || isPortrait(last) !== isPortrait(item);
+      });
+      const target = (alternating ?? order[0]).column;
+      result[target].push({ item, index });
+      heights[target] += item.height / item.width + 0.02;
+    });
+    return result;
+  }, [columnCount, filteredItems]);
 
   // Error Handler
   const handleImageError = (id: number) => {
@@ -513,10 +563,9 @@ export const PortfolioPage: React.FC = () => {
   }, [selectedImageIndex]);
 
   return (
-    <div className="min-h-screen pt-32 pb-12 md:pb-24 px-4 md:px-8 relative selection:bg-brand-black selection:text-white">
+    <div className="min-h-screen bg-white pt-32 pb-12 md:pb-24 px-4 md:px-8 relative selection:bg-brand-black selection:text-white">
        <Seo page="portfolio" />
-       <LiquidBackground />
-       
+
        <div className="max-w-[1800px] mx-auto relative z-10">
             
             {/* --- HEADER --- */}
@@ -533,16 +582,18 @@ export const PortfolioPage: React.FC = () => {
                 </div>
             </header>
 
-            {/* --- MASONRY LAYOUT (CSS COLUMNS), at most 80% of the page width on desktop --- */}
-            <section aria-labelledby="portfolio-gallery-heading" className="mx-auto columns-1 gap-3 sm:columns-2 md:w-[88%] lg:w-[80%] lg:columns-3 xl:columns-4">
+            {/* --- MASONRY LAYOUT, at most 80% of the page width on desktop --- */}
+            <section aria-labelledby="portfolio-gallery-heading" className="mx-auto flex items-start gap-3 md:w-[88%] lg:w-[80%]">
                 <h2 id="portfolio-gallery-heading" className="sr-only">
                     Galeria portfolio Sobotki Weddings
                 </h2>
-                {filteredItems.map((item, index) => (
+                {columns.map((column, columnIndex) => (
+                  <div key={columnIndex} className="flex min-w-0 flex-1 flex-col gap-3">
+                    {column.map(({ item, index }) => (
                         <div
                             key={item.id}
                             onClick={() => openLightbox(index)}
-                            className="break-inside-avoid mb-3 relative group overflow-hidden cursor-zoom-in bg-gray-200"
+                            className="relative group overflow-hidden cursor-zoom-in bg-gray-100"
                         >
                             <div
                                 className="relative w-full overflow-hidden bg-gray-200/80"
@@ -574,7 +625,7 @@ export const PortfolioPage: React.FC = () => {
                                     !failedImages.has(item.id) ? (
                                         <img 
                                             src={item.previewSrc ?? item.src}
-                                            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 27vw, (min-width: 640px) 50vw, 100vw"
+                                            sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 27vw, (min-width: 640px) 44vw, 92vw"
                                             alt={item.alt}
                                             loading="lazy"
                                             decoding="async"
@@ -597,6 +648,8 @@ export const PortfolioPage: React.FC = () => {
                             </div>
                         </div>
                     ))}
+                  </div>
+                ))}
             </section>
 
             {/* --- LIGHTBOX MODAL --- */}
@@ -609,7 +662,7 @@ export const PortfolioPage: React.FC = () => {
                         role="dialog"
                         aria-modal="true"
                         aria-label="Podgląd elementu portfolio"
-                        className="fixed inset-0 z-[100] bg-brand-paper/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
+                        className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
                         onClick={closeLightbox}
                     >
                         <button 
